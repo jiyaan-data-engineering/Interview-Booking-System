@@ -65,6 +65,12 @@ export default function SlotCard({ slot, children, showCandidate = true }: SlotC
           <div className="text-slate-400 text-sm font-semibold mb-1">Duration</div>
           <div className="text-white text-lg">{slot.duration}</div>
         </div>
+        {slot.round && (
+          <div>
+            <div className="text-slate-400 text-sm font-semibold mb-1">Round</div>
+            <div className="text-white text-lg">{slot.round}</div>
+          </div>
+        )}
       </div>
 
       {showCandidate && isBooked && (

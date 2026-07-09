@@ -79,13 +79,14 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 4000);
   };
 
-  const handleCandidateRegistration = (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string) => {
+  const handleCandidateRegistration = (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => {
     const newSlot: InterviewSlot = {
       id: Date.now().toString(),
       date,
       time,
       company,
       duration,
+      round,
       candidateName,
       candidateEmail: email,
       candidatePhone: phone,

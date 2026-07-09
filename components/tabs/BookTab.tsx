@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface BookTabProps {
-  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string) => void;
+  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => void;
 }
 
 export default function BookTab({ onBook }: BookTabProps) {
@@ -15,6 +15,7 @@ export default function BookTab({ onBook }: BookTabProps) {
     time: '',
     company: '',
     duration: '',
+    round: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -28,9 +29,8 @@ export default function BookTab({ onBook }: BookTabProps) {
     e.preventDefault();
 
     if (formData.name && formData.email && formData.phone && formData.date &&
-        formData.time && formData.company && formData.duration) {
+        formData.time && formData.company && formData.duration && formData.round) {
 
-      // Submit candidate registration with all details
       onBook(
         formData.name,
         formData.email,
@@ -38,7 +38,8 @@ export default function BookTab({ onBook }: BookTabProps) {
         formData.date,
         formData.time,
         formData.company,
-        formData.duration
+        formData.duration,
+        formData.round
       );
 
       setSubmitted(true);
@@ -50,6 +51,7 @@ export default function BookTab({ onBook }: BookTabProps) {
         time: '',
         company: '',
         duration: '',
+        round: '',
       });
 
       setTimeout(() => setSubmitted(false), 5000);
@@ -210,6 +212,26 @@ export default function BookTab({ onBook }: BookTabProps) {
                   <option value="1 hour">1 hour</option>
                   <option value="1.5 hours">1.5 hours</option>
                   <option value="2 hours">2 hours</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Interview Round *
+                </label>
+                <select
+                  name="round"
+                  className="input-field"
+                  value={formData.round}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Round</option>
+                  <option value="Screening">Screening</option>
+                  <option value="L1">L1</option>
+                  <option value="L2">L2</option>
+                  <option value="Client">Client</option>
+                  <option value="HR">HR</option>
                 </select>
               </div>
             </div>

@@ -104,6 +104,12 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                 <div className="text-slate-400 text-sm font-semibold mb-1">Duration</div>
                 <div className="text-white text-lg">{slot.duration}</div>
               </div>
+              {slot.round && (
+                <div>
+                  <div className="text-slate-400 text-sm font-semibold mb-1">Round</div>
+                  <div className="text-white text-lg">{slot.round}</div>
+                </div>
+              )}
             </div>
 
             {slot.reason && (slot.status === 'cancelled' || slot.status === 'postponed') && (

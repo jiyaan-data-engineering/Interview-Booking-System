@@ -6,6 +6,7 @@ export interface InterviewSlot {
   time: string;
   company: string;
   duration: string;
+  round?: string;
   candidateName: string;
   candidateEmail: string;
   candidatePhone: string;
