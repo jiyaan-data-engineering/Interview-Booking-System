@@ -13,15 +13,13 @@ export default function TomorrowScheduleTab({ slots, candidateEmail }: TomorrowS
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
 
-  // Filter for tomorrow's bookings for this candidate, sorted by time
+  // Filter for ALL tomorrow's bookings, sorted by time
   const tomorrowSlots = slots
     .filter(slot => {
       // Must have candidate info
       if (!slot.candidateName || !slot.candidateEmail) return false;
       // Must be tomorrow's date
       if (slot.date !== tomorrowDateStr) return false;
-      // Must match this candidate's email
-      if (slot.candidateEmail !== candidateEmail) return false;
       return true;
     })
     .sort((a, b) => a.time.localeCompare(b.time));
@@ -61,7 +59,7 @@ export default function TomorrowScheduleTab({ slots, candidateEmail }: TomorrowS
     <div>
       <h2 className="text-2xl font-bold text-white mb-2">📆 Tomorrow's Schedule</h2>
       <p className="text-slate-400 mb-6">
-        Your interviews scheduled for {tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        All interviews scheduled for {tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
       </p>
 
       {tomorrowSlots.length === 0 ? (
