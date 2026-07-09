@@ -5,8 +5,6 @@ import {
   deleteDoc,
   doc,
   updateDoc,
-  query,
-  where,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { InterviewSlot } from './types';
