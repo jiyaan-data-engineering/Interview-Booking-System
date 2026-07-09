@@ -9,10 +9,9 @@ interface MyBookingsTabProps {
   onCancel: (slotId: string, reason: string) => Promise<void> | void;
   onMarkCompleted?: (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string) => Promise<void> | void;
   candidateEmail?: string;
-  candidateId?: string;
 }
 
-export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCompleted, candidateEmail, candidateId }: MyBookingsTabProps) {
+export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCompleted, candidateEmail }: MyBookingsTabProps) {
   const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
   const [rescheduleData, setRescheduleData] = useState<Record<string, { date: string; time: string }>>({});
   const [cancelReason, setCancelReason] = useState<Record<string, string>>({});

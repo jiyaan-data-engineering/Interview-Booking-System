@@ -482,7 +482,6 @@ export default function Dashboard() {
                 onCancel={handleCancelBookingWithReason}
                 onMarkCompleted={handleMarkCompleted}
                 candidateEmail={candidateUser?.email || ''}
-                candidateId={candidateUser?.uid || ''}
               />
             )}
 
