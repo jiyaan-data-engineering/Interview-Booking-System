@@ -4,14 +4,19 @@ interface TabNavigationProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   isAdmin?: boolean;
+  isCandidateLoggedIn?: boolean;
 }
 
-export default function TabNavigation({ activeTab, onTabChange, isAdmin = false }: TabNavigationProps) {
-  const candidateTabs: { id: TabType; label: string; icon: string }[] = [
-    { id: 'book', label: 'Book Interview', icon: '📋' },
-    { id: 'mybookings', label: 'My Bookings', icon: '📌' },
-    { id: 'allbookings', label: 'All Bookings', icon: '👥' },
-  ];
+export default function TabNavigation({ activeTab, onTabChange, isAdmin = false, isCandidateLoggedIn = false }: TabNavigationProps) {
+  const candidateTabs: { id: TabType; label: string; icon: string }[] = isCandidateLoggedIn
+    ? [
+        { id: 'book', label: 'Book Interview', icon: '📋' },
+        { id: 'mybookings', label: 'My Bookings', icon: '📌' },
+        { id: 'allbookings', label: 'All Bookings', icon: '👥' },
+      ]
+    : [
+        { id: 'allbookings', label: 'All Bookings', icon: '👥' },
+      ];
 
   const adminTabs: { id: TabType; label: string; icon: string }[] = [
     { id: 'book', label: 'Book Interview', icon: '📋' },

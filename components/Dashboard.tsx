@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { User, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { InterviewSlot } from '@/lib/types';
 import { getSlots, saveSlot, updateSlot, deleteSlot } from '@/lib/firestore';
+import { registerCandidate, loginCandidate, logoutCandidate } from '@/lib/auth';
 import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
@@ -12,11 +15,13 @@ import AnalyticsTab from './tabs/AnalyticsTab';
 import ViewTab from './tabs/ViewTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
+import RegisterForm from './auth/RegisterForm';
+import LoginForm from './auth/LoginForm';
 
 type TabType = 'book' | 'mybookings' | 'allbookings' | 'view' | 'admin';
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState<TabType>('book');
+  const [activeTab, setActiveTab] = useState<TabType>('allbookings');
   const [slots, setSlots] = useState<InterviewSlot[]>([]);
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,8 +31,28 @@ export default function Dashboard() {
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
 
+  // Candidate auth
+  const [candidateUser, setCandidateUser] = useState<User | null>(null);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+
   useEffect(() => {
     const loadData = async () => {
+      // Check Firebase Auth state
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setCandidateUser(user);
+        if (user) {
+          setShowLoginForm(false);
+          setShowRegisterForm(false);
+          // If candidate is logged in, default to 'book' tab
+          setActiveTab('book');
+        } else {
+          // If not logged in, default to 'allbookings' tab
+          setActiveTab('allbookings');
+        }
+      });
+
       // Check if admin is already logged in
       const savedAdmin = localStorage.getItem('isAdmin');
       if (savedAdmin === 'true') {
@@ -47,6 +72,9 @@ export default function Dashboard() {
         setSlots([]);
       }
       setIsLoading(false);
+      setAuthLoading(false);
+
+      return () => unsubscribe();
     };
 
     loadData();
@@ -54,6 +82,33 @@ export default function Dashboard() {
 
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin@123';
+
+  const handleCandidateRegister = async (name: string, email: string, phone: string, password: string) => {
+    try {
+      await registerCandidate(name, email, phone, password);
+      showAlert('Registration successful! Welcome!', 'success');
+    } catch (error: any) {
+      showAlert(error.message || 'Registration failed', 'error');
+    }
+  };
+
+  const handleCandidateLogin = async (email: string, password: string) => {
+    try {
+      await loginCandidate(email, password);
+      showAlert('Login successful! Welcome back!', 'success');
+    } catch (error: any) {
+      showAlert(error.message || 'Login failed', 'error');
+    }
+  };
+
+  const handleCandidateLogout = async () => {
+    try {
+      await logoutCandidate();
+      showAlert('Logged out successfully', 'success');
+    } catch (error: any) {
+      showAlert(error.message || 'Logout failed', 'error');
+    }
+  };
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -279,24 +334,70 @@ export default function Dashboard() {
 
         {alert && <Alert message={alert.message} type={alert.type} />}
 
-        {/* Admin Login/Logout Button */}
-        <div className="mt-4 flex justify-end">
-          {isAdmin ? (
+        {/* Auth Buttons */}
+        <div className="mt-4 flex justify-end gap-2">
+          {candidateUser ? (
+            <button
+              onClick={handleCandidateLogout}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-all"
+            >
+              👤 Logout
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => setShowLoginForm(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all"
+              >
+                🔑 Candidate Login
+              </button>
+              <button
+                onClick={() => setShowRegisterForm(true)}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 transition-all"
+              >
+                📝 Candidate Register
+              </button>
+            </>
+          )}
+          {!isAdmin && (
+            <button
+              onClick={() => setShowAdminLogin(true)}
+              className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-600 transition-all"
+            >
+              🔐 Admin
+            </button>
+          )}
+          {isAdmin && (
             <button
               onClick={handleAdminLogout}
               className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
             >
               🔐 Admin Logout
             </button>
-          ) : (
-            <button
-              onClick={() => setShowAdminLogin(true)}
-              className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-600 transition-all"
-            >
-              🔐 Admin Login
-            </button>
           )}
         </div>
+
+        {/* Candidate Register Form */}
+        {showRegisterForm && (
+          <RegisterForm
+            onRegister={handleCandidateRegister}
+            onSwitchToLogin={() => {
+              setShowRegisterForm(false);
+              setShowLoginForm(true);
+            }}
+          />
+        )}
+
+        {/* Candidate Login Form */}
+        {showLoginForm && (
+          <LoginForm
+            onLogin={handleCandidateLogin}
+            onSwitchToRegister={() => {
+              setShowLoginForm(false);
+              setShowRegisterForm(true);
+            }}
+          />
+        )}
 
         {/* Admin Login Modal */}
         {showAdminLogin && !isAdmin && (
@@ -363,19 +464,21 @@ export default function Dashboard() {
         )}
 
         <div className="card mt-4 overflow-hidden">
-          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} isAdmin={isAdmin} />
+          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} isAdmin={isAdmin} isCandidateLoggedIn={!!candidateUser} />
 
           <div className="p-8">
-            {activeTab === 'book' && (
+            {activeTab === 'book' && candidateUser && (
               <BookTab onBook={handleCandidateRegistration} />
             )}
 
-            {activeTab === 'mybookings' && (
+            {activeTab === 'mybookings' && candidateUser && (
               <MyBookingsTab
                 slots={slots}
                 onReschedule={handleRescheduleBooking}
                 onCancel={handleCancelBookingWithReason}
                 onMarkCompleted={handleMarkCompleted}
+                candidateEmail={candidateUser?.email || ''}
+                candidateId={candidateUser?.uid || ''}
               />
             )}
 
