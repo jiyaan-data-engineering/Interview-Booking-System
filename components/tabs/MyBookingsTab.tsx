@@ -15,8 +15,14 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   const [rescheduleData, setRescheduleData] = useState<Record<string, { date: string; time: string }>>({});
   const [cancelReason, setCancelReason] = useState<Record<string, string>>({});
   const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber: string; feedback: string }>>({});
+  const [candidateEmail, setCandidateEmail] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('candidateEmail') || '';
+    }
+    return '';
+  });
 
-  const bookedSlots = slots.filter(slot => slot.candidateName);
+  const bookedSlots = slots.filter(slot => slot.candidateName && slot.candidateEmail === candidateEmail);
 
   const handleRescheduleClick = (slotId: string, newDate: string, newTime: string) => {
     if (newDate && newTime) {
@@ -61,20 +67,39 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
-  if (bookedSlots.length === 0) {
-    return (
-      <div className="text-center py-16">
-        <div className="text-3xl mb-4">📭</div>
-        <p className="text-slate-400 text-lg mb-2">No interview bookings yet</p>
-        <p className="text-slate-500">Go to "Book Interview" to schedule your first interview</p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <h2 className="text-2xl font-bold text-white mb-2">Your Interview Bookings</h2>
       <p className="text-slate-400 mb-6">View, reschedule, or cancel your interviews</p>
+
+      <div className="mb-6 bg-slate-700/50 rounded-lg p-4 border border-slate-600">
+        <label className="block text-sm font-semibold text-slate-300 mb-2">
+          📧 Enter Your Email to View Your Bookings
+        </label>
+        <input
+          type="email"
+          placeholder="your.email@example.com"
+          value={candidateEmail}
+          onChange={(e) => {
+            setCandidateEmail(e.target.value);
+            localStorage.setItem('candidateEmail', e.target.value);
+          }}
+          className="input-field w-full mb-2"
+        />
+        <p className="text-xs text-slate-400">We'll remember your email for next time</p>
+      </div>
+
+      {bookedSlots.length === 0 ? (
+        <div className="text-center py-16">
+          <div className="text-3xl mb-4">📭</div>
+          <p className="text-slate-400 text-lg mb-2">
+            {candidateEmail ? 'No bookings found for this email' : 'Please enter your email to view bookings'}
+          </p>
+          <p className="text-slate-500">Go to "Book Interview" to schedule your first interview</p>
+        </div>
+      ) : null}
+
+      {bookedSlots.length > 0 && (
 
       <div className="space-y-4">
         {bookedSlots.map(slot => (
@@ -422,6 +447,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

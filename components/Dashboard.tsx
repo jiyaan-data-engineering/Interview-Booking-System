@@ -7,12 +7,13 @@ import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
 import MyBookingsTab from './tabs/MyBookingsTab';
+import AllBookingsTab from './tabs/AllBookingsTab';
 import AnalyticsTab from './tabs/AnalyticsTab';
 import ViewTab from './tabs/ViewTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
 
-type TabType = 'book' | 'mybookings' | 'view' | 'admin';
+type TabType = 'book' | 'mybookings' | 'allbookings' | 'view' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('book');
@@ -376,6 +377,10 @@ export default function Dashboard() {
                 onCancel={handleCancelBookingWithReason}
                 onMarkCompleted={handleMarkCompleted}
               />
+            )}
+
+            {activeTab === 'allbookings' && (
+              <AllBookingsTab slots={slots} />
             )}
 
             {activeTab === 'view' && isAdmin ? (
