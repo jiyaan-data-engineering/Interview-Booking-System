@@ -5,27 +5,41 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  limit,
+  orderBy,
+  query as firestoreQuery,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { InterviewSlot } from './types';
 
 const SLOTS_COLLECTION = 'interview_slots';
+let slotsCache: InterviewSlot[] | null = null;
+let cacheTime = 0;
+const CACHE_DURATION = 30000; // 30 seconds
 
-// Get all slots
+// Get all slots with caching
 export const getSlots = async (): Promise<InterviewSlot[]> => {
   try {
+    // Return cached data if fresh
+    if (slotsCache && Date.now() - cacheTime < CACHE_DURATION) {
+      return slotsCache;
+    }
+
     const querySnapshot = await getDocs(collection(db, SLOTS_COLLECTION));
     const slots: InterviewSlot[] = [];
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach((docSnap) => {
       slots.push({
-        id: doc.id,
-        ...doc.data(),
+        id: docSnap.id,
+        ...docSnap.data(),
       } as InterviewSlot);
     });
+
+    slotsCache = slots;
+    cacheTime = Date.now();
     return slots;
   } catch (error) {
     console.error('Error fetching slots:', error);
-    return [];
+    return slotsCache || [];
   }
 };
 
