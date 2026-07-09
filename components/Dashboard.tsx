@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [slots, setSlots] = useState<InterviewSlot[]>([]);
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     let savedSlots = getSlots();
@@ -158,8 +159,22 @@ export default function Dashboard() {
 
         {alert && <Alert message={alert.message} type={alert.type} />}
 
-        <div className="card mt-6 overflow-hidden">
-          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+        {/* Admin Toggle */}
+        <div className="mt-4 flex justify-end">
+          <button
+            onClick={() => setIsAdmin(!isAdmin)}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              isAdmin
+                ? 'bg-red-600 text-white hover:bg-red-700'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            }`}
+          >
+            {isAdmin ? '🔒 Admin Mode: ON' : '👤 Candidate View'}
+          </button>
+        </div>
+
+        <div className="card mt-4 overflow-hidden">
+          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} isAdmin={isAdmin} />
 
           <div className="p-8">
             {activeTab === 'book' && (

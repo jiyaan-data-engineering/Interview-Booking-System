@@ -3,15 +3,23 @@ type TabType = 'book' | 'mybookings' | 'view' | 'admin';
 interface TabNavigationProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  isAdmin?: boolean;
 }
 
-export default function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
-  const tabs: { id: TabType; label: string; icon: string }[] = [
+export default function TabNavigation({ activeTab, onTabChange, isAdmin = false }: TabNavigationProps) {
+  const candidateTabs: { id: TabType; label: string; icon: string }[] = [
+    { id: 'book', label: 'Book Interview', icon: '📋' },
+    { id: 'mybookings', label: 'My Bookings', icon: '📌' },
+  ];
+
+  const adminTabs: { id: TabType; label: string; icon: string }[] = [
     { id: 'book', label: 'Book Interview', icon: '📋' },
     { id: 'mybookings', label: 'My Bookings', icon: '📌' },
     { id: 'view', label: 'View All Slots', icon: '👀' },
     { id: 'admin', label: 'Admin Panel', icon: '⚙️' },
   ];
+
+  const tabs = isAdmin ? adminTabs : candidateTabs;
 
   return (
     <div className="flex border-b border-slate-700 bg-slate-800/50">
