@@ -131,10 +131,12 @@ export default function AdminTab({
         </button>
         <button
           onClick={() => {
-            if (confirm('⚠️ This will delete ALL interview slots!\n\nMake sure you exported the data first!\n\nContinue?')) {
-              if (slots.length > 0) {
-                slots.forEach(slot => onDeleteSlot(slot.id));
-              }
+            const confirmed = window.confirm('⚠️ WARNING!\n\nThis will DELETE ALL interview slots!\n\nMake sure you exported data first!\n\nContinue?');
+            if (confirmed) {
+              slots.forEach(slot => {
+                onDeleteSlot(slot.id);
+              });
+              alert('✅ All data cleared!');
             }
           }}
           className="btn-danger"
