@@ -39,18 +39,22 @@ export default function Dashboard() {
   useEffect(() => {
     const loadData = async () => {
       // Check Firebase Auth state
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setCandidateUser(user);
-        if (user) {
-          setShowLoginForm(false);
-          setShowRegisterForm(false);
-          // If candidate is logged in, default to 'book' tab
-          setActiveTab('book');
-        } else {
-          // If not logged in, default to 'allbookings' tab
-          setActiveTab('allbookings');
-        }
-      });
+      let unsubscribe: (() => void) | null = null;
+
+      if (auth) {
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          setCandidateUser(user);
+          if (user) {
+            setShowLoginForm(false);
+            setShowRegisterForm(false);
+            // If candidate is logged in, default to 'book' tab
+            setActiveTab('book');
+          } else {
+            // If not logged in, default to 'allbookings' tab
+            setActiveTab('allbookings');
+          }
+        });
+      }
 
       // Check if admin is already logged in
       const savedAdmin = localStorage.getItem('isAdmin');
@@ -72,7 +76,9 @@ export default function Dashboard() {
       }
       setIsLoading(false);
 
-      return () => unsubscribe();
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
     };
 
     loadData();
