@@ -68,6 +68,20 @@ export default function AdminTab({
     }
   };
 
+  const handleClearAllData = async () => {
+    const confirmed = window.confirm('⚠️ WARNING!\n\nThis will DELETE ALL interview slots!\n\nMake sure you exported data first!\n\nContinue?');
+    if (confirmed) {
+      try {
+        // Delete all slots
+        await Promise.all(slots.map(slot => Promise.resolve(onDeleteSlot(slot.id))));
+        alert('✅ All data cleared successfully!');
+      } catch (error) {
+        alert('❌ Error clearing data. Please try again.');
+        console.error(error);
+      }
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-white mb-6">Admin Panel</h2>
@@ -243,15 +257,7 @@ export default function AdminTab({
           📊 Export CSV
         </button>
         <button
-          onClick={() => {
-            const confirmed = window.confirm('⚠️ WARNING!\n\nThis will DELETE ALL interview slots!\n\nMake sure you exported data first!\n\nContinue?');
-            if (confirmed) {
-              slots.forEach(slot => {
-                onDeleteSlot(slot.id);
-              });
-              alert('✅ All data cleared!');
-            }
-          }}
+          onClick={handleClearAllData}
           className="btn-danger"
         >
           🗑️ Clear All Data
