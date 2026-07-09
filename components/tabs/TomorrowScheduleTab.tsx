@@ -15,11 +15,15 @@ export default function TomorrowScheduleTab({ slots, candidateEmail }: TomorrowS
 
   // Filter for tomorrow's bookings for this candidate, sorted by time
   const tomorrowSlots = slots
-    .filter(slot =>
-      slot.candidateName &&
-      slot.candidateEmail === candidateEmail &&
-      slot.date === tomorrowDateStr
-    )
+    .filter(slot => {
+      // Must have candidate info
+      if (!slot.candidateName || !slot.candidateEmail) return false;
+      // Must be tomorrow's date
+      if (slot.date !== tomorrowDateStr) return false;
+      // Must match this candidate's email
+      if (slot.candidateEmail !== candidateEmail) return false;
+      return true;
+    })
     .sort((a, b) => a.time.localeCompare(b.time));
 
   const getStatusColor = (status: string | undefined) => {
