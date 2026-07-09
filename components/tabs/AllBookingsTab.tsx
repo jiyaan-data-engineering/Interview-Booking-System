@@ -52,6 +52,7 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
           <div key={slot.id} className="slot-card">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
+                <div className="text-sm text-slate-400 font-semibold mb-2">👤 {slot.candidateName}</div>
                 <div className="text-2xl font-bold text-purple-400 mb-2">
                   {new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', {
                     weekday: 'short',
