@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminUsername, setAdminUsername] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
 
@@ -38,19 +39,25 @@ export default function Dashboard() {
     setIsLoading(false);
   }, []);
 
-  const ADMIN_PASSWORD = 'admin@jiyaan123';
+  const ADMIN_USERNAME = 'admin';
+  const ADMIN_PASSWORD = 'admin@123';
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPassword === ADMIN_PASSWORD) {
+    if (!adminUsername || !adminPassword) {
+      setAdminError('Please enter username and password');
+      return;
+    }
+    if (adminUsername === ADMIN_USERNAME && adminPassword === ADMIN_PASSWORD) {
       setIsAdmin(true);
       localStorage.setItem('isAdmin', 'true');
       setShowAdminLogin(false);
+      setAdminUsername('');
       setAdminPassword('');
       setAdminError('');
       showAlert('Admin login successful!');
     } else {
-      setAdminError('Invalid password');
+      setAdminError('Invalid username or password');
     }
   };
 
@@ -215,19 +222,32 @@ export default function Dashboard() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 w-full max-w-sm shadow-2xl">
               <h2 className="text-2xl font-bold text-white mb-1">Admin Login</h2>
-              <p className="text-slate-400 text-sm mb-4">Enter password to access admin panel</p>
+              <p className="text-slate-400 text-sm mb-4">Access admin panel</p>
 
               <form onSubmit={handleAdminLogin} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">Admin Password *</label>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">Username *</label>
+                  <input
+                    type="text"
+                    value={adminUsername}
+                    onChange={e => setAdminUsername(e.target.value)}
+                    placeholder="Enter username"
+                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    autoFocus
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Default: admin</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">Password *</label>
                   <input
                     type="password"
                     value={adminPassword}
                     onChange={e => setAdminPassword(e.target.value)}
                     placeholder="Enter password"
                     className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
-                    autoFocus
                   />
+                  <p className="text-xs text-slate-500 mt-1">Default: admin@123</p>
                 </div>
 
                 {adminError && (
@@ -247,6 +267,7 @@ export default function Dashboard() {
                     type="button"
                     onClick={() => {
                       setShowAdminLogin(false);
+                      setAdminUsername('');
                       setAdminPassword('');
                       setAdminError('');
                     }}
