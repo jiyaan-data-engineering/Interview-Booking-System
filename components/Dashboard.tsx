@@ -166,13 +166,14 @@ export default function Dashboard() {
     }
   };
 
-  const handleAddSlot = (date: string, time: string, company: string, duration: string) => {
+  const handleAddSlot = (date: string, time: string, company: string, duration: string, round?: string) => {
     const newSlot: InterviewSlot = {
       id: Date.now().toString(),
       date,
       time,
       company,
       duration,
+      round,
       candidateName: '',
       candidateEmail: '',
       candidatePhone: '',

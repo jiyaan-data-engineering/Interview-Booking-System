@@ -7,7 +7,7 @@ import { exportToJSON, exportToCSV } from '@/lib/storage';
 
 interface AdminTabProps {
   slots: InterviewSlot[];
-  onAddSlot: (date: string, time: string, company: string, duration: string) => void;
+  onAddSlot: (date: string, time: string, company: string, duration: string, round?: string) => void;
   onDeleteSlot: (slotId: string) => void;
   onCancelBooking: (slotId: string) => void;
   onUpdateStatus: (slotId: string, status: string, reason?: string) => void;
@@ -26,13 +26,14 @@ export default function AdminTab({
     time: '',
     company: '',
     duration: '',
+    round: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.date && formData.time && formData.company && formData.duration) {
-      onAddSlot(formData.date, formData.time, formData.company, formData.duration);
-      setFormData({ date: '', time: '', company: '', duration: '' });
+    if (formData.date && formData.time && formData.company && formData.duration && formData.round) {
+      onAddSlot(formData.date, formData.time, formData.company, formData.duration, formData.round);
+      setFormData({ date: '', time: '', company: '', duration: '', round: '' });
     }
   };
 
@@ -107,6 +108,25 @@ export default function AdminTab({
                 <option value="30 min">30 minutes</option>
                 <option value="45 min">45 minutes</option>
                 <option value="1 hour">1 hour</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Interview Round *
+              </label>
+              <select
+                name="round"
+                className="input-field"
+                value={formData.round}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Round</option>
+                <option value="Screening">Screening</option>
+                <option value="L1">L1</option>
+                <option value="L2">L2</option>
+                <option value="Client">Client</option>
+                <option value="HR">HR</option>
               </select>
             </div>
           </div>
