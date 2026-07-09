@@ -19,8 +19,6 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
       ];
 
   const adminTabs: { id: TabType; label: string; icon: string }[] = [
-    { id: 'book', label: 'Book Interview', icon: '📋' },
-    { id: 'mybookings', label: 'My Bookings', icon: '📌' },
     { id: 'view', label: 'Analytics', icon: '📊' },
     { id: 'admin', label: 'Admin Panel', icon: '⚙️' },
   ];
