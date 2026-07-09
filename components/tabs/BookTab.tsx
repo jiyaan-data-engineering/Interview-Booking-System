@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { InterviewSlot } from '@/lib/types';
 
 interface BookTabProps {
-  slots: InterviewSlot[];
   onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string) => void;
 }
 
-export default function BookTab({ slots, onBook }: BookTabProps) {
+export default function BookTab({ onBook }: BookTabProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',

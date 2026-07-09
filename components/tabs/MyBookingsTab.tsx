@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import SlotCard from '@/components/SlotCard';
 
 interface MyBookingsTabProps {
   slots: InterviewSlot[];

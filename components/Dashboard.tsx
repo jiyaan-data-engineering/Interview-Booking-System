@@ -134,6 +134,7 @@ export default function Dashboard() {
       candidateName: '',
       candidateEmail: '',
       candidatePhone: '',
+      status: 'pending' as const,
     };
     updateSlots([...slots, newSlot]);
     showAlert('Interview slot added successfully!');
@@ -162,7 +163,7 @@ export default function Dashboard() {
 
           <div className="p-8">
             {activeTab === 'book' && (
-              <BookTab slots={slots} onBook={handleCandidateRegistration} />
+              <BookTab onBook={handleCandidateRegistration} />
             )}
 
             {activeTab === 'mybookings' && (
