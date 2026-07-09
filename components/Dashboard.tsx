@@ -7,6 +7,7 @@ import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
 import MyBookingsTab from './tabs/MyBookingsTab';
+import AnalyticsTab from './tabs/AnalyticsTab';
 import ViewTab from './tabs/ViewTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
@@ -298,13 +299,15 @@ export default function Dashboard() {
               />
             )}
 
-            {activeTab === 'view' && (
+            {activeTab === 'view' && isAdmin ? (
+              <AnalyticsTab slots={slots} />
+            ) : activeTab === 'view' ? (
               <ViewTab
                 slots={slots}
                 available={availableSlots.length}
                 booked={bookedSlots.length}
               />
-            )}
+            ) : null}
 
             {activeTab === 'admin' && (
               <AdminTab
