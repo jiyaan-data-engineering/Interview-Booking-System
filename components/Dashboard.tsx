@@ -10,6 +10,7 @@ import MyBookingsTab from './tabs/MyBookingsTab';
 import ViewTab from './tabs/ViewTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
+import Login from './Login';
 
 type TabType = 'book' | 'mybookings' | 'view' | 'admin';
 
@@ -18,9 +19,20 @@ export default function Dashboard() {
   const [slots, setSlots] = useState<InterviewSlot[]>([]);
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
+    // Check if user is already logged in
+    const savedAuth = localStorage.getItem('userAuth');
+    if (savedAuth) {
+      const { email, admin } = JSON.parse(savedAuth);
+      setUserEmail(email);
+      setIsAdmin(admin);
+      setIsAuthenticated(true);
+    }
+
     let savedSlots = getSlots();
     if (savedSlots.length === 0) {
       savedSlots = initializeDemoSlots();
@@ -28,6 +40,23 @@ export default function Dashboard() {
     setSlots(savedSlots);
     setIsLoading(false);
   }, []);
+
+  const handleLogin = (email: string, admin: boolean) => {
+    setUserEmail(email);
+    setIsAdmin(admin);
+    setIsAuthenticated(true);
+    localStorage.setItem('userAuth', JSON.stringify({ email, admin }));
+    showAlert(`Welcome ${admin ? 'Admin' : 'Candidate'}!`);
+  };
+
+  const handleLogout = () => {
+    setUserEmail('');
+    setIsAdmin(false);
+    setIsAuthenticated(false);
+    localStorage.removeItem('userAuth');
+    setActiveTab('book');
+    showAlert('Logged out successfully!');
+  };
 
   const updateSlots = (newSlots: InterviewSlot[]) => {
     setSlots(newSlots);
@@ -149,6 +178,10 @@ export default function Dashboard() {
     );
   }
 
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   const availableSlots = slots.filter(slot => !slot.candidateName);
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
@@ -159,17 +192,19 @@ export default function Dashboard() {
 
         {alert && <Alert message={alert.message} type={alert.type} />}
 
-        {/* Admin Toggle */}
-        <div className="mt-4 flex justify-end">
+        {/* User Info & Logout */}
+        <div className="mt-4 flex justify-between items-center">
+          <div className="text-slate-300 text-sm">
+            <span className={isAdmin ? 'text-red-400' : 'text-blue-400'}>
+              {isAdmin ? '🔐' : '👤'} {isAdmin ? 'Admin' : 'Candidate'}
+            </span>
+            <span className="text-slate-500 ml-2">({userEmail})</span>
+          </div>
           <button
-            onClick={() => setIsAdmin(!isAdmin)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              isAdmin
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            }`}
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
           >
-            {isAdmin ? '🔒 Admin Mode: ON' : '👤 Candidate View'}
+            🚪 Logout
           </button>
         </div>
 
