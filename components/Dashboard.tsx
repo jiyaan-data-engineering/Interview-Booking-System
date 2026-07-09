@@ -147,10 +147,13 @@ export default function Dashboard() {
 
   const handleUpdateStatus = async (slotId: string, newStatus: string, reason?: string) => {
     try {
-      await updateSlot(slotId, { status: newStatus as InterviewSlot['status'], reason: reason || undefined });
+      const updates: any = { status: newStatus as InterviewSlot['status'] };
+      if (reason) updates.reason = reason;
+
+      await updateSlot(slotId, updates);
       const updated = slots.map(slot =>
         slot.id === slotId
-          ? { ...slot, status: newStatus as InterviewSlot['status'], reason: reason || slot.reason }
+          ? { ...slot, status: newStatus as InterviewSlot['status'], ...(reason && { reason }) }
           : slot
       );
       updateSlots(updated);
