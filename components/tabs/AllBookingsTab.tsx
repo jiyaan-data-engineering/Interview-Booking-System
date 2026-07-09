@@ -1,7 +1,6 @@
 'use client';
 
 import { InterviewSlot } from '@/lib/types';
-import SlotCard from '@/components/SlotCard';
 
 interface AllBookingsTabProps {
   slots: InterviewSlot[];
