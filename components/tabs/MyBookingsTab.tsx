@@ -197,6 +197,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                         type="date"
                         className="input-field"
                         value={rescheduleData[slot.id]?.date || ''}
+                        min={new Date().toISOString().split('T')[0]}
                         onChange={e =>
                           setRescheduleData(prev => ({
                             ...prev,

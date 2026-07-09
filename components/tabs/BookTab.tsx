@@ -144,6 +144,7 @@ export default function BookTab({ onBook }: BookTabProps) {
                   className="input-field"
                   value={formData.date}
                   onChange={handleChange}
+                  min={new Date().toISOString().split('T')[0]}
                   required
                 />
               </div>
