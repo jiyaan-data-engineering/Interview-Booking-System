@@ -22,6 +22,10 @@ export const getSlots = async (): Promise<InterviewSlot[]> => {
       return slotsCache;
     }
 
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
+
     const querySnapshot = await getDocs(collection(db, SLOTS_COLLECTION));
     const slots: InterviewSlot[] = [];
     querySnapshot.forEach((docSnap) => {
@@ -64,6 +68,10 @@ export const saveSlot = async (slot: Omit<InterviewSlot, 'id'>): Promise<string>
 // Update slot
 export const updateSlot = async (slotId: string, updates: Partial<InterviewSlot>): Promise<void> => {
   try {
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
+
     const slotRef = doc(db, SLOTS_COLLECTION, slotId);
     await updateDoc(slotRef, updates);
     // Clear cache
@@ -77,6 +85,10 @@ export const updateSlot = async (slotId: string, updates: Partial<InterviewSlot>
 // Delete slot
 export const deleteSlot = async (slotId: string): Promise<void> => {
   try {
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
+
     await deleteDoc(doc(db, SLOTS_COLLECTION, slotId));
     // Clear cache
     slotsCache = null;
