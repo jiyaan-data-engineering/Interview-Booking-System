@@ -83,13 +83,6 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
               )}
             </div>
 
-            {slot.candidateName && (
-              <div className="bg-blue-900/30 border-l-4 border-blue-500 p-3 rounded">
-                <div className="font-semibold text-white mb-1">{slot.candidateName}</div>
-                <div className="text-blue-300 text-sm">{slot.candidateEmail}</div>
-                <div className="text-blue-300 text-sm">{slot.candidatePhone}</div>
-              </div>
-            )}
           </div>
         ))}
       </div>
