@@ -123,10 +123,32 @@ export default function AnalyticsTab({ slots }: AnalyticsTabProps) {
           <StatCard title="Companies" value={todayCompanies.length} color="from-orange-600 to-orange-400" />
         </div>
         {todayCompanies.length > 0 && (
-          <div className="bg-slate-800/50 rounded-lg p-3 text-slate-300 text-sm">
+          <div className="bg-slate-800/50 rounded-lg p-3 text-slate-300 text-sm mb-4">
             <span className="font-semibold">Companies today:</span> {todayCompanies.join(', ')}
           </div>
         )}
+
+        {/* Daily HR Feedback */}
+        <div className="bg-slate-800/50 rounded-lg p-4">
+          <h4 className="text-white font-semibold mb-3">HR Feedback Breakdown</h4>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">{todaySlots.filter(s => s.feedback === 'GOOD').length}</div>
+              <div className="text-sm text-slate-400">🟢 GOOD</div>
+              <div className="text-xs text-slate-500">{todayCompleted > 0 ? Math.round((todaySlots.filter(s => s.feedback === 'GOOD').length / todayCompleted) * 100) : 0}%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-400">{todaySlots.filter(s => s.feedback === 'AVG').length}</div>
+              <div className="text-sm text-slate-400">🟡 AVERAGE</div>
+              <div className="text-xs text-slate-500">{todayCompleted > 0 ? Math.round((todaySlots.filter(s => s.feedback === 'AVG').length / todayCompleted) * 100) : 0}%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-400">{todaySlots.filter(s => s.feedback === 'BAD').length}</div>
+              <div className="text-sm text-slate-400">🔴 BAD</div>
+              <div className="text-xs text-slate-500">{todayCompleted > 0 ? Math.round((todaySlots.filter(s => s.feedback === 'BAD').length / todayCompleted) * 100) : 0}%</div>
+            </div>
+          </div>
+        </div>
       </div>
       )}
 
@@ -148,6 +170,28 @@ export default function AnalyticsTab({ slots }: AnalyticsTabProps) {
           </div>
           <StatCard title="Avg Duration" value={`${weekAvgDuration}m`} color="from-green-600 to-green-400" />
           <StatCard title="Top Company" value={topWeekCompany} color="from-orange-600 to-orange-400" />
+        </div>
+
+        {/* Weekly HR Feedback */}
+        <div className="bg-slate-800/50 rounded-lg p-4">
+          <h4 className="text-white font-semibold mb-3">HR Feedback Breakdown</h4>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">{weekSlots.filter(s => s.feedback === 'GOOD').length}</div>
+              <div className="text-sm text-slate-400">🟢 GOOD</div>
+              <div className="text-xs text-slate-500">{weekCompleted > 0 ? Math.round((weekSlots.filter(s => s.feedback === 'GOOD').length / weekCompleted) * 100) : 0}%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-400">{weekSlots.filter(s => s.feedback === 'AVG').length}</div>
+              <div className="text-sm text-slate-400">🟡 AVERAGE</div>
+              <div className="text-xs text-slate-500">{weekCompleted > 0 ? Math.round((weekSlots.filter(s => s.feedback === 'AVG').length / weekCompleted) * 100) : 0}%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-red-400">{weekSlots.filter(s => s.feedback === 'BAD').length}</div>
+              <div className="text-sm text-slate-400">🔴 BAD</div>
+              <div className="text-xs text-slate-500">{weekCompleted > 0 ? Math.round((weekSlots.filter(s => s.feedback === 'BAD').length / weekCompleted) * 100) : 0}%</div>
+            </div>
+          </div>
         </div>
       </div>
       )}
