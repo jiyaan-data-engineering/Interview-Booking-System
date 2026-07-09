@@ -183,7 +183,10 @@ export default function AdminTab({
                     <select
                       className="input-field mb-2"
                       value={slot.status || 'pending'}
-                      onChange={e => onUpdateStatus(slot.id, e.target.value)}
+                      onChange={e => {
+                        console.log('Updating status to:', e.target.value);
+                        onUpdateStatus(slot.id, e.target.value);
+                      }}
                     >
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
