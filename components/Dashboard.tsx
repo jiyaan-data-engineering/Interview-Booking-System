@@ -523,17 +523,17 @@ export default function Dashboard() {
           <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} isAdmin={isAdmin} isCandidateLoggedIn={!!candidateUser} />
 
           <div className="p-8">
-            {activeTab === 'book' && candidateUser && (
+            {activeTab === 'book' && (candidateUser || isAdmin) && (
               <BookTab onBook={handleCandidateRegistration} />
             )}
 
-            {activeTab === 'mybookings' && candidateUser && (
+            {activeTab === 'mybookings' && (candidateUser || isAdmin) && (
               <MyBookingsTab
                 slots={slots}
                 onReschedule={handleRescheduleBooking}
                 onCancel={handleCancelBookingWithReason}
                 onMarkCompleted={handleMarkCompleted}
-                candidateEmail={candidateUser?.email || ''}
+                candidateEmail={candidateUser?.email || isAdmin ? 'admin@system' : ''}
               />
             )}
 
