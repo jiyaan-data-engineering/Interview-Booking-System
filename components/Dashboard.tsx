@@ -533,7 +533,7 @@ export default function Dashboard() {
                 onReschedule={handleRescheduleBooking}
                 onCancel={handleCancelBookingWithReason}
                 onMarkCompleted={handleMarkCompleted}
-                candidateEmail={candidateUser ? candidateUser.email : (isAdmin ? 'admin@system' : '')}
+                candidateEmail={candidateUser?.email || (isAdmin ? 'admin@system' : '') || ''}
               />
             )}
 
