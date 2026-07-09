@@ -10,6 +10,7 @@ import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
 import MyBookingsTab from './tabs/MyBookingsTab';
+import TomorrowScheduleTab from './tabs/TomorrowScheduleTab';
 import AllBookingsTab from './tabs/AllBookingsTab';
 import AnalyticsTab from './tabs/AnalyticsTab';
 import ViewTab from './tabs/ViewTab';
@@ -18,7 +19,7 @@ import Alert from './Alert';
 import LoginForm from './auth/LoginForm';
 import LoginPage from './LoginPage';
 
-type TabType = 'book' | 'mybookings' | 'allbookings' | 'view' | 'admin';
+type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'view' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('allbookings');
@@ -534,6 +535,13 @@ export default function Dashboard() {
                 onCancel={handleCancelBookingWithReason}
                 onMarkCompleted={handleMarkCompleted}
                 candidateEmail={candidateUser?.email || (isAdmin ? 'admin@system' : '') || ''}
+              />
+            )}
+
+            {activeTab === 'tomorrow' && candidateUser && (
+              <TomorrowScheduleTab
+                slots={slots}
+                candidateEmail={candidateUser?.email || ''}
               />
             )}
 

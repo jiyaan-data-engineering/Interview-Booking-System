@@ -1,4 +1,4 @@
-type TabType = 'book' | 'mybookings' | 'allbookings' | 'view' | 'admin';
+type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'view' | 'admin';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -12,6 +12,7 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
     ? [
         { id: 'book', label: 'Book Interview', icon: '📋' },
         { id: 'mybookings', label: 'My Bookings', icon: '📌' },
+        { id: 'tomorrow', label: "Tomorrow's Schedule", icon: '📆' },
         { id: 'allbookings', label: 'All Bookings', icon: '👥' },
       ]
     : [
