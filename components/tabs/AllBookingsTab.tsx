@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { InterviewSlot } from '@/lib/types';
 
 interface AllBookingsTabProps {
@@ -7,7 +8,22 @@ interface AllBookingsTabProps {
 }
 
 export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+
   const bookedSlots = slots.filter(slot => slot.candidateName);
+
+  const filteredSlots = bookedSlots.filter(slot => {
+    if (!fromDate && !toDate) return true;
+
+    const slotDate = new Date(slot.date + 'T00:00:00');
+    const from = fromDate ? new Date(fromDate + 'T00:00:00') : null;
+    const to = toDate ? new Date(toDate + 'T23:59:59') : null;
+
+    if (from && slotDate < from) return false;
+    if (to && slotDate > to) return false;
+    return true;
+  });
 
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
@@ -46,8 +62,49 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
       <h2 className="text-2xl font-bold text-white mb-2">📋 All Interview Bookings</h2>
       <p className="text-slate-400 mb-6">View all scheduled interviews (read-only)</p>
 
-      <div className="space-y-4">
-        {bookedSlots.map(slot => (
+      {/* Date Filter */}
+      <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">From Date</label>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="input-field w-full"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">To Date</label>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="input-field w-full"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setFromDate('');
+                setToDate('');
+              }}
+              className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
+            >
+              Clear Filter
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-slate-400 mt-2">Showing {filteredSlots.length} of {bookedSlots.length} bookings</p>
+      </div>
+
+      {filteredSlots.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-slate-400">No bookings found for the selected date range</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredSlots.map(slot => (
           <div key={slot.id} className="slot-card">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
@@ -85,7 +142,8 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
 
           </div>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
