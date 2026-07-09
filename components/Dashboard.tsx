@@ -15,7 +15,6 @@ import AnalyticsTab from './tabs/AnalyticsTab';
 import ViewTab from './tabs/ViewTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
-import RegisterForm from './auth/RegisterForm';
 import LoginForm from './auth/LoginForm';
 
 type TabType = 'book' | 'mybookings' | 'allbookings' | 'view' | 'admin';
@@ -33,7 +32,6 @@ export default function Dashboard() {
 
   // Candidate auth
   const [candidateUser, setCandidateUser] = useState<User | null>(null);
-  const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
 
   useEffect(() => {
@@ -46,7 +44,6 @@ export default function Dashboard() {
           setCandidateUser(user);
           if (user) {
             setShowLoginForm(false);
-            setShowRegisterForm(false);
             // If candidate is logged in, default to 'book' tab
             setActiveTab('book');
           } else {
@@ -87,10 +84,10 @@ export default function Dashboard() {
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin@123';
 
-  const handleCandidateRegister = async (name: string, email: string, phone: string, password: string) => {
+  const handleAdminRegisterCandidate = async (name: string, email: string, phone: string, password: string) => {
     try {
       await registerCandidate(name, email, phone, password);
-      showAlert('Registration successful! Welcome!', 'success');
+      showAlert(`Candidate "${name}" registered successfully!`, 'success');
     } catch (error: any) {
       showAlert(error.message || 'Registration failed', 'error');
     }
@@ -348,20 +345,12 @@ export default function Dashboard() {
               👤 Logout
             </button>
           ) : (
-            <>
-              <button
-                onClick={() => setShowLoginForm(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all"
-              >
-                🔑 Candidate Login
-              </button>
-              <button
-                onClick={() => setShowRegisterForm(true)}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 transition-all"
-              >
-                📝 Candidate Register
-              </button>
-            </>
+            <button
+              onClick={() => setShowLoginForm(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all"
+            >
+              🔑 Candidate Login
+            </button>
           )}
           {!isAdmin && (
             <button
@@ -381,26 +370,9 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Candidate Register Form */}
-        {showRegisterForm && (
-          <RegisterForm
-            onRegister={handleCandidateRegister}
-            onSwitchToLogin={() => {
-              setShowRegisterForm(false);
-              setShowLoginForm(true);
-            }}
-          />
-        )}
-
         {/* Candidate Login Form */}
         {showLoginForm && (
-          <LoginForm
-            onLogin={handleCandidateLogin}
-            onSwitchToRegister={() => {
-              setShowLoginForm(false);
-              setShowRegisterForm(true);
-            }}
-          />
+          <LoginForm onLogin={handleCandidateLogin} />
         )}
 
         {/* Admin Login Modal */}
@@ -506,6 +478,7 @@ export default function Dashboard() {
                 onDeleteSlot={handleDeleteSlot}
                 onCancelBooking={handleCancelBooking}
                 onUpdateStatus={handleUpdateStatus}
+                onRegisterCandidate={handleAdminRegisterCandidate}
               />
             )}
           </div>

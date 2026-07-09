@@ -12,6 +12,7 @@ interface AdminTabProps {
   onCancelBooking: (slotId: string) => Promise<void> | void;
   onUpdateStatus: (slotId: string, status: string, reason?: string) => Promise<void> | void;
   onClearAllSlots?: () => void;
+  onRegisterCandidate?: (name: string, email: string, phone: string, password: string) => Promise<void> | void;
 }
 
 export default function AdminTab({
@@ -20,6 +21,7 @@ export default function AdminTab({
   onDeleteSlot,
   onCancelBooking,
   onUpdateStatus,
+  onRegisterCandidate,
 }: AdminTabProps) {
   const [formData, setFormData] = useState({
     date: '',
@@ -27,6 +29,13 @@ export default function AdminTab({
     company: '',
     duration: '',
     round: '',
+  });
+
+  const [candidateFormData, setCandidateFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -44,10 +53,94 @@ export default function AdminTab({
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCandidateFormChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setCandidateFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleRegisterCandidate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (candidateFormData.name && candidateFormData.email && candidateFormData.phone && candidateFormData.password && onRegisterCandidate) {
+      onRegisterCandidate(candidateFormData.name, candidateFormData.email, candidateFormData.phone, candidateFormData.password);
+      setCandidateFormData({ name: '', email: '', phone: '', password: '' });
+    }
+  };
+
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-6">Admin Panel - Manage Slots</h2>
+      <h2 className="text-2xl font-bold text-white mb-6">Admin Panel</h2>
 
+      {/* Register Candidate Section */}
+      <div className="bg-blue-900/30 rounded-xl p-6 mb-8 border border-blue-600">
+        <h3 className="text-xl font-semibold text-blue-300 mb-4">👤 Register New Candidate</h3>
+        <form onSubmit={handleRegisterCandidate} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                name="name"
+                className="input-field"
+                placeholder="John Doe"
+                value={candidateFormData.name}
+                onChange={handleCandidateFormChange}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                name="email"
+                className="input-field"
+                placeholder="candidate@example.com"
+                value={candidateFormData.email}
+                onChange={handleCandidateFormChange}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Phone Number *
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                className="input-field"
+                placeholder="+1 (555) 123-4567"
+                value={candidateFormData.phone}
+                onChange={handleCandidateFormChange}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Password *
+              </label>
+              <input
+                type="password"
+                name="password"
+                className="input-field"
+                placeholder="••••••••"
+                value={candidateFormData.password}
+                onChange={handleCandidateFormChange}
+                required
+              />
+            </div>
+          </div>
+          <button type="submit" className="btn-primary w-full">
+            Register Candidate
+          </button>
+        </form>
+      </div>
+
+      <h3 className="text-xl font-semibold text-white mb-4">📅 Manage Interview Slots</h3>
       <div className="bg-slate-700/50 rounded-xl p-6 mb-8 border border-slate-600">
         <h3 className="text-xl font-semibold text-white mb-4">Add New Interview Slot</h3>
         <form onSubmit={handleSubmit} className="space-y-4">

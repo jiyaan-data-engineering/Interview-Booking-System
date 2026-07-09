@@ -4,10 +4,9 @@ import { useState } from 'react';
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => Promise<void>;
-  onSwitchToRegister: () => void;
 }
 
-export default function LoginForm({ onLogin, onSwitchToRegister }: LoginFormProps) {
+export default function LoginForm({ onLogin }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -83,19 +82,6 @@ export default function LoginForm({ onLogin, onSwitchToRegister }: LoginFormProp
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
-
-          <div className="text-center">
-            <p className="text-slate-400 text-sm">
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={onSwitchToRegister}
-                className="text-blue-400 hover:text-blue-300 font-semibold"
-              >
-                Register
-              </button>
-            </p>
-          </div>
         </form>
       </div>
     </div>
