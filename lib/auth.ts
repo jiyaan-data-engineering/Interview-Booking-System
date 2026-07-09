@@ -23,6 +23,10 @@ export const registerCandidate = async (
   phone: string,
   password: string
 ): Promise<User> => {
+  if (!auth) {
+    throw new Error('Firebase Authentication not initialized');
+  }
+
   try {
     // Create Firebase Auth user
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -45,6 +49,10 @@ export const registerCandidate = async (
 };
 
 export const loginCandidate = async (email: string, password: string): Promise<User> => {
+  if (!auth) {
+    throw new Error('Firebase Authentication not initialized');
+  }
+
   try {
     // Enable persistence
     await setPersistence(auth, browserLocalPersistence);
@@ -57,6 +65,10 @@ export const loginCandidate = async (email: string, password: string): Promise<U
 };
 
 export const logoutCandidate = async (): Promise<void> => {
+  if (!auth) {
+    throw new Error('Firebase Authentication not initialized');
+  }
+
   try {
     await signOut(auth);
   } catch (error: any) {
