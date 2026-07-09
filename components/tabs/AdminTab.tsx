@@ -11,6 +11,7 @@ interface AdminTabProps {
   onDeleteSlot: (slotId: string) => void;
   onCancelBooking: (slotId: string) => void;
   onUpdateStatus: (slotId: string, status: string, reason?: string) => void;
+  onClearAllSlots?: () => void;
 }
 
 export default function AdminTab({
@@ -115,18 +116,30 @@ export default function AdminTab({
         </form>
       </div>
 
-      <div className="flex gap-4 mb-8">
+      <div className="flex gap-4 mb-8 flex-wrap">
         <button
           onClick={() => exportToJSON(slots)}
-          className="btn-secondary flex items-center gap-2"
+          className="btn-secondary"
         >
-          📥 Export as JSON
+          📥 Export JSON
         </button>
         <button
           onClick={() => exportToCSV(slots)}
-          className="btn-secondary flex items-center gap-2"
+          className="btn-secondary"
         >
-          📊 Export as CSV
+          📊 Export CSV
+        </button>
+        <button
+          onClick={() => {
+            if (confirm('⚠️ This will delete ALL interview slots!\n\nMake sure you exported the data first!\n\nContinue?')) {
+              if (slots.length > 0) {
+                slots.forEach(slot => onDeleteSlot(slot.id));
+              }
+            }
+          }}
+          className="btn-danger"
+        >
+          🗑️ Clear All Data
         </button>
       </div>
 
