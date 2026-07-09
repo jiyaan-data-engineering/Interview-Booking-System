@@ -48,7 +48,7 @@ export default function Dashboard() {
       candidateName,
       candidateEmail: email,
       candidatePhone: phone,
-      status: 'pending',
+      status: 'pending' as const,
       createdAt: new Date().toISOString(),
     };
     updateSlots([...slots, newSlot]);
@@ -58,7 +58,7 @@ export default function Dashboard() {
   const handleRescheduleBooking = (slotId: string, newDate: string, newTime: string) => {
     const updated = slots.map(slot =>
       slot.id === slotId
-        ? { ...slot, date: newDate, time: newTime, status: 'pending' }
+        ? { ...slot, date: newDate, time: newTime, status: 'pending' as const }
         : slot
     );
     updateSlots(updated);
@@ -68,7 +68,7 @@ export default function Dashboard() {
   const handleCancelBookingWithReason = (slotId: string, reason: string) => {
     const updated = slots.map(slot =>
       slot.id === slotId
-        ? { ...slot, status: 'cancelled', reason }
+        ? { ...slot, status: 'cancelled' as const, reason }
         : slot
     );
     updateSlots(updated);
@@ -78,7 +78,7 @@ export default function Dashboard() {
   const handleUpdateStatus = (slotId: string, newStatus: string, reason?: string) => {
     const updated = slots.map(slot =>
       slot.id === slotId
-        ? { ...slot, status: newStatus as any, reason: reason || slot.reason }
+        ? { ...slot, status: newStatus as InterviewSlot['status'], reason: reason || slot.reason }
         : slot
     );
     updateSlots(updated);
@@ -91,7 +91,7 @@ export default function Dashboard() {
       slot.id === slotId
         ? {
             ...slot,
-            status: 'completed',
+            status: 'completed' as const,
             supportPerson,
             hrName,
             panelName,
