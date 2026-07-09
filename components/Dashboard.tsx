@@ -38,17 +38,6 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 4000);
   };
 
-  const handleBookSlot = (slotId: string, candidateName: string, email: string, phone: string) => {
-    const updated = slots.map(slot =>
-      slot.id === slotId
-        ? { ...slot, candidateName, candidateEmail: email, candidatePhone: phone }
-        : slot
-    );
-    updateSlots(updated);
-    showAlert('Booking confirmed! Check your email for details.');
-    setTimeout(() => setActiveTab('view'), 2000);
-  };
-
   const handleCandidateRegistration = (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string) => {
     const newSlot: InterviewSlot = {
       id: Date.now().toString(),
