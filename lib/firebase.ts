@@ -10,7 +10,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const db: Firestore = getFirestore(app);
+let app;
+let db: Firestore | null = null;
 
+try {
+  console.log('🔥 Initializing Firebase with config:', {
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain,
+  });
+
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+
+  console.log('✅ Firebase initialized successfully!');
+} catch (error) {
+  console.error('❌ Firebase initialization error:', error);
+}
+
+export { db };
 export default app;

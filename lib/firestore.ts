@@ -43,12 +43,20 @@ export const getSlots = async (): Promise<InterviewSlot[]> => {
 // Save/add slot
 export const saveSlot = async (slot: Omit<InterviewSlot, 'id'>): Promise<string> => {
   try {
+    console.log('📝 Attempting to save slot:', slot);
+
+    if (!db) {
+      throw new Error('Firestore database not initialized!');
+    }
+
     const docRef = await addDoc(collection(db, SLOTS_COLLECTION), slot);
+    console.log('✅ Slot saved successfully with ID:', docRef.id);
+
     // Clear cache
     slotsCache = null;
     return docRef.id;
   } catch (error) {
-    console.error('Error saving slot:', error);
+    console.error('❌ Error saving slot:', error);
     throw error;
   }
 };
