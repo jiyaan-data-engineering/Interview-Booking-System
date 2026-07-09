@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,15 +10,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app;
-let db;
+const app = initializeApp(firebaseConfig);
+export const db: Firestore = getFirestore(app);
 
-try {
-  app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-} catch (error) {
-  console.error('Firebase initialization error:', error);
-}
-
-export { db };
 export default app;
