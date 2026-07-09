@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import { getSlots, saveSlot, updateSlot, deleteSlot, exportToJSON, exportToCSV } from '@/lib/firestore';
+import { getSlots, saveSlot, updateSlot, deleteSlot } from '@/lib/firestore';
 import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
