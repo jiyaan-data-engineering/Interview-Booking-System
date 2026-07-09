@@ -21,56 +21,10 @@ export const saveSlots = (slots: InterviewSlot[]): void => {
 };
 
 export const initializeDemoSlots = (): InterviewSlot[] => {
-  const demoSlots: InterviewSlot[] = [
-    {
-      id: '1',
-      date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      time: '10:00',
-      company: 'TechCorp',
-      duration: '30 min',
-      candidateName: '',
-      candidateEmail: '',
-      candidatePhone: '',
-      status: 'pending',
-    },
-    {
-      id: '2',
-      date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      time: '11:00',
-      company: 'TechCorp',
-      duration: '30 min',
-      candidateName: '',
-      candidateEmail: '',
-      candidatePhone: '',
-      status: 'pending',
-    },
-    {
-      id: '3',
-      date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      time: '10:00',
-      company: 'InnovateLabs',
-      duration: '45 min',
-      candidateName: 'John Doe',
-      candidateEmail: 'john@example.com',
-      candidatePhone: '555-0123',
-      status: 'confirmed',
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: '4',
-      date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      time: '11:00',
-      company: 'InnovateLabs',
-      duration: '45 min',
-      candidateName: '',
-      candidateEmail: '',
-      candidatePhone: '',
-      status: 'pending',
-    },
-  ];
-
-  saveSlots(demoSlots);
-  return demoSlots;
+  // Start fresh - no demo data
+  const emptySlots: InterviewSlot[] = [];
+  saveSlots(emptySlots);
+  return emptySlots;
 };
 
 export const exportToJSON = (slots: InterviewSlot[]): void => {
