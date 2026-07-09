@@ -10,7 +10,6 @@ import MyBookingsTab from './tabs/MyBookingsTab';
 import ViewTab from './tabs/ViewTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
-import Login from './Login';
 
 type TabType = 'book' | 'mybookings' | 'view' | 'admin';
 
@@ -19,18 +18,16 @@ export default function Dashboard() {
   const [slots, setSlots] = useState<InterviewSlot[]>([]);
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminError, setAdminError] = useState('');
 
   useEffect(() => {
-    // Check if user is already logged in
-    const savedAuth = localStorage.getItem('userAuth');
-    if (savedAuth) {
-      const { email, admin } = JSON.parse(savedAuth);
-      setUserEmail(email);
-      setIsAdmin(admin);
-      setIsAuthenticated(true);
+    // Check if admin is already logged in
+    const savedAdmin = localStorage.getItem('isAdmin');
+    if (savedAdmin === 'true') {
+      setIsAdmin(true);
     }
 
     let savedSlots = getSlots();
@@ -41,21 +38,27 @@ export default function Dashboard() {
     setIsLoading(false);
   }, []);
 
-  const handleLogin = (email: string, admin: boolean) => {
-    setUserEmail(email);
-    setIsAdmin(admin);
-    setIsAuthenticated(true);
-    localStorage.setItem('userAuth', JSON.stringify({ email, admin }));
-    showAlert(`Welcome ${admin ? 'Admin' : 'Candidate'}!`);
+  const ADMIN_PASSWORD = 'admin@jiyaan123';
+
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminPassword === ADMIN_PASSWORD) {
+      setIsAdmin(true);
+      localStorage.setItem('isAdmin', 'true');
+      setShowAdminLogin(false);
+      setAdminPassword('');
+      setAdminError('');
+      showAlert('Admin login successful!');
+    } else {
+      setAdminError('Invalid password');
+    }
   };
 
-  const handleLogout = () => {
-    setUserEmail('');
+  const handleAdminLogout = () => {
     setIsAdmin(false);
-    setIsAuthenticated(false);
-    localStorage.removeItem('userAuth');
+    localStorage.removeItem('isAdmin');
     setActiveTab('book');
-    showAlert('Logged out successfully!');
+    showAlert('Admin logged out!');
   };
 
   const updateSlots = (newSlots: InterviewSlot[]) => {
@@ -178,10 +181,6 @@ export default function Dashboard() {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
-
   const availableSlots = slots.filter(slot => !slot.candidateName);
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
@@ -192,21 +191,74 @@ export default function Dashboard() {
 
         {alert && <Alert message={alert.message} type={alert.type} />}
 
-        {/* User Info & Logout */}
-        <div className="mt-4 flex justify-between items-center">
-          <div className="text-slate-300 text-sm">
-            <span className={isAdmin ? 'text-red-400' : 'text-blue-400'}>
-              {isAdmin ? '🔐' : '👤'} {isAdmin ? 'Admin' : 'Candidate'}
-            </span>
-            <span className="text-slate-500 ml-2">({userEmail})</span>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
-          >
-            🚪 Logout
-          </button>
+        {/* Admin Login/Logout Button */}
+        <div className="mt-4 flex justify-end">
+          {isAdmin ? (
+            <button
+              onClick={handleAdminLogout}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition-all"
+            >
+              🔐 Admin Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowAdminLogin(true)}
+              className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-600 transition-all"
+            >
+              🔐 Admin Login
+            </button>
+          )}
         </div>
+
+        {/* Admin Login Modal */}
+        {showAdminLogin && !isAdmin && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 w-full max-w-sm shadow-2xl">
+              <h2 className="text-2xl font-bold text-white mb-1">Admin Login</h2>
+              <p className="text-slate-400 text-sm mb-4">Enter password to access admin panel</p>
+
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">Admin Password *</label>
+                  <input
+                    type="password"
+                    value={adminPassword}
+                    onChange={e => setAdminPassword(e.target.value)}
+                    placeholder="Enter password"
+                    className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                    autoFocus
+                  />
+                </div>
+
+                {adminError && (
+                  <div className="bg-red-900/30 border border-red-500 text-red-300 px-3 py-2 rounded-lg text-sm">
+                    {adminError}
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="flex-1 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all"
+                  >
+                    Login
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAdminLogin(false);
+                      setAdminPassword('');
+                      setAdminError('');
+                    }}
+                    className="flex-1 py-2 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-600 transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         <div className="card mt-4 overflow-hidden">
           <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} isAdmin={isAdmin} />
