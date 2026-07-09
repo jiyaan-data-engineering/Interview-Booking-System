@@ -423,29 +423,14 @@ export default function Dashboard() {
 
         {alert && <Alert message={alert.message} type={alert.type} />}
 
-        {/* Auth Buttons */}
+        {/* Logout Button */}
         <div className="mt-4 flex justify-end gap-2">
-          {candidateUser ? (
+          {candidateUser && (
             <button
               onClick={handleCandidateLogout}
               className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-all"
             >
-              👤 Logout
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowLoginForm(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all"
-            >
-              🔑 Candidate Login
-            </button>
-          )}
-          {!isAdmin && (
-            <button
-              onClick={() => setShowAdminLogin(true)}
-              className="px-4 py-2 bg-slate-700 text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-600 transition-all"
-            >
-              🔐 Admin
+              👤 Candidate Logout
             </button>
           )}
           {isAdmin && (
