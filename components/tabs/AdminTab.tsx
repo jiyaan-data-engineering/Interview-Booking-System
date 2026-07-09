@@ -7,10 +7,10 @@ import { exportToJSON, exportToCSV } from '@/lib/storage';
 
 interface AdminTabProps {
   slots: InterviewSlot[];
-  onAddSlot: (date: string, time: string, company: string, duration: string, round?: string) => void;
-  onDeleteSlot: (slotId: string) => void;
-  onCancelBooking: (slotId: string) => void;
-  onUpdateStatus: (slotId: string, status: string, reason?: string) => void;
+  onAddSlot: (date: string, time: string, company: string, duration: string, round?: string) => Promise<void> | void;
+  onDeleteSlot: (slotId: string) => Promise<void> | void;
+  onCancelBooking: (slotId: string) => Promise<void> | void;
+  onUpdateStatus: (slotId: string, status: string, reason?: string) => Promise<void> | void;
   onClearAllSlots?: () => void;
 }
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface BookTabProps {
-  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => void;
+  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => Promise<void> | void;
 }
 
 export default function BookTab({ onBook }: BookTabProps) {

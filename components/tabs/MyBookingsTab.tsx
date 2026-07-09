@@ -5,9 +5,9 @@ import { InterviewSlot } from '@/lib/types';
 
 interface MyBookingsTabProps {
   slots: InterviewSlot[];
-  onReschedule: (slotId: string, date: string, time: string) => void;
-  onCancel: (slotId: string, reason: string) => void;
-  onMarkCompleted?: (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string) => void;
+  onReschedule: (slotId: string, date: string, time: string) => Promise<void> | void;
+  onCancel: (slotId: string, reason: string) => Promise<void> | void;
+  onMarkCompleted?: (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string) => Promise<void> | void;
 }
 
 export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCompleted }: MyBookingsTabProps) {

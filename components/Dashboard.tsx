@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import { getSlots, saveSlots, initializeDemoSlots } from '@/lib/storage';
+import { getSlots, saveSlot, updateSlot, deleteSlot, exportToJSON, exportToCSV } from '@/lib/firestore';
 import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
@@ -26,18 +26,25 @@ export default function Dashboard() {
   const [adminError, setAdminError] = useState('');
 
   useEffect(() => {
-    // Check if admin is already logged in
-    const savedAdmin = localStorage.getItem('isAdmin');
-    if (savedAdmin === 'true') {
-      setIsAdmin(true);
-    }
+    const loadData = async () => {
+      // Check if admin is already logged in
+      const savedAdmin = localStorage.getItem('isAdmin');
+      if (savedAdmin === 'true') {
+        setIsAdmin(true);
+      }
 
-    let savedSlots = getSlots();
-    if (savedSlots.length === 0) {
-      savedSlots = initializeDemoSlots();
-    }
-    setSlots(savedSlots);
-    setIsLoading(false);
+      // Load slots from Firestore
+      try {
+        const savedSlots = await getSlots();
+        setSlots(savedSlots);
+      } catch (error) {
+        console.error('Error loading slots:', error);
+        setSlots([]);
+      }
+      setIsLoading(false);
+    };
+
+    loadData();
   }, []);
 
   const ADMIN_USERNAME = 'admin';
@@ -71,7 +78,7 @@ export default function Dashboard() {
 
   const updateSlots = (newSlots: InterviewSlot[]) => {
     setSlots(newSlots);
-    saveSlots(newSlots);
+    // Slots are automatically saved to Firestore via individual update functions
   };
 
   const showAlert = (message: string, type: 'success' | 'error' = 'success') => {
@@ -79,108 +86,162 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 4000);
   };
 
-  const handleCandidateRegistration = (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => {
-    const newSlot: InterviewSlot = {
-      id: Date.now().toString(),
-      date,
-      time,
-      company,
-      duration,
-      round,
-      candidateName,
-      candidateEmail: email,
-      candidatePhone: phone,
-      status: 'pending' as const,
-      createdAt: new Date().toISOString(),
-    };
-    updateSlots([...slots, newSlot]);
-    showAlert('Registration submitted! We\'ll confirm your interview shortly.');
+  const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => {
+    try {
+      const newSlot: Omit<InterviewSlot, 'id'> = {
+        date,
+        time,
+        company,
+        duration,
+        round,
+        candidateName,
+        candidateEmail: email,
+        candidatePhone: phone,
+        status: 'pending' as const,
+        createdAt: new Date().toISOString(),
+      };
+      const slotId = await saveSlot(newSlot);
+      updateSlots([...slots, { id: slotId, ...newSlot }]);
+      showAlert('Registration submitted! We\'ll confirm your interview shortly.');
+    } catch (error) {
+      showAlert('Failed to submit registration. Please try again.', 'error');
+      console.error(error);
+    }
   };
 
-  const handleRescheduleBooking = (slotId: string, newDate: string, newTime: string) => {
-    const updated = slots.map(slot =>
-      slot.id === slotId
-        ? { ...slot, date: newDate, time: newTime, status: 'pending' as const }
-        : slot
-    );
-    updateSlots(updated);
-    showAlert('Interview rescheduled! Please wait for confirmation.');
-  };
-
-  const handleCancelBookingWithReason = (slotId: string, reason: string) => {
-    const updated = slots.map(slot =>
-      slot.id === slotId
-        ? { ...slot, status: 'cancelled' as const, reason }
-        : slot
-    );
-    updateSlots(updated);
-    showAlert('Interview cancelled. You can book another slot anytime.');
-  };
-
-  const handleUpdateStatus = (slotId: string, newStatus: string, reason?: string) => {
-    const updated = slots.map(slot =>
-      slot.id === slotId
-        ? { ...slot, status: newStatus as InterviewSlot['status'], reason: reason || slot.reason }
-        : slot
-    );
-    updateSlots(updated);
-    const statusMsg = newStatus === 'confirmed' ? 'Interview confirmed!' : `Interview status updated to ${newStatus}`;
-    showAlert(statusMsg);
-  };
-
-  const handleMarkCompleted = (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string) => {
-    const updated = slots.map(slot =>
-      slot.id === slotId
-        ? {
-            ...slot,
-            status: 'completed' as const,
-            supportPerson,
-            hrName,
-            panelName,
-            hrNumber,
-            feedback,
-            completedAt: new Date().toISOString()
-          }
-        : slot
-    );
-    updateSlots(updated);
-    showAlert('Interview marked as completed! Thank you for the details.');
-  };
-
-  const handleCancelBooking = (slotId: string) => {
-    if (confirm('Cancel this booking?')) {
+  const handleRescheduleBooking = async (slotId: string, newDate: string, newTime: string) => {
+    try {
+      await updateSlot(slotId, { date: newDate, time: newTime, status: 'pending' as const });
       const updated = slots.map(slot =>
         slot.id === slotId
-          ? { ...slot, candidateName: '', candidateEmail: '', candidatePhone: '' }
+          ? { ...slot, date: newDate, time: newTime, status: 'pending' as const }
           : slot
       );
       updateSlots(updated);
-      showAlert('Booking cancelled.');
+      showAlert('Interview rescheduled! Please wait for confirmation.');
+    } catch (error) {
+      showAlert('Failed to reschedule. Please try again.', 'error');
+      console.error(error);
     }
   };
 
-  const handleDeleteSlot = (slotId: string) => {
+  const handleCancelBookingWithReason = async (slotId: string, reason: string) => {
+    try {
+      await updateSlot(slotId, { status: 'cancelled' as const, reason });
+      const updated = slots.map(slot =>
+        slot.id === slotId
+          ? { ...slot, status: 'cancelled' as const, reason }
+          : slot
+      );
+      updateSlots(updated);
+      showAlert('Interview cancelled. You can book another slot anytime.');
+    } catch (error) {
+      showAlert('Failed to cancel. Please try again.', 'error');
+      console.error(error);
+    }
+  };
+
+  const handleUpdateStatus = async (slotId: string, newStatus: string, reason?: string) => {
+    try {
+      await updateSlot(slotId, { status: newStatus as InterviewSlot['status'], reason: reason || undefined });
+      const updated = slots.map(slot =>
+        slot.id === slotId
+          ? { ...slot, status: newStatus as InterviewSlot['status'], reason: reason || slot.reason }
+          : slot
+      );
+      updateSlots(updated);
+      const statusMsg = newStatus === 'confirmed' ? 'Interview confirmed!' : `Interview status updated to ${newStatus}`;
+      showAlert(statusMsg);
+    } catch (error) {
+      showAlert('Failed to update status. Please try again.', 'error');
+      console.error(error);
+    }
+  };
+
+  const handleMarkCompleted = async (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string) => {
+    try {
+      await updateSlot(slotId, {
+        status: 'completed' as const,
+        supportPerson,
+        hrName,
+        panelName,
+        hrNumber,
+        feedback,
+        completedAt: new Date().toISOString()
+      });
+      const updated = slots.map(slot =>
+        slot.id === slotId
+          ? {
+              ...slot,
+              status: 'completed' as const,
+              supportPerson,
+              hrName,
+              panelName,
+              hrNumber,
+              feedback,
+              completedAt: new Date().toISOString()
+            }
+          : slot
+      );
+      updateSlots(updated);
+      showAlert('Interview marked as completed! Thank you for the details.');
+    } catch (error) {
+      showAlert('Failed to mark completed. Please try again.', 'error');
+      console.error(error);
+    }
+  };
+
+  const handleCancelBooking = async (slotId: string) => {
+    if (confirm('Cancel this booking?')) {
+      try {
+        await updateSlot(slotId, { candidateName: '', candidateEmail: '', candidatePhone: '' });
+        const updated = slots.map(slot =>
+          slot.id === slotId
+            ? { ...slot, candidateName: '', candidateEmail: '', candidatePhone: '' }
+            : slot
+        );
+        updateSlots(updated);
+        showAlert('Booking cancelled.');
+      } catch (error) {
+        showAlert('Failed to cancel booking. Please try again.', 'error');
+        console.error(error);
+      }
+    }
+  };
+
+  const handleDeleteSlot = async (slotId: string) => {
     if (confirm('Are you sure you want to delete this slot?')) {
-      updateSlots(slots.filter(slot => slot.id !== slotId));
-      showAlert('Slot deleted successfully!');
+      try {
+        await deleteSlot(slotId);
+        updateSlots(slots.filter(slot => slot.id !== slotId));
+        showAlert('Slot deleted successfully!');
+      } catch (error) {
+        showAlert('Failed to delete slot. Please try again.', 'error');
+        console.error(error);
+      }
     }
   };
 
-  const handleAddSlot = (date: string, time: string, company: string, duration: string, round?: string) => {
-    const newSlot: InterviewSlot = {
-      id: Date.now().toString(),
-      date,
-      time,
-      company,
-      duration,
-      round,
-      candidateName: '',
-      candidateEmail: '',
-      candidatePhone: '',
-      status: 'pending' as const,
-    };
-    updateSlots([...slots, newSlot]);
-    showAlert('Interview slot added successfully!');
+  const handleAddSlot = async (date: string, time: string, company: string, duration: string, round?: string) => {
+    try {
+      const newSlot: Omit<InterviewSlot, 'id'> = {
+        date,
+        time,
+        company,
+        duration,
+        round,
+        candidateName: '',
+        candidateEmail: '',
+        candidatePhone: '',
+        status: 'pending' as const,
+      };
+      const slotId = await saveSlot(newSlot);
+      updateSlots([...slots, { id: slotId, ...newSlot }]);
+      showAlert('Interview slot added successfully!');
+    } catch (error) {
+      showAlert('Failed to add slot. Please try again.', 'error');
+      console.error(error);
+    }
   };
 
   if (isLoading) {
