@@ -33,10 +33,14 @@ export default function Dashboard() {
         setIsAdmin(true);
       }
 
-      // Load slots from Firestore
+      // Load slots from Firestore with timeout
       try {
-        const savedSlots = await getSlots();
-        setSlots(savedSlots);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firebase connection timeout')), 10000)
+        );
+        const slotsPromise = getSlots();
+        const savedSlots = await Promise.race([slotsPromise, timeoutPromise]);
+        setSlots(savedSlots as InterviewSlot[]);
       } catch (error) {
         console.error('Error loading slots:', error);
         setSlots([]);
