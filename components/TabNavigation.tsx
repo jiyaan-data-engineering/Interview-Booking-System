@@ -1,4 +1,4 @@
-type TabType = 'book' | 'mybookings' | 'view' | 'admin';
+type TabType = 'book' | 'mybookings' | 'allbookings' | 'view' | 'admin';
 
 interface TabNavigationProps {
   activeTab: TabType;
