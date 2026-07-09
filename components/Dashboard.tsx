@@ -35,7 +35,6 @@ export default function Dashboard() {
   const [candidateUser, setCandidateUser] = useState<User | null>(null);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
@@ -72,7 +71,6 @@ export default function Dashboard() {
         setSlots([]);
       }
       setIsLoading(false);
-      setAuthLoading(false);
 
       return () => unsubscribe();
     };
