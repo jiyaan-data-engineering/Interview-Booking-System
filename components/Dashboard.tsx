@@ -334,10 +334,22 @@ export default function Dashboard() {
           onShowCandidateLogin={() => setShowLoginForm(true)}
           onShowAdminLogin={() => setShowAdminLogin(true)}
         />
-        {showLoginForm && <LoginForm onLogin={handleCandidateLogin} />}
+        {showLoginForm && (
+          <LoginForm
+            onLogin={handleCandidateLogin}
+            onBack={() => setShowLoginForm(false)}
+          />
+        )}
         {showAdminLogin && !isAdmin && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 w-full max-w-sm shadow-2xl">
+              <button
+                type="button"
+                onClick={() => setShowAdminLogin(false)}
+                className="mb-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+              >
+                ← Back
+              </button>
               <h2 className="text-2xl font-bold text-white mb-1">Admin Login</h2>
               <p className="text-slate-400 text-sm mb-4">Access admin panel</p>
 
@@ -455,6 +467,13 @@ export default function Dashboard() {
         {showAdminLogin && !isAdmin && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 w-full max-w-sm shadow-2xl">
+              <button
+                type="button"
+                onClick={() => setShowAdminLogin(false)}
+                className="mb-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+              >
+                ← Back
+              </button>
               <h2 className="text-2xl font-bold text-white mb-1">Admin Login</h2>
               <p className="text-slate-400 text-sm mb-4">Access admin panel</p>
 

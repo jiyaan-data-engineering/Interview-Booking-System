@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 interface LoginFormProps {
   onLogin: (email: string, password: string) => Promise<void>;
+  onBack?: () => void;
 }
 
-export default function LoginForm({ onLogin }: LoginFormProps) {
+export default function LoginForm({ onLogin, onBack }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,6 +37,15 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 w-full max-w-md shadow-2xl">
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="mb-4 text-slate-400 hover:text-white transition-colors flex items-center gap-1"
+          >
+            ← Back
+          </button>
+        )}
         <h2 className="text-2xl font-bold text-white mb-1">Candidate Login</h2>
         <p className="text-slate-400 text-sm mb-6">Access your interview bookings</p>
 

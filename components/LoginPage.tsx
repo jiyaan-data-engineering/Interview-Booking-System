@@ -10,7 +10,11 @@ export default function LoginPage({ onShowCandidateLogin, onShowAdminLogin }: Lo
     <div className="min-h-screen py-8 px-4 flex items-center justify-center">
       <div className="max-w-2xl w-full">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-3">📅 Interview Booking System</h1>
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-purple-400 tracking-widest">JIYAAN INSTITUTE</p>
+            <h1 className="text-5xl font-bold text-white mt-2 mb-2">📅 Interview Booking System</h1>
+            <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-4"></div>
+          </div>
           <p className="text-xl text-slate-400">Schedule and manage your interviews efficiently</p>
         </div>
 
