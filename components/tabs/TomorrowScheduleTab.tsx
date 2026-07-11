@@ -4,10 +4,9 @@ import { InterviewSlot } from '@/lib/types';
 
 interface TomorrowScheduleTabProps {
   slots: InterviewSlot[];
-  candidateEmail?: string;
 }
 
-export default function TomorrowScheduleTab({ slots, candidateEmail }: TomorrowScheduleTabProps) {
+export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps) {
   // Get tomorrow's date
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);

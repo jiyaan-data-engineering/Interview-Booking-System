@@ -539,10 +539,7 @@ export default function Dashboard() {
             )}
 
             {activeTab === 'tomorrow' && candidateUser && (
-              <TomorrowScheduleTab
-                slots={slots}
-                candidateEmail={candidateUser?.email || ''}
-              />
+              <TomorrowScheduleTab slots={slots} />
             )}
 
             {activeTab === 'allbookings' && (
