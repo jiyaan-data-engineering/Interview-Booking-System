@@ -58,6 +58,19 @@ export default function BookTab({ onBook }: BookTabProps) {
     }
   };
 
+  const handleClear = () => {
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      date: '',
+      time: '',
+      company: '',
+      duration: '',
+      round: '',
+    });
+  };
+
   if (submitted) {
     return (
       <div className="text-center py-16">
@@ -262,14 +275,23 @@ export default function BookTab({ onBook }: BookTabProps) {
             </div>
           </div>
 
-          {/* Submit Button */}
+          {/* Submit and Clear Buttons */}
           <div className="border-t border-slate-600 pt-6">
-            <button
-              type="submit"
-              className="btn-primary w-full text-lg py-4 font-semibold"
-            >
-              Submit Interview Request
-            </button>
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                className="btn-primary flex-1 text-lg py-4 font-semibold"
+              >
+                Submit Interview Request
+              </button>
+              <button
+                type="button"
+                onClick={handleClear}
+                className="btn-secondary flex-1 text-lg py-4 font-semibold"
+              >
+                Clear Form
+              </button>
+            </div>
             <p className="text-center text-slate-400 text-sm mt-4">
               We'll review your request and send a confirmation email shortly.
             </p>
