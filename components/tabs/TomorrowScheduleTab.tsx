@@ -13,13 +13,15 @@ export default function TomorrowScheduleTab({ slots, candidateEmail }: TomorrowS
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
 
-  // Filter for ALL tomorrow's bookings, sorted by time
+  // Filter for CONFIRMED tomorrow's bookings, sorted by time
   const tomorrowSlots = slots
     .filter(slot => {
       // Must have candidate info
       if (!slot.candidateName || !slot.candidateEmail) return false;
       // Must be tomorrow's date
       if (slot.date !== tomorrowDateStr) return false;
+      // Only show confirmed interviews
+      if (slot.status !== 'confirmed') return false;
       return true;
     })
     .sort((a, b) => a.time.localeCompare(b.time));
