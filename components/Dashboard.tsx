@@ -288,28 +288,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleAddSlot = async (date: string, time: string, company: string, duration: string, round?: string) => {
-    try {
-      const newSlot: Omit<InterviewSlot, 'id'> = {
-        date,
-        time,
-        company,
-        duration,
-        round,
-        candidateName: '',
-        candidateEmail: '',
-        candidatePhone: '',
-        status: 'pending' as const,
-      };
-      const slotId = await saveSlot(newSlot);
-      updateSlots([...slots, { id: slotId, ...newSlot }]);
-      showAlert('Interview slot added successfully!');
-    } catch (error) {
-      showAlert('Failed to add slot. Please try again.', 'error');
-      console.error(error);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen py-8 px-4 flex items-center justify-center">
