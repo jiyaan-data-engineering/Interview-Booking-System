@@ -38,6 +38,26 @@ export default function AdminTab({
     password: '',
   });
 
+  const [filterDate, setFilterDate] = useState('');
+
+  // Detect conflicts
+  const getConflicts = () => {
+    const conflicts: Record<string, string[]> = {};
+    const pendingSlots = slots.filter(slot => slot.status === 'pending' || !slot.status);
+
+    pendingSlots.forEach(slot => {
+      const conflictingSlots = pendingSlots.filter(
+        other => other.id !== slot.id && other.date === slot.date && other.time === slot.time
+      );
+      if (conflictingSlots.length > 0) {
+        conflicts[slot.id] = conflictingSlots.map(s => s.id);
+      }
+    });
+    return conflicts;
+  };
+
+  const conflicts = getConflicts();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.date && formData.time && formData.company && formData.duration && formData.round) {
@@ -154,94 +174,6 @@ export default function AdminTab({
         </form>
       </div>
 
-      <h3 className="text-xl font-semibold text-white mb-4">📅 Manage Interview Slots</h3>
-      <div className="bg-slate-700/50 rounded-xl p-6 mb-8 border border-slate-600">
-        <h3 className="text-xl font-semibold text-white mb-4">Add New Interview Slot</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Date *
-              </label>
-              <input
-                type="date"
-                name="date"
-                className="input-field"
-                value={formData.date}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Time *
-              </label>
-              <input
-                type="time"
-                name="time"
-                className="input-field"
-                value={formData.time}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Company Name *
-              </label>
-              <input
-                type="text"
-                name="company"
-                className="input-field"
-                placeholder="e.g., TechCorp"
-                value={formData.company}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Duration *
-              </label>
-              <select
-                name="duration"
-                className="input-field"
-                value={formData.duration}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Duration</option>
-                <option value="15 min">15 minutes</option>
-                <option value="30 min">30 minutes</option>
-                <option value="45 min">45 minutes</option>
-                <option value="1 hour">1 hour</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Interview Round *
-              </label>
-              <select
-                name="round"
-                className="input-field"
-                value={formData.round}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Round</option>
-                <option value="Screening">Screening</option>
-                <option value="L1">L1</option>
-                <option value="L2">L2</option>
-                <option value="Client">Client</option>
-                <option value="HR">HR</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" className="btn-primary w-full">
-            Add Slot
-          </button>
-        </form>
-      </div>
 
       <div className="flex gap-4 mb-8 flex-wrap">
         <button
@@ -264,14 +196,49 @@ export default function AdminTab({
         </button>
       </div>
 
-      <h3 className="text-xl font-semibold text-white mb-4">Manage Existing Slots</h3>
-      {slots.length === 0 ? (
+      <h3 className="text-xl font-semibold text-white mb-4">⏳ Manage Pending Slots</h3>
+      <p className="text-slate-400 text-sm mb-4">Showing interviews awaiting confirmation</p>
+
+      {/* Date Filter */}
+      <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="input-field w-full"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={() => setFilterDate('')}
+              className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
+            >
+              Clear Filter
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-slate-400 mt-2">
+          Showing {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length} pending slots
+        </p>
+      </div>
+
+      {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-slate-400">No slots yet. Add your first slot above!</p>
+          <p className="text-slate-400">No pending slots. All interviews are confirmed or cancelled! ✅</p>
         </div>
       ) : (
         <div className="space-y-4">
-          {slots.map(slot => (
+          {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).map(slot => (
+            <div key={slot.id}>
+              {conflicts[slot.id] && (
+                <div className="mb-2 p-3 bg-red-900/30 border-l-4 border-red-500 rounded flex items-center gap-2">
+                  <span className="text-red-400 font-semibold">⚠️ Scheduling Conflict!</span>
+                  <span className="text-red-300 text-sm">{conflicts[slot.id].length} candidate(s) at same time</span>
+                </div>
+              )}
             <SlotCard key={slot.id} slot={slot} showCandidate={true}>
               {slot.candidateName && (
                 <div className="mt-4 space-y-3 bg-slate-900/50 p-4 rounded-lg border border-slate-600">
@@ -340,6 +307,7 @@ export default function AdminTab({
                 </div>
               )}
             </SlotCard>
+            </div>
           ))}
         </div>
       )}
