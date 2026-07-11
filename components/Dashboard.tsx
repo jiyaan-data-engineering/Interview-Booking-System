@@ -559,7 +559,6 @@ export default function Dashboard() {
             {activeTab === 'admin' && (
               <AdminTab
                 slots={slots}
-                onAddSlot={handleAddSlot}
                 onDeleteSlot={handleDeleteSlot}
                 onCancelBooking={handleCancelBooking}
                 onUpdateStatus={handleUpdateStatus}
