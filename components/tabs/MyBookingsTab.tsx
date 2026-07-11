@@ -465,6 +465,50 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                     </button>
                   </div>
                 </form>
+              ) : expandedSlot === `cancel-${slot.id}` ? (
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    const reason = cancelReason[slot.id] || 'No reason provided';
+                    onCancel(slot.id, reason);
+                    setExpandedSlot(null);
+                    setCancelReason(prev => {
+                      const updated = { ...prev };
+                      delete updated[slot.id];
+                      return updated;
+                    });
+                  }}
+                  className="mt-4 space-y-4 bg-red-900/30 p-4 rounded-lg border border-red-500/50"
+                >
+                  <h4 className="text-red-300 font-semibold mb-3">Cancel Interview</h4>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      Cancellation Reason *
+                    </label>
+                    <textarea
+                      className="input-field w-full"
+                      placeholder="Please provide a reason for cancellation..."
+                      rows={3}
+                      value={cancelReason[slot.id] || ''}
+                      onChange={e =>
+                        setCancelReason(prev => ({ ...prev, [slot.id]: e.target.value }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button type="submit" className="btn-danger flex-1">
+                      Confirm Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-secondary flex-1"
+                      onClick={() => setExpandedSlot(null)}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </form>
               ) : (
                 <div className="flex gap-3 mt-4 flex-wrap">
                   {slot.status === 'confirmed' && (
@@ -482,12 +526,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                     Reschedule
                   </button>
                   <button
-                    onClick={() => {
-                      const reason = prompt('Please provide a reason for cancellation:');
-                      if (reason !== null) {
-                        onCancel(slot.id, reason || 'No reason provided');
-                      }
-                    }}
+                    onClick={() => setExpandedSlot(`cancel-${slot.id}`)}
                     className="btn-danger flex-1 min-w-fit"
                   >
                     Cancel
