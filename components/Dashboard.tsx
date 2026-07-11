@@ -343,7 +343,6 @@ export default function Dashboard() {
                     className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     autoFocus
                   />
-                  <p className="text-xs text-slate-500 mt-1">Default: admin</p>
                 </div>
 
                 <div>
@@ -355,7 +354,6 @@ export default function Dashboard() {
                     placeholder="Enter password"
                     className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
                   />
-                  <p className="text-xs text-slate-500 mt-1">Default: admin@123</p>
                 </div>
 
                 {adminError && (
@@ -452,7 +450,6 @@ export default function Dashboard() {
                     className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
                     autoFocus
                   />
-                  <p className="text-xs text-slate-500 mt-1">Default: admin</p>
                 </div>
 
                 <div>
@@ -464,7 +461,6 @@ export default function Dashboard() {
                     placeholder="Enter password"
                     className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
                   />
-                  <p className="text-xs text-slate-500 mt-1">Default: admin@123</p>
                 </div>
 
                 {adminError && (
