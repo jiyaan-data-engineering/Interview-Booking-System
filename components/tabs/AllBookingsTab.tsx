@@ -12,9 +12,14 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
 
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
-  const filteredSlots = filterDate
+  const filteredSlots = (filterDate
     ? bookedSlots.filter(slot => slot.date === filterDate)
-    : bookedSlots;
+    : bookedSlots
+  ).sort((a, b) => {
+    const dateA = new Date(a.date + 'T00:00:00').getTime();
+    const dateB = new Date(b.date + 'T00:00:00').getTime();
+    return dateB - dateA;
+  });
 
   const getStatusColor = (status: string | undefined) => {
     switch (status) {

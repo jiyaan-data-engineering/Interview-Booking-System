@@ -20,9 +20,14 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
 
   const bookedSlots = slots.filter(slot => slot.candidateName && slot.candidateEmail === candidateEmail);
 
-  const filteredSlots = filterDate
+  const filteredSlots = (filterDate
     ? bookedSlots.filter(slot => slot.date === filterDate)
-    : bookedSlots;
+    : bookedSlots
+  ).sort((a, b) => {
+    const dateA = new Date(a.date + 'T00:00:00').getTime();
+    const dateB = new Date(b.date + 'T00:00:00').getTime();
+    return dateB - dateA;
+  });
 
   const handleRescheduleClick = (slotId: string, newDate: string, newTime: string) => {
     if (newDate && newTime) {

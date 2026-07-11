@@ -85,6 +85,10 @@ export default function TomorrowScheduleTab({ slots, candidateEmail }: TomorrowS
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
+                  <div className="text-slate-400 text-sm font-semibold mb-1">👤 Candidate Name</div>
+                  <div className="text-white text-lg">{slot.candidateName}</div>
+                </div>
+                <div>
                   <div className="text-slate-400 text-sm font-semibold mb-1">Company</div>
                   <div className="text-white text-lg">{slot.company}</div>
                 </div>
