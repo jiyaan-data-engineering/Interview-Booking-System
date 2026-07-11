@@ -23,14 +23,6 @@ export default function AdminTab({
   onUpdateStatus,
   onRegisterCandidate,
 }: AdminTabProps) {
-  const [formData, setFormData] = useState({
-    date: '',
-    time: '',
-    company: '',
-    duration: '',
-    round: '',
-  });
-
   const [candidateFormData, setCandidateFormData] = useState({
     name: '',
     email: '',
@@ -57,21 +49,6 @@ export default function AdminTab({
   };
 
   const conflicts = getConflicts();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.date && formData.time && formData.company && formData.duration && formData.round) {
-      onAddSlot(formData.date, formData.time, formData.company, formData.duration, formData.round);
-      setFormData({ date: '', time: '', company: '', duration: '', round: '' });
-    }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
 
   const handleCandidateFormChange = (
     e: React.ChangeEvent<HTMLInputElement>
