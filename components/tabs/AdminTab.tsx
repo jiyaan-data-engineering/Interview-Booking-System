@@ -7,7 +7,6 @@ import { exportToJSON, exportToCSV } from '@/lib/storage';
 
 interface AdminTabProps {
   slots: InterviewSlot[];
-  onAddSlot: (date: string, time: string, company: string, duration: string, round?: string) => Promise<void> | void;
   onDeleteSlot: (slotId: string) => Promise<void> | void;
   onCancelBooking: (slotId: string) => Promise<void> | void;
   onUpdateStatus: (slotId: string, status: string, reason?: string) => Promise<void> | void;
@@ -17,7 +16,6 @@ interface AdminTabProps {
 
 export default function AdminTab({
   slots,
-  onAddSlot,
   onDeleteSlot,
   onCancelBooking,
   onUpdateStatus,
