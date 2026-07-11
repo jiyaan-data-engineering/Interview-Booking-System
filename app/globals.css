@@ -17,28 +17,31 @@ body {
 }
 
 @layer components {
+  /* Buttons - Mobile optimized */
   .btn-primary {
-    @apply px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 disabled:opacity-50;
+    @apply px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold text-sm sm:text-base hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 disabled:opacity-50 min-h-[44px] sm:min-h-auto flex items-center justify-center;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-600 transition-all duration-300;
+    @apply px-4 py-2 sm:px-6 sm:py-3 bg-slate-700 text-white rounded-lg font-semibold text-sm sm:text-base hover:bg-slate-600 transition-all duration-300 min-h-[44px] sm:min-h-auto flex items-center justify-center;
   }
 
   .btn-danger {
-    @apply px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all duration-300;
+    @apply px-4 py-2 sm:px-6 sm:py-3 bg-red-600 text-white rounded-lg font-semibold text-sm sm:text-base hover:bg-red-700 transition-all duration-300 min-h-[44px] sm:min-h-auto flex items-center justify-center;
   }
 
   .btn-success {
-    @apply px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all duration-300;
+    @apply px-4 py-2 sm:px-6 sm:py-3 bg-green-600 text-white rounded-lg font-semibold text-sm sm:text-base hover:bg-green-700 transition-all duration-300 min-h-[44px] sm:min-h-auto flex items-center justify-center;
   }
 
+  /* Cards and layouts */
   .card {
     @apply bg-slate-800 border border-slate-700 rounded-xl shadow-lg backdrop-blur-sm;
   }
 
+  /* Tab buttons - Mobile optimized */
   .tab-button {
-    @apply px-6 py-3 font-semibold text-sm transition-all duration-300;
+    @apply px-2 py-2 sm:px-6 sm:py-3 font-semibold text-xs sm:text-sm transition-all duration-300 flex-1 text-center;
   }
 
   .tab-button.active {
@@ -49,15 +52,24 @@ body {
     @apply text-slate-400 hover:text-slate-300;
   }
 
+  /* Input fields - Mobile optimized */
   .input-field {
-    @apply w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200;
+    @apply w-full px-3 py-2 sm:px-4 sm:py-2 bg-slate-700 border border-slate-600 rounded-lg text-sm sm:text-base text-white placeholder-slate-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 min-h-[44px] sm:min-h-auto;
   }
 
+  /* Slot cards - Mobile optimized */
   .slot-card {
-    @apply card p-6 hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300;
+    @apply card p-4 sm:p-6 hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300;
   }
 
   .slot-card.booked {
     @apply border-green-500 bg-slate-800/50;
   }
+
+  /* Typography - Mobile optimized */
+  h1 { @apply text-2xl sm:text-4xl; }
+  h2 { @apply text-xl sm:text-2xl; }
+  h3 { @apply text-lg sm:text-xl; }
+  h4 { @apply text-base sm:text-lg; }
+  p { @apply text-sm sm:text-base; }
 }
