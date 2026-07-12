@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin SDK
-if (!admin.apps.length) {
+if ((admin as any).apps?.length === 0) {
   const serviceAccount = JSON.parse(
     process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}'
   );
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+  (admin as any).initializeApp({
+    credential: (admin as any).credential.cert(serviceAccount),
   });
 }
 
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify admin is actually an admin
-    const adminUser = await admin.auth().getUser(adminUID);
+    const adminUser = await (admin as any).auth().getUser(adminUID);
 
     // Check if user has admin custom claim
     if (!adminUser.customClaims?.admin) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update the target user's password
-    await admin.auth().updateUser(targetEmail, {
+    await (admin as any).auth().updateUser(targetEmail, {
       password: newPassword,
     });
 
