@@ -28,6 +28,13 @@ export default function AdminTab({
     password: '',
   });
 
+  const [resetPasswordData, setResetPasswordData] = useState({
+    targetEmail: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [resetMessage, setResetMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
   const [filterDate, setFilterDate] = useState('');
 
   // Detect conflicts
@@ -47,6 +54,44 @@ export default function AdminTab({
   };
 
   const conflicts = getConflicts();
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (resetPasswordData.newPassword !== resetPasswordData.confirmPassword) {
+      setResetMessage({ text: 'Passwords do not match', type: 'error' });
+      return;
+    }
+
+    if (resetPasswordData.newPassword.length < 6) {
+      setResetMessage({ text: 'Password must be at least 6 characters', type: 'error' });
+      return;
+    }
+
+    try {
+      setResetMessage(null);
+      const response = await fetch('/api/admin/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          adminUID: (window as any).adminUID,
+          targetEmail: resetPasswordData.targetEmail,
+          newPassword: resetPasswordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResetMessage({ text: '✅ Password reset successfully!', type: 'success' });
+        setResetPasswordData({ targetEmail: '', newPassword: '', confirmPassword: '' });
+      } else {
+        setResetMessage({ text: `❌ ${data.error}`, type: 'error' });
+      }
+    } catch (error: any) {
+      setResetMessage({ text: `❌ Error: ${error.message}`, type: 'error' });
+    }
+  };
 
   const handleCandidateFormChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -149,6 +194,68 @@ export default function AdminTab({
         </form>
       </div>
 
+      {/* Reset Password Section */}
+      <div className="bg-slate-700/50 rounded-xl p-6 mb-8 border border-slate-600">
+        <h3 className="text-xl font-semibold text-white mb-4">🔐 Manage Passwords</h3>
+        <form onSubmit={handleResetPassword} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
+              Target Email (Candidate or Admin) *
+            </label>
+            <input
+              type="email"
+              className="input-field"
+              placeholder="user@example.com"
+              value={resetPasswordData.targetEmail}
+              onChange={(e) => setResetPasswordData(prev => ({ ...prev, targetEmail: e.target.value }))}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                New Password *
+              </label>
+              <input
+                type="password"
+                className="input-field"
+                placeholder="••••••••"
+                value={resetPasswordData.newPassword}
+                onChange={(e) => setResetPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Confirm Password *
+              </label>
+              <input
+                type="password"
+                className="input-field"
+                placeholder="••••••••"
+                value={resetPasswordData.confirmPassword}
+                onChange={(e) => setResetPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                required
+              />
+            </div>
+          </div>
+
+          {resetMessage && (
+            <div className={`p-3 rounded-lg text-sm font-semibold ${
+              resetMessage.type === 'success'
+                ? 'bg-green-900/30 border border-green-500 text-green-300'
+                : 'bg-red-900/30 border border-red-500 text-red-300'
+            }`}>
+              {resetMessage.text}
+            </div>
+          )}
+
+          <button type="submit" className="btn-primary w-full">
+            Reset Password
+          </button>
+        </form>
+      </div>
 
       <div className="flex gap-4 mb-8 flex-wrap">
         <button
