@@ -25,24 +25,6 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
     });
   }, [completedSlots, filterDate, filterCandidate, filterRound, filterFeedback]);
 
-  const feedbackStats = useMemo(() => {
-    const good = filteredFeedback.filter(s => s.feedback === 'GOOD').length;
-    const avg = filteredFeedback.filter(s => s.feedback === 'AVG').length;
-    const bad = filteredFeedback.filter(s => s.feedback === 'BAD').length;
-    const total = filteredFeedback.length;
-
-    return {
-      good,
-      avg,
-      bad,
-      total,
-      goodPercent: total > 0 ? ((good / total) * 100).toFixed(1) : 0,
-      avgPercent: total > 0 ? ((avg / total) * 100).toFixed(1) : 0,
-      badPercent: total > 0 ? ((bad / total) * 100).toFixed(1) : 0,
-    };
-  }, [filteredFeedback]);
-
-
   const uniqueCandidates = [...new Set(completedSlots.map(s => s.candidateName))];
   const uniqueRounds = [...new Set(completedSlots.map(s => s.round || 'Unknown'))];
 
