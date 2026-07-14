@@ -126,6 +126,129 @@ export default function AdminTab({
     <div>
       <h2 className="text-2xl font-bold text-white mb-6">Admin Panel</h2>
 
+      <h3 className="text-xl font-semibold text-white mb-4">⏳ Manage Pending Slots</h3>
+      <p className="text-slate-400 text-sm mb-4">Showing interviews awaiting confirmation</p>
+
+      {/* Date Filter */}
+      <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              className="input-field w-full"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={() => setFilterDate('')}
+              className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
+            >
+              Clear Filter
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-slate-400 mt-2">
+          Showing {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length} pending slots
+        </p>
+      </div>
+
+      {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-slate-400">No pending slots. All interviews are confirmed or cancelled! ✅</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).map(slot => (
+            <div key={slot.id}>
+              {conflicts[slot.id] && (
+                <div className="mb-2 p-3 bg-red-900/30 border-l-4 border-red-500 rounded flex items-center gap-2">
+                  <span className="text-red-400 font-semibold">⚠️ Scheduling Conflict!</span>
+                  <span className="text-red-300 text-sm">{conflicts[slot.id].length} candidate(s) at same time</span>
+                </div>
+              )}
+            <SlotCard key={slot.id} slot={slot} showCandidate={true}>
+              {slot.candidateName && (
+                <div className="mt-4 space-y-3 bg-slate-900/50 p-4 rounded-lg border border-slate-600">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      Interview Status
+                    </label>
+                    <select
+                      className="input-field mb-2"
+                      value={slot.status || 'pending'}
+                      onChange={e => {
+                        console.log('Updating status to:', e.target.value);
+                        onUpdateStatus(slot.id, e.target.value);
+                      }}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="postponed">Postponed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+
+                  {(slot.status === 'cancelled' || slot.status === 'postponed') && (
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                        Reason
+                      </label>
+                      <textarea
+                        className="input-field"
+                        placeholder="Add reason for cancellation/postponement"
+                        rows={2}
+                        value={slot.reason || ''}
+                        onChange={e => {
+                          console.log('Reason updated:', e.target.value);
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {slot.status !== 'confirmed' && (
+                    <div>
+                      <p className="text-cyan-300 text-xs">💡 Confirm this interview to allocate a room below ↓</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => onCancelBooking(slot.id)}
+                      className="btn-danger flex-1 text-sm"
+                    >
+                      Force Cancel
+                    </button>
+                    <button
+                      onClick={() => onDeleteSlot(slot.id)}
+                      className="btn-danger flex-1 text-sm"
+                    >
+                      Delete Slot
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!slot.candidateName && (
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => onDeleteSlot(slot.id)}
+                    className="btn-danger w-full"
+                  >
+                    Delete Slot
+                  </button>
+                </div>
+              )}
+            </SlotCard>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <hr className="my-8 border-slate-700" />
+
       {/* Register Candidate Section */}
       <div className="bg-blue-900/30 rounded-xl p-6 mb-8 border border-blue-600">
         <h3 className="text-xl font-semibold text-blue-300 mb-4">👤 Register New Candidate</h3>
@@ -277,127 +400,6 @@ export default function AdminTab({
           🗑️ Clear All Data
         </button>
       </div>
-
-      <h3 className="text-xl font-semibold text-white mb-4">⏳ Manage Pending Slots</h3>
-      <p className="text-slate-400 text-sm mb-4">Showing interviews awaiting confirmation</p>
-
-      {/* Date Filter */}
-      <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
-            <input
-              type="date"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-              className="input-field w-full"
-            />
-          </div>
-          <div className="flex items-end">
-            <button
-              onClick={() => setFilterDate('')}
-              className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
-            >
-              Clear Filter
-            </button>
-          </div>
-        </div>
-        <p className="text-xs text-slate-400 mt-2">
-          Showing {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length} pending slots
-        </p>
-      </div>
-
-      {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-slate-400">No pending slots. All interviews are confirmed or cancelled! ✅</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).map(slot => (
-            <div key={slot.id}>
-              {conflicts[slot.id] && (
-                <div className="mb-2 p-3 bg-red-900/30 border-l-4 border-red-500 rounded flex items-center gap-2">
-                  <span className="text-red-400 font-semibold">⚠️ Scheduling Conflict!</span>
-                  <span className="text-red-300 text-sm">{conflicts[slot.id].length} candidate(s) at same time</span>
-                </div>
-              )}
-            <SlotCard key={slot.id} slot={slot} showCandidate={true}>
-              {slot.candidateName && (
-                <div className="mt-4 space-y-3 bg-slate-900/50 p-4 rounded-lg border border-slate-600">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">
-                      Interview Status
-                    </label>
-                    <select
-                      className="input-field mb-2"
-                      value={slot.status || 'pending'}
-                      onChange={e => {
-                        console.log('Updating status to:', e.target.value);
-                        onUpdateStatus(slot.id, e.target.value);
-                      }}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="postponed">Postponed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                  </div>
-
-                  {(slot.status === 'cancelled' || slot.status === 'postponed') && (
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Reason
-                      </label>
-                      <textarea
-                        className="input-field"
-                        placeholder="Add reason for cancellation/postponement"
-                        rows={2}
-                        value={slot.reason || ''}
-                        onChange={e => {
-                          console.log('Reason updated:', e.target.value);
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {slot.status !== 'confirmed' && (
-                    <div>
-                      <p className="text-cyan-300 text-xs">💡 Confirm this interview to allocate a room below ↓</p>
-                    </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => onCancelBooking(slot.id)}
-                      className="btn-danger flex-1 text-sm"
-                    >
-                      Force Cancel
-                    </button>
-                    <button
-                      onClick={() => onDeleteSlot(slot.id)}
-                      className="btn-danger flex-1 text-sm"
-                    >
-                      Delete Slot
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {!slot.candidateName && (
-                <div className="flex gap-3 mt-4">
-                  <button
-                    onClick={() => onDeleteSlot(slot.id)}
-                    className="btn-danger w-full"
-                  >
-                    Delete Slot
-                  </button>
-                </div>
-              )}
-            </SlotCard>
-            </div>
-          ))}
-        </div>
-      )}
 
     </div>
   );

@@ -42,33 +42,6 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
     };
   }, [filteredFeedback]);
 
-  const feedbackByCandidate = useMemo(() => {
-    const candidateMap: Record<string, { good: number; avg: number; bad: number }> = {};
-    filteredFeedback.forEach(slot => {
-      const candidateName = slot.candidateName || 'Unknown';
-      if (!candidateMap[candidateName]) {
-        candidateMap[candidateName] = { good: 0, avg: 0, bad: 0 };
-      }
-      if (slot.feedback === 'GOOD') candidateMap[candidateName].good++;
-      else if (slot.feedback === 'AVG') candidateMap[candidateName].avg++;
-      else if (slot.feedback === 'BAD') candidateMap[candidateName].bad++;
-    });
-    return candidateMap;
-  }, [filteredFeedback]);
-
-  const feedbackByRound = useMemo(() => {
-    const roundMap: Record<string, { good: number; avg: number; bad: number }> = {};
-    filteredFeedback.forEach(slot => {
-      const round = slot.round || 'Unknown';
-      if (!roundMap[round]) {
-        roundMap[round] = { good: 0, avg: 0, bad: 0 };
-      }
-      if (slot.feedback === 'GOOD') roundMap[round].good++;
-      else if (slot.feedback === 'AVG') roundMap[round].avg++;
-      else if (slot.feedback === 'BAD') roundMap[round].bad++;
-    });
-    return roundMap;
-  }, [filteredFeedback]);
 
   const uniqueCandidates = [...new Set(completedSlots.map(s => s.candidateName))];
   const uniqueRounds = [...new Set(completedSlots.map(s => s.round || 'Unknown'))];
@@ -197,101 +170,7 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
         </div>
       </div>
 
-      {/* Feedback by Candidate */}
-      {Object.keys(feedbackByCandidate).length > 0 && (
-        <div className="bg-slate-700/50 rounded-lg p-6 mb-8 border border-slate-600">
-          <h3 className="text-lg font-semibold text-white mb-4">👤 Feedback by Candidate</h3>
-          <div className="space-y-4">
-            {Object.entries(feedbackByCandidate).map(([candidate, stats]) => {
-              const total = stats.good + stats.avg + stats.bad;
-              return (
-                <div key={candidate}>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-white font-semibold">{candidate}</span>
-                    <span className="text-slate-400 text-sm">{total} interviews</span>
-                  </div>
-                  <div className="flex gap-2 h-6 rounded-lg overflow-hidden">
-                    {stats.good > 0 && (
-                      <div
-                        className="bg-green-500"
-                        style={{ width: `${(stats.good / total) * 100}%` }}
-                        title={`GOOD: ${stats.good}`}
-                      />
-                    )}
-                    {stats.avg > 0 && (
-                      <div
-                        className="bg-yellow-500"
-                        style={{ width: `${(stats.avg / total) * 100}%` }}
-                        title={`AVERAGE: ${stats.avg}`}
-                      />
-                    )}
-                    {stats.bad > 0 && (
-                      <div
-                        className="bg-red-500"
-                        style={{ width: `${(stats.bad / total) * 100}%` }}
-                        title={`BAD: ${stats.bad}`}
-                      />
-                    )}
-                  </div>
-                  <div className="flex gap-4 text-xs mt-1">
-                    <span className="text-green-300">🟢 {stats.good}</span>
-                    <span className="text-yellow-300">🟡 {stats.avg}</span>
-                    <span className="text-red-300">🔴 {stats.bad}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
-      {/* Feedback by Round */}
-      {Object.keys(feedbackByRound).length > 0 && (
-        <div className="bg-slate-700/50 rounded-lg p-6 mb-8 border border-slate-600">
-          <h3 className="text-lg font-semibold text-white mb-4">📋 Feedback by Round</h3>
-          <div className="space-y-4">
-            {Object.entries(feedbackByRound).map(([round, stats]) => {
-              const total = stats.good + stats.avg + stats.bad;
-              return (
-                <div key={round}>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-white font-semibold">{round}</span>
-                    <span className="text-slate-400 text-sm">{total} interviews</span>
-                  </div>
-                  <div className="flex gap-2 h-6 rounded-lg overflow-hidden">
-                    {stats.good > 0 && (
-                      <div
-                        className="bg-green-500"
-                        style={{ width: `${(stats.good / total) * 100}%` }}
-                        title={`GOOD: ${stats.good}`}
-                      />
-                    )}
-                    {stats.avg > 0 && (
-                      <div
-                        className="bg-yellow-500"
-                        style={{ width: `${(stats.avg / total) * 100}%` }}
-                        title={`AVERAGE: ${stats.avg}`}
-                      />
-                    )}
-                    {stats.bad > 0 && (
-                      <div
-                        className="bg-red-500"
-                        style={{ width: `${(stats.bad / total) * 100}%` }}
-                        title={`BAD: ${stats.bad}`}
-                      />
-                    )}
-                  </div>
-                  <div className="flex gap-4 text-xs mt-1">
-                    <span className="text-green-300">🟢 {stats.good}</span>
-                    <span className="text-yellow-300">🟡 {stats.avg}</span>
-                    <span className="text-red-300">🔴 {stats.bad}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Detailed Feedback List */}
       <div className="bg-slate-700/50 rounded-lg p-6 border border-slate-600">

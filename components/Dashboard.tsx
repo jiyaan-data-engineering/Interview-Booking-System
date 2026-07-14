@@ -69,6 +69,7 @@ export default function Dashboard() {
       const savedAdmin = localStorage.getItem('isAdmin');
       if (savedAdmin === 'true') {
         setIsAdmin(true);
+        setActiveTab('book');
       }
 
       // Load slots from Firestore with timeout
@@ -145,7 +146,7 @@ export default function Dashboard() {
   const handleAdminLogout = () => {
     setIsAdmin(false);
     localStorage.removeItem('isAdmin');
-    setActiveTab('book');
+    setActiveTab('allbookings');
     showAlert('Admin logged out!');
   };
 
@@ -529,7 +530,7 @@ export default function Dashboard() {
               />
             )}
 
-            {activeTab === 'tomorrow' && candidateUser && (
+            {activeTab === 'tomorrow' && (candidateUser || isAdmin) && (
               <TomorrowScheduleTab slots={slots} />
             )}
 
