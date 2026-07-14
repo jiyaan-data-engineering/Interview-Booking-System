@@ -1,4 +1,4 @@
-type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'admin';
+type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'cancelled' | 'admin';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -26,6 +26,7 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
     { id: 'allbookings', label: 'All Bookings', icon: '👥' },
     { id: 'feedbackanalytics', label: 'Feedback', icon: '💬' },
     { id: 'confirmedslots', label: 'Confirmed Slots', icon: '✅' },
+    { id: 'cancelled', label: 'Cancelled', icon: '❌' },
     { id: 'admin', label: 'Admin Panel', icon: '⚙️' },
   ];
 
