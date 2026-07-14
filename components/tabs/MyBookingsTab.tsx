@@ -7,7 +7,7 @@ interface MyBookingsTabProps {
   slots: InterviewSlot[];
   onReschedule: (slotId: string, date: string, time: string) => Promise<void> | void;
   onCancel: (slotId: string, reason: string) => Promise<void> | void;
-  onMarkCompleted?: (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string) => Promise<void> | void;
+  onMarkCompleted?: (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string, comments: string) => Promise<void> | void;
   candidateEmail?: string;
 }
 
@@ -15,7 +15,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
   const [rescheduleData, setRescheduleData] = useState<Record<string, { date: string; time: string }>>({});
   const [cancelReason, setCancelReason] = useState<Record<string, string>>({});
-  const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber: string; feedback: string }>>({});
+  const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber: string; feedback: string; comments: string }>>({});
   const [filterDate, setFilterDate] = useState('');
 
   const bookedSlots = slots.filter(slot => slot.candidateName && slot.candidateEmail === candidateEmail);
@@ -217,6 +217,12 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                       </span>
                     </div>
                   )}
+                  {slot.comments && (
+                    <div>
+                      <span className="text-slate-400">Comments: </span>
+                      <span className="text-white">{slot.comments}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (slot.status === 'confirmed' || slot.status === 'pending' || !slot.status) ? (
@@ -340,7 +346,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                     e.preventDefault();
                     const data = completeFormData[slot.id];
                     if (data && data.supportPerson && data.hrName && data.panelName && data.hrNumber && onMarkCompleted) {
-                      onMarkCompleted(slot.id, data.supportPerson, data.hrName, data.panelName, data.hrNumber, data.feedback);
+                      onMarkCompleted(slot.id, data.supportPerson, data.hrName, data.panelName, data.hrNumber, data.feedback, data.comments);
                       setExpandedSlot(null);
                       setCompleteFormData(prev => {
                         const updated = { ...prev };
@@ -450,6 +456,24 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                       <option value="AVG">🟡 AVERAGE - Satisfactory Performance</option>
                       <option value="BAD">🔴 BAD - Needs Improvement</option>
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      Comments (optional)
+                    </label>
+                    <textarea
+                      className="input-field"
+                      placeholder="Write your detailed comments, observations, or feedback here..."
+                      rows={4}
+                      value={completeFormData[slot.id]?.comments || ''}
+                      onChange={e =>
+                        setCompleteFormData(prev => ({
+                          ...prev,
+                          [slot.id]: { ...prev[slot.id], comments: e.target.value },
+                        }))
+                      }
+                    />
                   </div>
 
                   <div className="flex gap-3">

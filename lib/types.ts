@@ -17,6 +17,7 @@ export interface InterviewSlot {
   panelName?: string;
   hrNumber?: string;
   feedback?: string;
+  comments?: string;
   createdAt?: string;
   completedAt?: string;
 }

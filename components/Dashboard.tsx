@@ -14,12 +14,13 @@ import TomorrowScheduleTab from './tabs/TomorrowScheduleTab';
 import AllBookingsTab from './tabs/AllBookingsTab';
 import AnalyticsTab from './tabs/AnalyticsTab';
 import ViewTab from './tabs/ViewTab';
+import FeedbackAnalyticsTab from './tabs/FeedbackAnalyticsTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
 import LoginForm from './auth/LoginForm';
 import LoginPage from './LoginPage';
 
-type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'view' | 'admin';
+type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'view' | 'feedbackanalytics' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('allbookings');
@@ -224,9 +225,9 @@ export default function Dashboard() {
     }
   };
 
-  const handleMarkCompleted = async (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string) => {
+  const handleMarkCompleted = async (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string, comments: string) => {
     try {
-      await updateSlot(slotId, {
+      const updates: any = {
         status: 'completed' as const,
         supportPerson,
         hrName,
@@ -234,7 +235,10 @@ export default function Dashboard() {
         hrNumber,
         feedback,
         completedAt: new Date().toISOString()
-      });
+      };
+      if (comments) updates.comments = comments;
+
+      await updateSlot(slotId, updates);
       const updated = slots.map(slot =>
         slot.id === slotId
           ? {
@@ -245,6 +249,7 @@ export default function Dashboard() {
               panelName,
               hrNumber,
               feedback,
+              ...(comments && { comments }),
               completedAt: new Date().toISOString()
             }
           : slot
@@ -529,6 +534,10 @@ export default function Dashboard() {
                 booked={bookedSlots.length}
               />
             ) : null}
+
+            {activeTab === 'feedbackanalytics' && isAdmin && (
+              <FeedbackAnalyticsTab slots={slots} />
+            )}
 
             {activeTab === 'admin' && (
               <AdminTab

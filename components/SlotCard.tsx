@@ -121,6 +121,12 @@ export default function SlotCard({ slot, children, showCandidate = true }: SlotC
                   </div>
                 </div>
               )}
+              {slot.comments && (
+                <div>
+                  <div className="text-slate-400 text-xs font-semibold">Comments</div>
+                  <div className="text-white text-sm whitespace-pre-wrap">{slot.comments}</div>
+                </div>
+              )}
             </div>
           )}
         </div>
