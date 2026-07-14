@@ -7,9 +7,10 @@ import SlotCard from '@/components/SlotCard';
 interface ManageConfirmedSlotsTabProps {
   slots: InterviewSlot[];
   onUpdateStatus: (slotId: string, status: string, reason?: string, room?: string) => Promise<void> | void;
+  onDeleteSlot: (slotId: string) => Promise<void> | void;
 }
 
-export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus }: ManageConfirmedSlotsTabProps) {
+export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDeleteSlot }: ManageConfirmedSlotsTabProps) {
   const [roomAllocation, setRoomAllocation] = useState<Record<string, string>>({});
   const [filterDate, setFilterDate] = useState('');
 
@@ -134,6 +135,12 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus }: Manag
                       className="btn-success whitespace-nowrap"
                     >
                       Save Room
+                    </button>
+                    <button
+                      onClick={() => onDeleteSlot(slot.id)}
+                      className="px-4 py-2 bg-red-900/50 hover:bg-red-800/70 text-red-300 hover:text-red-100 rounded-lg font-semibold transition-all border border-red-500/50 whitespace-nowrap"
+                    >
+                      🗑️ Delete
                     </button>
                   </div>
                 </div>

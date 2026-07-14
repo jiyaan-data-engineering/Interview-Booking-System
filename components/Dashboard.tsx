@@ -543,7 +543,7 @@ export default function Dashboard() {
             )}
 
             {activeTab === 'confirmedslots' && isAdmin && (
-              <ManageConfirmedSlotsTab slots={slots} onUpdateStatus={handleUpdateStatus} />
+              <ManageConfirmedSlotsTab slots={slots} onUpdateStatus={handleUpdateStatus} onDeleteSlot={handleDeleteSlot} />
             )}
 
             {activeTab === 'admin' && (
