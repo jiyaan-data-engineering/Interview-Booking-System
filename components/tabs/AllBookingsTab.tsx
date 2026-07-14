@@ -19,6 +19,11 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
     return `${displayHours}:${m} ${period}`;
   };
 
+  const timeToMinutes = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    return parseInt(hours) * 60 + parseInt(minutes);
+  };
+
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
   const filteredSlots = (filterDate
@@ -27,7 +32,10 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
   ).sort((a, b) => {
     const dateA = new Date(a.date + 'T00:00:00').getTime();
     const dateB = new Date(b.date + 'T00:00:00').getTime();
-    return dateB - dateA;
+    if (dateA !== dateB) {
+      return dateB - dateA;
+    }
+    return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
 
   const getStatusColor = (status: string | undefined) => {

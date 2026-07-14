@@ -5,7 +5,7 @@ import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { InterviewSlot } from '@/lib/types';
 import { getSlots, saveSlot, updateSlot, deleteSlot } from '@/lib/firestore';
-import { registerCandidate, loginCandidate, logoutCandidate } from '@/lib/auth';
+import { registerCandidate, loginCandidate, logoutCandidate, getCandidateProfile } from '@/lib/auth';
 import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
@@ -34,6 +34,7 @@ export default function Dashboard() {
 
   // Candidate auth
   const [candidateUser, setCandidateUser] = useState<User | null>(null);
+  const [candidateProfile, setCandidateProfile] = useState<{ name: string; phone: string } | null>(null);
   const [showLoginForm, setShowLoginForm] = useState(false);
 
   useEffect(() => {
@@ -42,14 +43,23 @@ export default function Dashboard() {
       let unsubscribe: (() => void) | null = null;
 
       if (auth) {
-        unsubscribe = onAuthStateChanged(auth, (user) => {
+        unsubscribe = onAuthStateChanged(auth, async (user) => {
           setCandidateUser(user);
           if (user) {
             setShowLoginForm(false);
+            // Fetch candidate profile from Firestore
+            const profile = await getCandidateProfile(user.uid);
+            if (profile) {
+              setCandidateProfile({
+                name: profile.name,
+                phone: profile.phone
+              });
+            }
             // If candidate is logged in, default to 'book' tab
             setActiveTab('book');
           } else {
             // If not logged in, default to 'allbookings' tab
+            setCandidateProfile(null);
             setActiveTab('allbookings');
           }
         });
@@ -501,7 +511,12 @@ export default function Dashboard() {
 
           <div className="p-8">
             {activeTab === 'book' && (candidateUser || isAdmin) && (
-              <BookTab onBook={handleCandidateRegistration} />
+              <BookTab
+                onBook={handleCandidateRegistration}
+                candidateEmail={candidateUser?.email || ''}
+                candidateName={candidateProfile?.name || candidateUser?.displayName || ''}
+                candidatePhone={candidateProfile?.phone || ''}
+              />
             )}
 
             {activeTab === 'mybookings' && (candidateUser || isAdmin) && (

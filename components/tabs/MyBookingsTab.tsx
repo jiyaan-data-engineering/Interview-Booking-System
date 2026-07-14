@@ -18,6 +18,20 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber: string; feedback: string; comments: string }>>({});
   const [filterDate, setFilterDate] = useState('');
 
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const h = parseInt(hours);
+    const m = minutes;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${displayHours}:${m} ${period}`;
+  };
+
+  const timeToMinutes = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    return parseInt(hours) * 60 + parseInt(minutes);
+  };
+
   const bookedSlots = slots.filter(slot => slot.candidateName && slot.candidateEmail === candidateEmail);
 
   const filteredSlots = (filterDate
@@ -26,7 +40,10 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   ).sort((a, b) => {
     const dateA = new Date(a.date + 'T00:00:00').getTime();
     const dateB = new Date(b.date + 'T00:00:00').getTime();
-    return dateB - dateA;
+    if (dateA !== dateB) {
+      return dateB - dateA;
+    }
+    return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
 
   const handleRescheduleClick = (slotId: string, newDate: string, newTime: string) => {
@@ -138,7 +155,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                     month: 'short',
                     day: 'numeric',
                   })}{' '}
-                  @ {slot.time}
+                  @ {formatTime(slot.time)}
                 </div>
               </div>
               <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(slot.status)}`}>

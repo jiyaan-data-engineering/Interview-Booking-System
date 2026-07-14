@@ -4,13 +4,16 @@ import { useState } from 'react';
 
 interface BookTabProps {
   onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => Promise<void> | void;
+  candidateEmail?: string;
+  candidateName?: string;
+  candidatePhone?: string;
 }
 
-export default function BookTab({ onBook }: BookTabProps) {
+export default function BookTab({ onBook, candidateEmail = '', candidateName = '', candidatePhone = '' }: BookTabProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: candidateName || 'Your Name',
+    email: candidateEmail || 'your.email@example.com',
+    phone: candidatePhone || '+1 (555) 123-4567',
     date: '',
     time: '',
     company: '',
@@ -44,9 +47,9 @@ export default function BookTab({ onBook }: BookTabProps) {
 
       setSubmitted(true);
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
+        name: candidateName || 'Your Name',
+        email: candidateEmail || 'your.email@example.com',
+        phone: candidatePhone || '+1 (555) 123-4567',
         date: '',
         time: '',
         company: '',
@@ -60,9 +63,9 @@ export default function BookTab({ onBook }: BookTabProps) {
 
   const handleClear = () => {
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
+      name: candidateName || 'Your Name',
+      email: candidateEmail || 'your.email@example.com',
+      phone: candidatePhone || '+1 (555) 123-4567',
       date: '',
       time: '',
       company: '',
@@ -97,30 +100,30 @@ export default function BookTab({ onBook }: BookTabProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Full Name *
+                  Full Name * <span className="text-xs text-slate-500">(Read-only)</span>
                 </label>
                 <input
                   type="text"
                   name="name"
-                  className="input-field"
-                  placeholder="John Doe"
+                  className="input-field bg-slate-600 cursor-not-allowed"
+                  placeholder="Your Name"
                   value={formData.name}
-                  onChange={handleChange}
+                  disabled
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Email Address *
+                  Email Address * <span className="text-xs text-slate-500">(Read-only)</span>
                 </label>
                 <input
                   type="email"
                   name="email"
-                  className="input-field"
+                  className="input-field bg-slate-600 cursor-not-allowed"
                   placeholder="your.email@example.com"
                   value={formData.email}
-                  onChange={handleChange}
+                  disabled
                   required
                 />
               </div>
@@ -128,15 +131,15 @@ export default function BookTab({ onBook }: BookTabProps) {
 
             <div className="mt-4">
               <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Phone Number *
+                Phone Number * <span className="text-xs text-slate-500">(Read-only)</span>
               </label>
               <input
                 type="tel"
                 name="phone"
-                className="input-field"
+                className="input-field bg-slate-600 cursor-not-allowed"
                 placeholder="+1 (555) 123-4567"
                 value={formData.phone}
-                onChange={handleChange}
+                disabled
                 required
               />
             </div>
