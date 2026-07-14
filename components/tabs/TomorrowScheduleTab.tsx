@@ -7,9 +7,9 @@ interface TomorrowScheduleTabProps {
 }
 
 export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps) {
-  // Filter for confirmed slots only, sorted by time
+  // Filter for all booked slots, sorted by time
   const tomorrowSlots = slots
-    .filter(slot => slot.status === 'confirmed' && slot.candidateName)
+    .filter(slot => slot.candidateName)
     .sort((a, b) => a.time.localeCompare(b.time));
 
   const getStatusColor = (status: string | undefined) => {
