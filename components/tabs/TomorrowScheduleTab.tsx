@@ -7,17 +7,9 @@ interface TomorrowScheduleTabProps {
 }
 
 export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps) {
-  // Get tomorrow's date (local timezone, not UTC)
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const year = tomorrow.getFullYear();
-  const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-  const day = String(tomorrow.getDate()).padStart(2, '0');
-  const tomorrowDateStr = `${year}-${month}-${day}`;
-
-  // Filter for ALL tomorrow's slots (both booked and available), sorted by time
+  // Filter for confirmed slots only, sorted by time
   const tomorrowSlots = slots
-    .filter(slot => slot.date === tomorrowDateStr)
+    .filter(slot => slot.status === 'confirmed' && slot.candidateName)
     .sort((a, b) => a.time.localeCompare(b.time));
 
   const getStatusColor = (status: string | undefined) => {
@@ -53,9 +45,9 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-2">📆 Tomorrow's Schedule</h2>
+      <h2 className="text-2xl font-bold text-white mb-2">📆 Confirmed Interviews</h2>
       <p className="text-slate-400 mb-6">
-        All interviews scheduled for {tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        All confirmed interview bookings scheduled
       </p>
 
       {tomorrowSlots.length === 0 ? (
