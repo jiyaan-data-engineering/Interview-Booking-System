@@ -29,7 +29,7 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus }: Manag
     return { todayStr, tomorrowStr };
   };
 
-  const { todayStr, tomorrowStr } = getTodayAndTomorrow();
+  const { tomorrowStr } = getTodayAndTomorrow();
 
   // Show all confirmed slots, default filter to tomorrow
   const confirmedSlots = slots.filter(slot => slot.status === 'confirmed' && slot.candidateName);
