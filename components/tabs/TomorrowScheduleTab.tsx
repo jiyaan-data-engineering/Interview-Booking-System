@@ -7,10 +7,22 @@ interface TomorrowScheduleTabProps {
 }
 
 export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps) {
-  // Filter for all booked slots, sorted by time
-  const tomorrowSlots = slots
-    .filter(slot => slot.candidateName)
-    .sort((a, b) => a.time.localeCompare(b.time));
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const h = parseInt(hours);
+    const m = minutes;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${displayHours}:${m} ${period}`;
+  };
+
+  const bookedSlots = slots.filter(slot => slot.candidateName);
+
+  const sortedSlots = bookedSlots.sort((a, b) => {
+    const dateA = new Date(a.date + 'T00:00:00').getTime();
+    const dateB = new Date(b.date + 'T00:00:00').getTime();
+    return dateB - dateA;
+  });
 
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
@@ -34,83 +46,67 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
-  const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(':');
-    const h = parseInt(hours);
-    const m = minutes;
-    const period = h >= 12 ? 'PM' : 'AM';
-    const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
-    return `${displayHours}:${m} ${period}`;
-  };
+  if (bookedSlots.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <div className="text-3xl mb-4">📭</div>
+        <p className="text-slate-400 text-lg mb-2">No interview bookings yet</p>
+        <p className="text-slate-500">Check back soon!</p>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-2">📆 Confirmed Interviews</h2>
-      <p className="text-slate-400 mb-6">
-        All confirmed interview bookings scheduled
-      </p>
+      <h2 className="text-2xl font-bold text-white mb-2">📋 Interview Schedule (Numbered View)</h2>
+      <p className="text-slate-400 mb-6">All scheduled interviews numbered 1-N with AM/PM times</p>
 
-      {tomorrowSlots.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="text-3xl mb-4">📭</div>
-          <p className="text-slate-400 text-lg mb-2">No time slots available for tomorrow</p>
-          <p className="text-slate-500">Please create slots first</p>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {tomorrowSlots.map((slot, index) => {
-            const isBooked = slot.candidateName && slot.candidateEmail;
-            return (
-              <div
-                key={slot.id}
-                className={`p-4 rounded-lg border-2 flex justify-between items-center transition-all ${
-                  isBooked
-                    ? 'bg-green-900/30 border-green-500'
-                    : 'bg-slate-800/50 border-slate-600'
-                }`}
-              >
-                <div className="flex-1">
-                  <div className="text-xl font-bold text-white mb-2">
-                    <span className="bg-purple-600 px-3 py-1 rounded-full mr-3 text-lg">{index + 1}</span>
-                    ⏰ {formatTime(slot.time)} - {isBooked ? '✅ Booked' : '🔓 Available'}
-                  </div>
-                  {isBooked && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                      <div>
-                        <span className="text-slate-400 font-semibold">👤 Candidate:</span>
-                        <div className="text-white">{slot.candidateName}</div>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 font-semibold">🏢 Company:</span>
-                        <div className="text-white">{slot.company}</div>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 font-semibold">⏱️ Duration:</span>
-                        <div className="text-white">{slot.duration}</div>
-                      </div>
-                      {slot.round && (
-                        <div>
-                          <span className="text-slate-400 font-semibold">📋 Round:</span>
-                          <div className="text-white">{slot.round}</div>
-                        </div>
-                      )}
-                      {slot.room && (
-                        <div>
-                          <span className="text-slate-400 font-semibold">🚪 Room:</span>
-                          <div className="text-green-300 font-bold">{slot.room}</div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+      <div className="space-y-4">
+        {sortedSlots.map((slot, index) => (
+          <div key={slot.id} className="slot-card">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <div className="text-xl font-bold text-white mb-2">
+                  <span className="bg-purple-600 px-3 py-1 rounded-full mr-3 text-lg font-bold">{index + 1}</span>
+                  {new Date(slot.date + 'T00:00:00').toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                  })}{' '}
+                  @ {formatTime(slot.time)}
                 </div>
-                <div className={`px-4 py-2 rounded-full text-sm font-semibold border ml-4 whitespace-nowrap ${getStatusColor(slot.status)}`}>
-                  {isBooked ? getStatusLabel(slot.status) : '🔓 Open'}
-                </div>
+                <div className="text-sm text-slate-400 font-semibold">👤 {slot.candidateName}</div>
               </div>
-            );
-          })}
-        </div>
-      )}
+              <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(slot.status)}`}>
+                {getStatusLabel(slot.status)}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <div className="text-slate-400 text-sm font-semibold mb-1">Company</div>
+                <div className="text-white text-lg">{slot.company}</div>
+              </div>
+              <div>
+                <div className="text-slate-400 text-sm font-semibold mb-1">Duration</div>
+                <div className="text-white text-lg">{slot.duration}</div>
+              </div>
+              {slot.round && (
+                <div>
+                  <div className="text-slate-400 text-sm font-semibold mb-1">Round</div>
+                  <div className="text-white text-lg">{slot.round}</div>
+                </div>
+              )}
+              {slot.room && (
+                <div>
+                  <div className="text-slate-400 text-sm font-semibold mb-1">🚪 Room</div>
+                  <div className="text-white text-lg font-bold bg-green-900/50 px-3 py-1 rounded inline-block">{slot.room}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
