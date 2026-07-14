@@ -10,6 +10,15 @@ interface AllBookingsTabProps {
 export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
   const [filterDate, setFilterDate] = useState('');
 
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const h = parseInt(hours);
+    const m = minutes;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${displayHours}:${m} ${period}`;
+  };
+
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
   const filteredSlots = (filterDate
@@ -99,7 +108,7 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
                     month: 'short',
                     day: 'numeric',
                   })}{' '}
-                  @ {slot.time}
+                  @ {formatTime(slot.time)}
                 </div>
               </div>
               <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(slot.status)}`}>
