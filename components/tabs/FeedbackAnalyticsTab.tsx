@@ -46,6 +46,23 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
   const uniqueCandidates = [...new Set(completedSlots.map(s => s.candidateName))];
   const uniqueRounds = [...new Set(completedSlots.map(s => s.round || 'Unknown'))];
 
+  // Overall statistics (filtered by candidate if selected)
+  const getStatsByCandidate = () => {
+    let filtered = slots.filter(slot => slot.candidateName);
+    if (filterCandidate) {
+      filtered = filtered.filter(slot => slot.candidateName === filterCandidate);
+    }
+    return {
+      totalInterviews: filtered.length,
+      totalCompleted: filtered.filter(slot => slot.status === 'completed').length,
+      totalCancelled: filtered.filter(slot => slot.status === 'cancelled').length,
+      totalPending: filtered.filter(slot => (slot.status === 'pending' || !slot.status)).length,
+      totalConfirmed: filtered.filter(slot => slot.status === 'confirmed').length,
+    };
+  };
+
+  const stats = getStatsByCandidate();
+
   const exportToCSV = () => {
     const headers = ['Date', 'Candidate Name', 'Company', 'Round', 'Feedback', 'Support Person', 'HR Name', 'Panel Name', 'HR Number', 'Comments'];
     const rows = filteredFeedback.map(slot => [
@@ -75,37 +92,59 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
       <h2 className="text-2xl font-bold text-white mb-2">📊 Feedback Analytics</h2>
       <p className="text-slate-400 mb-6">Track and analyze interview feedback from candidates</p>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-green-900/40 to-green-900/20 border border-green-500/50 rounded-lg p-4">
-          <div className="text-green-300 text-sm font-semibold mb-1">🟢 GOOD</div>
-          <div className="text-3xl font-bold text-green-400">{feedbackStats.good}</div>
-          <div className="text-xs text-green-300 mt-1">{feedbackStats.goodPercent}% of feedback</div>
+      {/* Candidate Filter */}
+      <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
+        <label className="block text-sm font-semibold text-slate-300 mb-3">👤 Filter by Candidate (View Individual Statistics)</label>
+        <select
+          value={filterCandidate}
+          onChange={(e) => setFilterCandidate(e.target.value)}
+          className="w-full md:w-96 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+        >
+          <option value="">-- All Candidates --</option>
+          {uniqueCandidates.map(candidate => (
+            <option key={candidate} value={candidate}>{candidate}</option>
+          ))}
+        </select>
+        {filterCandidate && <p className="text-xs text-blue-300 mt-2">📊 Showing statistics for: <strong>{filterCandidate}</strong></p>}
+      </div>
+
+      {/* Overall Interview Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div className="bg-gradient-to-br from-blue-900/40 to-blue-900/20 border border-blue-500/50 rounded-lg p-4">
+          <div className="text-blue-300 text-sm font-semibold mb-1">📋 TOTAL INTERVIEWS</div>
+          <div className="text-3xl font-bold text-blue-400">{stats.totalInterviews}</div>
+          <div className="text-xs text-blue-300 mt-1">All booked interviews</div>
         </div>
 
-        <div className="bg-gradient-to-br from-yellow-900/40 to-yellow-900/20 border border-yellow-500/50 rounded-lg p-4">
-          <div className="text-yellow-300 text-sm font-semibold mb-1">🟡 AVERAGE</div>
-          <div className="text-3xl font-bold text-yellow-400">{feedbackStats.avg}</div>
-          <div className="text-xs text-yellow-300 mt-1">{feedbackStats.avgPercent}% of feedback</div>
+        <div className="bg-gradient-to-br from-green-900/40 to-green-900/20 border border-green-500/50 rounded-lg p-4">
+          <div className="text-green-300 text-sm font-semibold mb-1">✅ COMPLETED</div>
+          <div className="text-3xl font-bold text-green-400">{stats.totalCompleted}</div>
+          <div className="text-xs text-green-300 mt-1">Finished interviews</div>
         </div>
 
         <div className="bg-gradient-to-br from-red-900/40 to-red-900/20 border border-red-500/50 rounded-lg p-4">
-          <div className="text-red-300 text-sm font-semibold mb-1">🔴 BAD</div>
-          <div className="text-3xl font-bold text-red-400">{feedbackStats.bad}</div>
-          <div className="text-xs text-red-300 mt-1">{feedbackStats.badPercent}% of feedback</div>
+          <div className="text-red-300 text-sm font-semibold mb-1">❌ CANCELLED</div>
+          <div className="text-3xl font-bold text-red-400">{stats.totalCancelled}</div>
+          <div className="text-xs text-red-300 mt-1">Cancelled bookings</div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-900/40 to-blue-900/20 border border-blue-500/50 rounded-lg p-4">
-          <div className="text-blue-300 text-sm font-semibold mb-1">📈 TOTAL</div>
-          <div className="text-3xl font-bold text-blue-400">{feedbackStats.total}</div>
-          <div className="text-xs text-blue-300 mt-1">Feedback collected</div>
+        <div className="bg-gradient-to-br from-yellow-900/40 to-yellow-900/20 border border-yellow-500/50 rounded-lg p-4">
+          <div className="text-yellow-300 text-sm font-semibold mb-1">⏳ PENDING</div>
+          <div className="text-3xl font-bold text-yellow-400">{stats.totalPending}</div>
+          <div className="text-xs text-yellow-300 mt-1">Pending confirmation</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-900/40 to-purple-900/20 border border-purple-500/50 rounded-lg p-4">
+          <div className="text-purple-300 text-sm font-semibold mb-1">💜 CONFIRMED</div>
+          <div className="text-3xl font-bold text-purple-400">{stats.totalConfirmed}</div>
+          <div className="text-xs text-purple-300 mt-1">Confirmed interviews</div>
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Detailed Feedback Filters */}
       <div className="bg-slate-700/50 rounded-lg p-6 mb-8 border border-slate-600">
-        <h3 className="text-lg font-semibold text-white mb-4">🔍 Filters</h3>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <h3 className="text-lg font-semibold text-white mb-4">🔍 Filter Detailed Feedback</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
             <input
@@ -114,19 +153,6 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
               onChange={(e) => setFilterDate(e.target.value)}
               className="input-field"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-300 mb-2">Candidate</label>
-            <select
-              value={filterCandidate}
-              onChange={(e) => setFilterCandidate(e.target.value)}
-              className="input-field"
-            >
-              <option value="">All Candidates</option>
-              {uniqueCandidates.map(candidate => (
-                <option key={candidate} value={candidate}>{candidate}</option>
-              ))}
-            </select>
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">Round</label>
@@ -158,7 +184,6 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
             <button
               onClick={() => {
                 setFilterDate('');
-                setFilterCandidate('');
                 setFilterRound('');
                 setFilterFeedback('');
               }}
