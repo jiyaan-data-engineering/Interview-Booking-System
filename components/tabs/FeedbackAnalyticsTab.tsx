@@ -74,16 +74,18 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
   const uniqueRounds = [...new Set(completedSlots.map(s => s.round || 'Unknown'))];
 
   const exportToCSV = () => {
-    const headers = ['Date', 'Candidate Name', 'Company', 'Round', 'Feedback', 'Comments', 'HR Name', 'Support Person'];
+    const headers = ['Date', 'Candidate Name', 'Company', 'Round', 'Feedback', 'Support Person', 'HR Name', 'Panel Name', 'HR Number', 'Comments'];
     const rows = filteredFeedback.map(slot => [
       slot.date,
       slot.candidateName,
       slot.company,
       slot.round || 'N/A',
       slot.feedback || 'N/A',
-      `"${(slot.comments || '').replace(/"/g, '""')}"`,
-      slot.hrName || 'N/A',
       slot.supportPerson || 'N/A',
+      slot.hrName || 'N/A',
+      slot.panelName || 'N/A',
+      slot.hrNumber || 'N/A',
+      `"${(slot.comments || '').replace(/"/g, '""')}"`,
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -310,24 +312,28 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-slate-600">
+              <thead className="border-b border-slate-600 bg-slate-800/50 sticky top-0">
                 <tr className="text-left">
                   <th className="text-slate-300 font-semibold py-3 px-2">Date</th>
                   <th className="text-slate-300 font-semibold py-3 px-2">Candidate</th>
                   <th className="text-slate-300 font-semibold py-3 px-2">Company</th>
                   <th className="text-slate-300 font-semibold py-3 px-2">Round</th>
                   <th className="text-slate-300 font-semibold py-3 px-2">Feedback</th>
+                  <th className="text-slate-300 font-semibold py-3 px-2">Support Person</th>
+                  <th className="text-slate-300 font-semibold py-3 px-2">HR Name</th>
+                  <th className="text-slate-300 font-semibold py-3 px-2">Panel Name</th>
+                  <th className="text-slate-300 font-semibold py-3 px-2">HR Number</th>
                   <th className="text-slate-300 font-semibold py-3 px-2">Comments</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredFeedback.map((slot) => (
                   <tr key={slot.id} className="border-b border-slate-700 hover:bg-slate-800/50 transition-all">
-                    <td className="py-3 px-2 text-slate-300">{slot.date}</td>
+                    <td className="py-3 px-2 text-slate-300 whitespace-nowrap">{slot.date}</td>
                     <td className="py-3 px-2 text-white font-semibold">{slot.candidateName}</td>
                     <td className="py-3 px-2 text-slate-300">{slot.company}</td>
-                    <td className="py-3 px-2 text-slate-300">{slot.round || 'N/A'}</td>
-                    <td className="py-3 px-2">
+                    <td className="py-3 px-2 text-slate-300 whitespace-nowrap">{slot.round || 'N/A'}</td>
+                    <td className="py-3 px-2 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${
                         slot.feedback === 'GOOD' ? 'bg-green-900/50 text-green-300' :
                         slot.feedback === 'AVG' ? 'bg-yellow-900/50 text-yellow-300' :
@@ -339,7 +345,11 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
                         {slot.feedback === 'BAD' && '🔴 BAD'}
                       </span>
                     </td>
-                    <td className="py-3 px-2 text-slate-300 max-w-xs truncate" title={slot.comments}>
+                    <td className="py-3 px-2 text-slate-300 text-xs">{slot.supportPerson || '-'}</td>
+                    <td className="py-3 px-2 text-slate-300 text-xs">{slot.hrName || '-'}</td>
+                    <td className="py-3 px-2 text-slate-300 text-xs">{slot.panelName || '-'}</td>
+                    <td className="py-3 px-2 text-slate-300 text-xs">{slot.hrNumber || '-'}</td>
+                    <td className="py-3 px-2 text-slate-300 max-w-xs truncate text-xs" title={slot.comments}>
                       {slot.comments || '-'}
                     </td>
                   </tr>
