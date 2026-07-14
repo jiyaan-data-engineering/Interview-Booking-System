@@ -38,6 +38,23 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
     return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
 
+  // Detect time conflicts for filtered date
+  let timeConflicts: { time: string; candidates: string[]; date: string }[] = [];
+  if (filterDate) {
+    const dateSlots = bookedSlots.filter(slot => slot.date === filterDate);
+    const timeMap = new Map<string, string[]>();
+    dateSlots.forEach(slot => {
+      const existing = timeMap.get(slot.time) || [];
+      existing.push(slot.candidateName);
+      timeMap.set(slot.time, existing);
+    });
+    timeMap.forEach((candidates, time) => {
+      if (candidates.length > 1) {
+        timeConflicts.push({ time, candidates, date: filterDate });
+      }
+    });
+  }
+
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
       case 'confirmed':
@@ -98,6 +115,22 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
         </div>
         <p className="text-xs text-slate-400 mt-2">Showing {filteredSlots.length} of {bookedSlots.length} bookings</p>
       </div>
+
+      {timeConflicts.length > 0 && (
+        <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <div className="text-red-300 font-semibold mb-2">Time Conflict Alert!</div>
+              {timeConflicts.map((conflict, idx) => (
+                <div key={idx} className="text-red-200 text-sm mb-1">
+                  <strong>{formatTime(conflict.time)}</strong>: {conflict.candidates.join(', ')}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {filteredSlots.length === 0 ? (
         <div className="text-center py-8">

@@ -54,6 +54,20 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
     }
   });
 
+  // Detect time conflicts
+  const timeConflicts: { time: string; candidates: string[] }[] = [];
+  const timeMap = new Map<string, string[]>();
+  tomorrowConfirmedSlots.forEach(slot => {
+    const existing = timeMap.get(slot.time) || [];
+    existing.push(slot.candidateName);
+    timeMap.set(slot.time, existing);
+  });
+  timeMap.forEach((candidates, time) => {
+    if (candidates.length > 1) {
+      timeConflicts.push({ time, candidates });
+    }
+  });
+
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
       case 'confirmed':
@@ -107,6 +121,22 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
           </div>
         ) : (
           <>
+            {timeConflicts.length > 0 && (
+              <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">⚠️</span>
+                  <div>
+                    <div className="text-red-300 font-semibold mb-2">Time Conflict Alert!</div>
+                    {timeConflicts.map((conflict, idx) => (
+                      <div key={idx} className="text-red-200 text-sm mb-1">
+                        <strong>{formatTime(conflict.time)}</strong>: {conflict.candidates.join(', ')}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="mb-6 p-4 bg-slate-800 rounded-lg border border-slate-700">
               <div className="text-slate-300 font-semibold mb-3">👥 Candidate Breakdown:</div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
