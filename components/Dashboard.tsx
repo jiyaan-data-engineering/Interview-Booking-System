@@ -12,15 +12,14 @@ import BookTab from './tabs/BookTab';
 import MyBookingsTab from './tabs/MyBookingsTab';
 import TomorrowScheduleTab from './tabs/TomorrowScheduleTab';
 import AllBookingsTab from './tabs/AllBookingsTab';
-import AnalyticsTab from './tabs/AnalyticsTab';
-import ViewTab from './tabs/ViewTab';
 import FeedbackAnalyticsTab from './tabs/FeedbackAnalyticsTab';
+import ManageConfirmedSlotsTab from './tabs/ManageConfirmedSlotsTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
 import LoginForm from './auth/LoginForm';
 import LoginPage from './LoginPage';
 
-type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'view' | 'feedbackanalytics' | 'admin';
+type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('allbookings');
@@ -205,19 +204,20 @@ export default function Dashboard() {
     }
   };
 
-  const handleUpdateStatus = async (slotId: string, newStatus: string, reason?: string) => {
+  const handleUpdateStatus = async (slotId: string, newStatus: string, reason?: string, room?: string) => {
     try {
       const updates: any = { status: newStatus as InterviewSlot['status'] };
       if (reason) updates.reason = reason;
+      if (room) updates.room = room;
 
       await updateSlot(slotId, updates);
       const updated = slots.map(slot =>
         slot.id === slotId
-          ? { ...slot, status: newStatus as InterviewSlot['status'], ...(reason && { reason }) }
+          ? { ...slot, status: newStatus as InterviewSlot['status'], ...(reason && { reason }), ...(room && { room }) }
           : slot
       );
       updateSlots(updated);
-      const statusMsg = newStatus === 'confirmed' ? 'Interview confirmed!' : `Interview status updated to ${newStatus}`;
+      const statusMsg = newStatus === 'confirmed' ? 'Interview confirmed! Room allocated.' : `Interview status updated to ${newStatus}`;
       showAlert(statusMsg);
     } catch (error) {
       showAlert('Failed to update status. Please try again.', 'error');
@@ -395,9 +395,6 @@ export default function Dashboard() {
     );
   }
 
-  const availableSlots = slots.filter(slot => !slot.candidateName);
-  const bookedSlots = slots.filter(slot => slot.candidateName);
-
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-6xl mx-auto">
@@ -525,18 +522,12 @@ export default function Dashboard() {
               <AllBookingsTab slots={slots} />
             )}
 
-            {activeTab === 'view' && isAdmin ? (
-              <AnalyticsTab slots={slots} />
-            ) : activeTab === 'view' ? (
-              <ViewTab
-                slots={slots}
-                available={availableSlots.length}
-                booked={bookedSlots.length}
-              />
-            ) : null}
-
             {activeTab === 'feedbackanalytics' && isAdmin && (
               <FeedbackAnalyticsTab slots={slots} />
+            )}
+
+            {activeTab === 'confirmedslots' && isAdmin && (
+              <ManageConfirmedSlotsTab slots={slots} onUpdateStatus={handleUpdateStatus} />
             )}
 
             {activeTab === 'admin' && (

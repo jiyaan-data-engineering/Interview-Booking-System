@@ -71,6 +71,12 @@ export default function SlotCard({ slot, children, showCandidate = true }: SlotC
             <div className="text-white text-lg">{slot.round}</div>
           </div>
         )}
+        {slot.room && (
+          <div>
+            <div className="text-slate-400 text-sm font-semibold mb-1">🚪 Room Allocated</div>
+            <div className="text-white text-lg font-semibold text-green-400 bg-green-900/30 px-3 py-1 rounded">{slot.room}</div>
+          </div>
+        )}
       </div>
 
       {showCandidate && isBooked && (

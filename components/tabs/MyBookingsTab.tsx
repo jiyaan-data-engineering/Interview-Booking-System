@@ -172,6 +172,20 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
               </div>
             )}
 
+            {slot.status === 'confirmed' && slot.room && (
+              <div className="mt-4 p-4 bg-green-900/30 border border-green-500/50 rounded-lg">
+                <div className="flex items-start justify-between">
+                  <h4 className="text-green-300 font-semibold">✅ Interview Confirmed</h4>
+                </div>
+                <div className="mt-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-400">🚪 Room Allocated:</span>
+                    <span className="text-white font-bold text-lg bg-green-900/50 px-3 py-1 rounded">{slot.room}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {slot.status === 'completed' ? (
               <div className="mt-4 p-4 bg-green-900/30 border border-green-500/50 rounded-lg">
                 <div className="flex items-start justify-between mb-3">

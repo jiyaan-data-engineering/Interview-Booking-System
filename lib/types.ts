@@ -12,6 +12,7 @@ export interface InterviewSlot {
   candidatePhone: string;
   status: InterviewStatus;
   reason?: string;
+  room?: string;
   supportPerson?: string;
   hrName?: string;
   panelName?: string;

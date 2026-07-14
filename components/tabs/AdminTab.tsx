@@ -9,7 +9,7 @@ interface AdminTabProps {
   slots: InterviewSlot[];
   onDeleteSlot: (slotId: string) => Promise<void> | void;
   onCancelBooking: (slotId: string) => Promise<void> | void;
-  onUpdateStatus: (slotId: string, status: string, reason?: string) => Promise<void> | void;
+  onUpdateStatus: (slotId: string, status: string, reason?: string, room?: string) => Promise<void> | void;
   onClearAllSlots?: () => void;
   onRegisterCandidate?: (name: string, email: string, phone: string, password: string) => Promise<void> | void;
 }
@@ -354,10 +354,15 @@ export default function AdminTab({
                         rows={2}
                         value={slot.reason || ''}
                         onChange={e => {
-                          // This would need a separate handler in Dashboard
                           console.log('Reason updated:', e.target.value);
                         }}
                       />
+                    </div>
+                  )}
+
+                  {slot.status !== 'confirmed' && (
+                    <div>
+                      <p className="text-cyan-300 text-xs">💡 Confirm this interview to allocate a room below ↓</p>
                     </div>
                   )}
 
@@ -393,6 +398,7 @@ export default function AdminTab({
           ))}
         </div>
       )}
+
     </div>
   );
 }

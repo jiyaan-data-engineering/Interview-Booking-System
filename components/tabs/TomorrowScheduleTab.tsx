@@ -7,22 +7,17 @@ interface TomorrowScheduleTabProps {
 }
 
 export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps) {
-  // Get tomorrow's date
+  // Get tomorrow's date (local timezone, not UTC)
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowDateStr = tomorrow.toISOString().split('T')[0];
+  const year = tomorrow.getFullYear();
+  const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+  const day = String(tomorrow.getDate()).padStart(2, '0');
+  const tomorrowDateStr = `${year}-${month}-${day}`;
 
-  // Filter for CONFIRMED tomorrow's bookings, sorted by time
+  // Filter for ALL tomorrow's slots (both booked and available), sorted by time
   const tomorrowSlots = slots
-    .filter(slot => {
-      // Must have candidate info
-      if (!slot.candidateName || !slot.candidateEmail) return false;
-      // Must be tomorrow's date
-      if (slot.date !== tomorrowDateStr) return false;
-      // Only show confirmed interviews
-      if (slot.status !== 'confirmed') return false;
-      return true;
-    })
+    .filter(slot => slot.date === tomorrowDateStr)
     .sort((a, b) => a.time.localeCompare(b.time));
 
   const getStatusColor = (status: string | undefined) => {
@@ -65,55 +60,63 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
 
       {tomorrowSlots.length === 0 ? (
         <div className="text-center py-16">
-          <div className="text-3xl mb-4">🎉</div>
-          <p className="text-slate-400 text-lg mb-2">No interviews scheduled for tomorrow</p>
-          <p className="text-slate-500">You're all clear!</p>
+          <div className="text-3xl mb-4">📭</div>
+          <p className="text-slate-400 text-lg mb-2">No time slots available for tomorrow</p>
+          <p className="text-slate-500">Please create slots first</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {tomorrowSlots.map((slot, index) => (
-            <div key={slot.id} className="slot-card">
-              <div className="flex justify-between items-start mb-4">
+        <div className="space-y-2">
+          {tomorrowSlots.map((slot, index) => {
+            const isBooked = slot.candidateName && slot.candidateEmail;
+            return (
+              <div
+                key={slot.id}
+                className={`p-4 rounded-lg border-2 flex justify-between items-center transition-all ${
+                  isBooked
+                    ? 'bg-green-900/30 border-green-500'
+                    : 'bg-slate-800/50 border-slate-600'
+                }`}
+              >
                 <div className="flex-1">
-                  <div className="text-3xl font-bold text-purple-400 mb-2">
-                    {index + 1}. {formatTime(slot.time)}
+                  <div className="text-xl font-bold text-white mb-2">
+                    <span className="bg-purple-600 px-3 py-1 rounded-full mr-3 text-lg">{index + 1}</span>
+                    ⏰ {formatTime(slot.time)} - {isBooked ? '✅ Booked' : '🔓 Available'}
                   </div>
+                  {isBooked && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                      <div>
+                        <span className="text-slate-400 font-semibold">👤 Candidate:</span>
+                        <div className="text-white">{slot.candidateName}</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 font-semibold">🏢 Company:</span>
+                        <div className="text-white">{slot.company}</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 font-semibold">⏱️ Duration:</span>
+                        <div className="text-white">{slot.duration}</div>
+                      </div>
+                      {slot.round && (
+                        <div>
+                          <span className="text-slate-400 font-semibold">📋 Round:</span>
+                          <div className="text-white">{slot.round}</div>
+                        </div>
+                      )}
+                      {slot.room && (
+                        <div>
+                          <span className="text-slate-400 font-semibold">🚪 Room:</span>
+                          <div className="text-green-300 font-bold">{slot.room}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(slot.status)}`}>
-                  {getStatusLabel(slot.status)}
+                <div className={`px-4 py-2 rounded-full text-sm font-semibold border ml-4 whitespace-nowrap ${getStatusColor(slot.status)}`}>
+                  {isBooked ? getStatusLabel(slot.status) : '🔓 Open'}
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <div className="text-slate-400 text-sm font-semibold mb-1">👤 Candidate Name</div>
-                  <div className="text-white text-lg">{slot.candidateName}</div>
-                </div>
-                <div>
-                  <div className="text-slate-400 text-sm font-semibold mb-1">Company</div>
-                  <div className="text-white text-lg">{slot.company}</div>
-                </div>
-                <div>
-                  <div className="text-slate-400 text-sm font-semibold mb-1">Duration</div>
-                  <div className="text-white text-lg">{slot.duration}</div>
-                </div>
-                {slot.round && (
-                  <div>
-                    <div className="text-slate-400 text-sm font-semibold mb-1">Round</div>
-                    <div className="text-white text-lg">{slot.round}</div>
-                  </div>
-                )}
-              </div>
-
-              <div className="bg-blue-900/30 border-l-4 border-blue-500 p-3 rounded">
-                <div className="text-blue-300 text-sm">
-                  <span className="font-semibold">⏰ Interview at {formatTime(slot.time)}</span>
-                  <br/>
-                  <span className="text-xs mt-1 block">Status: {getStatusLabel(slot.status)}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
