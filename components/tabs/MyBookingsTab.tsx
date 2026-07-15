@@ -208,11 +208,11 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
             {slot.interviewStatus && (
               <div className="mt-4 p-4 bg-blue-900/30 border border-blue-500/50 rounded-lg">
                 <div className="flex items-start justify-between mb-3">
-                  <h4 className="text-blue-300 font-semibold">📋 Interview Status</h4>
+                  <h4 className="text-blue-300 font-semibold">📋 Interview Invite Status</h4>
                 </div>
                 <div className="flex items-end gap-3">
                   <div className="flex-1">
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">Update Status</label>
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">Update Invite Status</label>
                     <select
                       className="input-field w-full"
                       value={interviewStatusData[slot.id] || slot.interviewStatus || ''}

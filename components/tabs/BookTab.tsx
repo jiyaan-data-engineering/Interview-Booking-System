@@ -282,7 +282,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
 
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Interview Status *
+                  Interview Invite Status *
                 </label>
                 <select
                   name="interviewStatus"
