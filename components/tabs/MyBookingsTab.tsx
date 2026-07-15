@@ -8,14 +8,16 @@ interface MyBookingsTabProps {
   onReschedule: (slotId: string, date: string, time: string) => Promise<void> | void;
   onCancel: (slotId: string, reason: string) => Promise<void> | void;
   onMarkCompleted?: (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string, comments: string) => Promise<void> | void;
+  onUpdateInterviewStatus?: (slotId: string, interviewStatus: string) => Promise<void> | void;
   candidateEmail?: string;
 }
 
-export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCompleted, candidateEmail }: MyBookingsTabProps) {
+export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCompleted, onUpdateInterviewStatus, candidateEmail }: MyBookingsTabProps) {
   const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
   const [rescheduleData, setRescheduleData] = useState<Record<string, { date: string; time: string }>>({});
   const [cancelReason, setCancelReason] = useState<Record<string, string>>({});
   const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber: string; feedback: string; comments: string }>>({});
+  const [interviewStatusData, setInterviewStatusData] = useState<Record<string, string>>({});
   const [filterDate, setFilterDate] = useState('');
 
   const formatTime = (time: string) => {
@@ -199,6 +201,43 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                     <span className="text-slate-400">🚪 Room Allocated:</span>
                     <span className="text-white font-bold text-lg bg-green-900/50 px-3 py-1 rounded">{slot.room}</span>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {slot.interviewStatus && (
+              <div className="mt-4 p-4 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+                <div className="flex items-start justify-between mb-3">
+                  <h4 className="text-blue-300 font-semibold">📋 Interview Status</h4>
+                </div>
+                <div className="flex items-end gap-3">
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">Update Status</label>
+                    <select
+                      className="input-field w-full"
+                      value={interviewStatusData[slot.id] || slot.interviewStatus || ''}
+                      onChange={(e) => setInterviewStatusData(prev => ({ ...prev, [slot.id]: e.target.value }))}
+                    >
+                      <option value="Received">Received</option>
+                      <option value="Waiting for Invite">Waiting for Invite</option>
+                    </select>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newStatus = interviewStatusData[slot.id] || slot.interviewStatus;
+                      if (newStatus && newStatus !== slot.interviewStatus && onUpdateInterviewStatus) {
+                        onUpdateInterviewStatus(slot.id, newStatus);
+                        setInterviewStatusData(prev => {
+                          const updated = { ...prev };
+                          delete updated[slot.id];
+                          return updated;
+                        });
+                      }
+                    }}
+                    className="btn-primary whitespace-nowrap"
+                  >
+                    Update Status
+                  </button>
                 </div>
               </div>
             )}

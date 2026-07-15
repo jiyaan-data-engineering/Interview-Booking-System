@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface BookTabProps {
-  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => Promise<void> | void;
+  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string) => Promise<void> | void;
   candidateEmail?: string;
   candidateName?: string;
   candidatePhone?: string;
@@ -19,6 +19,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
     company: '',
     duration: '',
     round: '',
+    interviewStatus: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -32,7 +33,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
     e.preventDefault();
 
     if (formData.name && formData.email && formData.phone && formData.date &&
-        formData.time && formData.company && formData.duration && formData.round) {
+        formData.time && formData.company && formData.duration && formData.round && formData.interviewStatus) {
 
       onBook(
         formData.name,
@@ -42,7 +43,8 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         formData.time,
         formData.company,
         formData.duration,
-        formData.round
+        formData.round,
+        formData.interviewStatus
       );
 
       setSubmitted(true);
@@ -55,6 +57,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         company: '',
         duration: '',
         round: '',
+        interviewStatus: '',
       });
 
       setTimeout(() => setSubmitted(false), 5000);
@@ -71,6 +74,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
       company: '',
       duration: '',
       round: '',
+      interviewStatus: '',
     });
   };
 
@@ -273,6 +277,23 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                   <option value="L2">L2</option>
                   <option value="Client">Client</option>
                   <option value="HR">HR</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Interview Status *
+                </label>
+                <select
+                  name="interviewStatus"
+                  className="input-field"
+                  value={formData.interviewStatus}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="Received">Received</option>
+                  <option value="Waiting for Invite">Waiting for Invite</option>
                 </select>
               </div>
             </div>

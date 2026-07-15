@@ -19,6 +19,7 @@ export interface InterviewSlot {
   hrNumber?: string;
   feedback?: string;
   comments?: string;
+  interviewStatus?: string;
   createdAt?: string;
   completedAt?: string;
 }

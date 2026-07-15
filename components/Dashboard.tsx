@@ -161,7 +161,7 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 4000);
   };
 
-  const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string) => {
+  const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string) => {
     try {
       const newSlot: Omit<InterviewSlot, 'id'> = {
         date,
@@ -173,6 +173,7 @@ export default function Dashboard() {
         candidateEmail: email,
         candidatePhone: phone,
         status: 'pending' as const,
+        interviewStatus,
         createdAt: new Date().toISOString(),
       };
       const slotId = await saveSlot(newSlot);
@@ -302,6 +303,22 @@ export default function Dashboard() {
         showAlert('Failed to delete slot. Please try again.', 'error');
         console.error(error);
       }
+    }
+  };
+
+  const handleUpdateInterviewStatus = async (slotId: string, interviewStatus: string) => {
+    try {
+      await updateSlot(slotId, { interviewStatus });
+      const updated = slots.map(slot =>
+        slot.id === slotId
+          ? { ...slot, interviewStatus }
+          : slot
+      );
+      updateSlots(updated);
+      showAlert('Interview status updated successfully!');
+    } catch (error) {
+      showAlert('Failed to update interview status. Please try again.', 'error');
+      console.error(error);
     }
   };
 
@@ -527,6 +544,7 @@ export default function Dashboard() {
                 onReschedule={handleRescheduleBooking}
                 onCancel={handleCancelBookingWithReason}
                 onMarkCompleted={handleMarkCompleted}
+                onUpdateInterviewStatus={handleUpdateInterviewStatus}
                 candidateEmail={candidateUser?.email || (isAdmin ? 'admin@system' : '') || ''}
               />
             )}
