@@ -20,14 +20,11 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
   };
 
   const getTodayAndTomorrow = () => {
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-
-    const tomorrow = new Date(today);
+    const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-    return { todayStr, tomorrowStr };
+    return { tomorrowStr };
   };
 
   const { tomorrowStr } = getTodayAndTomorrow();
