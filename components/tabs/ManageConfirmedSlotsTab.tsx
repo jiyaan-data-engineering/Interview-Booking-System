@@ -13,6 +13,7 @@ interface ManageConfirmedSlotsTabProps {
 export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDeleteSlot }: ManageConfirmedSlotsTabProps) {
   const [roomAllocation, setRoomAllocation] = useState<Record<string, string>>({});
   const [filterDate, setFilterDate] = useState('');
+  const [filterCandidate, setFilterCandidate] = useState('');
 
   const timeToMinutes = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -32,10 +33,13 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
   // Show all confirmed slots, default filter to tomorrow
   const confirmedSlots = slots.filter(slot => slot.status === 'confirmed' && slot.candidateName);
 
+  const uniqueCandidates = [...new Set(confirmedSlots.map(s => s.candidateName))];
+
   const filteredSlots = (filterDate
     ? confirmedSlots.filter(slot => slot.date === filterDate)
     : confirmedSlots.filter(slot => slot.date === tomorrowStr)
-  ).sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+  ).filter(slot => !filterCandidate || slot.candidateName === filterCandidate)
+   .sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
 
   // Detect time conflicts
   const getConflicts = () => {
@@ -65,10 +69,10 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
         </div>
       )}
 
-      {/* Date Filter */}
+      {/* Date & Candidate Filter */}
       {confirmedSlots.length > 0 && (
         <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
               <input
@@ -78,12 +82,28 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
                 className="input-field w-full"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">👤 Filter by Candidate</label>
+              <select
+                value={filterCandidate}
+                onChange={(e) => setFilterCandidate(e.target.value)}
+                className="input-field w-full"
+              >
+                <option value="">-- All Candidates --</option>
+                {uniqueCandidates.map(candidate => (
+                  <option key={candidate} value={candidate}>{candidate}</option>
+                ))}
+              </select>
+            </div>
             <div className="flex items-end">
               <button
-                onClick={() => setFilterDate('')}
+                onClick={() => {
+                  setFilterDate('');
+                  setFilterCandidate('');
+                }}
                 className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
               >
-                Clear Filter
+                Clear Filters
               </button>
             </div>
           </div>

@@ -36,6 +36,7 @@ export default function AdminTab({
   const [resetMessage, setResetMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const [filterDate, setFilterDate] = useState('');
+  const [filterCandidate, setFilterCandidate] = useState('');
 
   // Detect conflicts
   const getConflicts = () => {
@@ -129,9 +130,9 @@ export default function AdminTab({
       <h3 className="text-xl font-semibold text-white mb-4">⏳ Manage Pending Slots</h3>
       <p className="text-slate-400 text-sm mb-4">Showing interviews awaiting confirmation</p>
 
-      {/* Date Filter */}
+      {/* Date & Candidate Filter */}
       <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
             <input
@@ -141,27 +142,43 @@ export default function AdminTab({
               className="input-field w-full"
             />
           </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">👤 Filter by Candidate</label>
+            <select
+              value={filterCandidate}
+              onChange={(e) => setFilterCandidate(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">-- All Candidates --</option>
+              {[...new Set(slots.filter(slot => (slot.status === 'pending' || !slot.status) && slot.candidateName).map(s => s.candidateName))].map(candidate => (
+                <option key={candidate} value={candidate}>{candidate}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-end">
             <button
-              onClick={() => setFilterDate('')}
+              onClick={() => {
+                setFilterDate('');
+                setFilterCandidate('');
+              }}
               className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
             >
-              Clear Filter
+              Clear Filters
             </button>
           </div>
         </div>
         <p className="text-xs text-slate-400 mt-2">
-          Showing {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length} pending slots
+          Showing {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate) && (!filterCandidate || slot.candidateName === filterCandidate)).length} pending slots
         </p>
       </div>
 
-      {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).length === 0 ? (
+      {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate) && (!filterCandidate || slot.candidateName === filterCandidate)).length === 0 ? (
         <div className="text-center py-8">
           <p className="text-slate-400">No pending slots. All interviews are confirmed or cancelled! ✅</p>
         </div>
       ) : (
         <div className="space-y-4">
-          {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate)).map(slot => (
+          {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate) && (!filterCandidate || slot.candidateName === filterCandidate)).map(slot => (
             <div key={slot.id}>
               {conflicts[slot.id] && (
                 <div className="mb-2 p-3 bg-red-900/30 border-l-4 border-red-500 rounded flex items-center gap-2">
