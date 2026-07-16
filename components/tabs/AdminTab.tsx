@@ -37,6 +37,23 @@ export default function AdminTab({
 
   const [filterDate, setFilterDate] = useState('');
   const [filterCandidate, setFilterCandidate] = useState('');
+  const [filterTime, setFilterTime] = useState('');
+
+  const getTimeSlotOptions = () => {
+    const slots: { label: string; value: string }[] = [];
+    for (let h = 6; h < 22; h++) {
+      for (let m of [0, 30]) {
+        const hours = String(h).padStart(2, '0');
+        const minutes = String(m).padStart(2, '0');
+        const timeValue = `${hours}:${minutes}`;
+        const period = h >= 12 ? 'PM' : 'AM';
+        const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+        const label = `${displayHours}:${minutes} ${period}`;
+        slots.push({ label, value: timeValue });
+      }
+    }
+    return slots;
+  };
 
   // Detect conflicts
   const getConflicts = () => {
@@ -130,9 +147,9 @@ export default function AdminTab({
       <h3 className="text-xl font-semibold text-white mb-4">⏳ Manage Pending Slots</h3>
       <p className="text-slate-400 text-sm mb-4">Showing interviews awaiting confirmation</p>
 
-      {/* Date & Candidate Filter */}
+      {/* Date, Candidate & Time Filter */}
       <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
             <input
@@ -150,8 +167,21 @@ export default function AdminTab({
               className="input-field w-full"
             >
               <option value="">-- All Candidates --</option>
-              {[...new Set(slots.filter(slot => (slot.status === 'pending' || !slot.status) && slot.candidateName).map(s => s.candidateName))].map(candidate => (
+              {[...new Set(slots.filter(slot => (slot.status === 'pending' || !slot.status) && slot.candidateName).map(s => s.candidateName))].sort().map(candidate => (
                 <option key={candidate} value={candidate}>{candidate}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">⏰ Select Time</label>
+            <select
+              value={filterTime}
+              onChange={(e) => setFilterTime(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">-- All Times --</option>
+              {getTimeSlotOptions().map(slot => (
+                <option key={slot.value} value={slot.value}>{slot.label}</option>
               ))}
             </select>
           </div>
@@ -160,6 +190,7 @@ export default function AdminTab({
               onClick={() => {
                 setFilterDate('');
                 setFilterCandidate('');
+                setFilterTime('');
               }}
               className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
             >
@@ -167,18 +198,37 @@ export default function AdminTab({
             </button>
           </div>
         </div>
+
         <p className="text-xs text-slate-400 mt-2">
-          Showing {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate) && (!filterCandidate || slot.candidateName === filterCandidate)).length} pending slots
+          Showing {slots.filter(slot => {
+            const matchesStatus = slot.status === 'pending' || !slot.status;
+            const matchesDate = !filterDate || slot.date === filterDate;
+            const matchesCandidate = !filterCandidate || slot.candidateName === filterCandidate;
+            const matchesTime = !filterTime || slot.time === filterTime;
+            return matchesStatus && matchesDate && matchesCandidate && matchesTime;
+          }).length} pending slots
         </p>
       </div>
 
-      {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate) && (!filterCandidate || slot.candidateName === filterCandidate)).length === 0 ? (
+      {slots.filter(slot => {
+        const matchesStatus = slot.status === 'pending' || !slot.status;
+        const matchesDate = !filterDate || slot.date === filterDate;
+        const matchesCandidate = !filterCandidate || slot.candidateName === filterCandidate;
+        const matchesTime = !filterTime || slot.time === filterTime;
+        return matchesStatus && matchesDate && matchesCandidate && matchesTime;
+      }).length === 0 ? (
         <div className="text-center py-8">
           <p className="text-slate-400">No pending slots. All interviews are confirmed or cancelled! ✅</p>
         </div>
       ) : (
         <div className="space-y-4">
-          {slots.filter(slot => (slot.status === 'pending' || !slot.status) && (!filterDate || slot.date === filterDate) && (!filterCandidate || slot.candidateName === filterCandidate)).map(slot => (
+          {slots.filter(slot => {
+            const matchesStatus = slot.status === 'pending' || !slot.status;
+            const matchesDate = !filterDate || slot.date === filterDate;
+            const matchesCandidate = !filterCandidate || slot.candidateName === filterCandidate;
+            const matchesTime = !filterTime || slot.time === filterTime;
+            return matchesStatus && matchesDate && matchesCandidate && matchesTime;
+          }).map(slot => (
             <div key={slot.id}>
               {conflicts[slot.id] && (
                 <div className="mb-2 p-3 bg-red-900/30 border-l-4 border-red-500 rounded flex items-center gap-2">

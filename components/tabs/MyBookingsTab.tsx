@@ -19,6 +19,23 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber: string; feedback: string; comments: string }>>({});
   const [interviewStatusData, setInterviewStatusData] = useState<Record<string, string>>({});
   const [filterDate, setFilterDate] = useState('');
+  const [filterTime, setFilterTime] = useState('');
+
+  const getTimeSlotOptions = () => {
+    const slots: { label: string; value: string }[] = [];
+    for (let h = 6; h < 22; h++) {
+      for (let m of [0, 30]) {
+        const hours = String(h).padStart(2, '0');
+        const minutes = String(m).padStart(2, '0');
+        const timeValue = `${hours}:${minutes}`;
+        const period = h >= 12 ? 'PM' : 'AM';
+        const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+        const label = `${displayHours}:${minutes} ${period}`;
+        slots.push({ label, value: timeValue });
+      }
+    }
+    return slots;
+  };
 
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -39,7 +56,8 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   const filteredSlots = (filterDate
     ? bookedSlots.filter(slot => slot.date === filterDate)
     : bookedSlots
-  ).sort((a, b) => {
+  ).filter(slot => !filterTime || slot.time === filterTime)
+   .sort((a, b) => {
     const dateA = new Date(a.date + 'T00:00:00').getTime();
     const dateB = new Date(b.date + 'T00:00:00').getTime();
     if (dateA !== dateB) {
@@ -104,10 +122,10 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
         <p className="text-xs text-slate-400 mt-2">Viewing all bookings for this email</p>
       </div>
 
-      {/* Date Filter */}
+      {/* Date & Time Filter */}
       {bookedSlots.length > 0 && (
         <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
               <input
@@ -117,12 +135,28 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                 className="input-field w-full"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">⏰ Select Time</label>
+              <select
+                value={filterTime}
+                onChange={(e) => setFilterTime(e.target.value)}
+                className="input-field w-full"
+              >
+                <option value="">-- All Times --</option>
+                {getTimeSlotOptions().map(slot => (
+                  <option key={slot.value} value={slot.value}>{slot.label}</option>
+                ))}
+              </select>
+            </div>
             <div className="flex items-end">
               <button
-                onClick={() => setFilterDate('')}
+                onClick={() => {
+                  setFilterDate('');
+                  setFilterTime('');
+                }}
                 className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
               >
-                Clear Filter
+                Clear Filters
               </button>
             </div>
           </div>

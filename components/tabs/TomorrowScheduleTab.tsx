@@ -9,6 +9,23 @@ interface TomorrowScheduleTabProps {
 
 export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps) {
   const [filterName, setFilterName] = useState('');
+  const [filterTime, setFilterTime] = useState('');
+
+  const getTimeSlotOptions = () => {
+    const slots: { label: string; value: string }[] = [];
+    for (let h = 6; h < 22; h++) {
+      for (let m of [0, 30]) {
+        const hours = String(h).padStart(2, '0');
+        const minutes = String(m).padStart(2, '0');
+        const timeValue = `${hours}:${minutes}`;
+        const period = h >= 12 ? 'PM' : 'AM';
+        const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+        const label = `${displayHours}:${minutes} ${period}`;
+        slots.push({ label, value: timeValue });
+      }
+    }
+    return slots;
+  };
 
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -42,9 +59,11 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
     return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
 
-  const filteredTomorrowSlots = tomorrowConfirmedSlots.filter(slot =>
-    slot.candidateName.toLowerCase().includes(filterName.toLowerCase())
-  );
+  const filteredTomorrowSlots = tomorrowConfirmedSlots.filter(slot => {
+    const matchesName = slot.candidateName.toLowerCase().includes(filterName.toLowerCase());
+    const matchesTime = !filterTime || slot.time === filterTime;
+    return matchesName && matchesTime;
+  });
 
   // Get unique candidates and their count
   const candidateCount = new Map<string, number>();
@@ -98,20 +117,48 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
           Tomorrow's Schedule - Confirmed ({tomorrowDate})
         </h3>
 
-        <div className="mb-6">
-          <label className="block text-sm font-semibold text-slate-300 mb-2">Filter by Candidate:</label>
-          <select
-            value={filterName}
-            onChange={(e) => setFilterName(e.target.value)}
-            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
-          >
-            <option value="">-- All Candidates --</option>
-            {Array.from(candidateCount.entries()).map(([name]) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
+        <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">👤 Filter by Candidate</label>
+              <select
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+              >
+                <option value="">-- All Candidates --</option>
+                {Array.from(candidateCount.entries()).map(([name]) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">⏰ Select Time</label>
+              <select
+                value={filterTime}
+                onChange={(e) => setFilterTime(e.target.value)}
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+              >
+                <option value="">-- All Times --</option>
+                {getTimeSlotOptions().map(slot => (
+                  <option key={slot.value} value={slot.value}>{slot.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-end">
+              <button
+                onClick={() => {
+                  setFilterName('');
+                  setFilterTime('');
+                }}
+                className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
         </div>
 
         {tomorrowConfirmedSlots.length === 0 ? (

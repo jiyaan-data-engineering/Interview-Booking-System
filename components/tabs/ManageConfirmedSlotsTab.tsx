@@ -14,6 +14,23 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
   const [roomAllocation, setRoomAllocation] = useState<Record<string, string>>({});
   const [filterDate, setFilterDate] = useState('');
   const [filterCandidate, setFilterCandidate] = useState('');
+  const [filterTime, setFilterTime] = useState('');
+
+  const getTimeSlotOptions = () => {
+    const slots: { label: string; value: string }[] = [];
+    for (let h = 6; h < 22; h++) {
+      for (let m of [0, 30]) {
+        const hours = String(h).padStart(2, '0');
+        const minutes = String(m).padStart(2, '0');
+        const timeValue = `${hours}:${minutes}`;
+        const period = h >= 12 ? 'PM' : 'AM';
+        const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+        const label = `${displayHours}:${minutes} ${period}`;
+        slots.push({ label, value: timeValue });
+      }
+    }
+    return slots;
+  };
 
   const timeToMinutes = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -33,12 +50,13 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
   // Show all confirmed slots, default filter to tomorrow
   const confirmedSlots = slots.filter(slot => slot.status === 'confirmed' && slot.candidateName);
 
-  const uniqueCandidates = [...new Set(confirmedSlots.map(s => s.candidateName))];
+  const uniqueCandidates = [...new Set(confirmedSlots.map(s => s.candidateName))].sort();
 
   const filteredSlots = (filterDate
     ? confirmedSlots.filter(slot => slot.date === filterDate)
     : confirmedSlots.filter(slot => slot.date === tomorrowStr)
   ).filter(slot => !filterCandidate || slot.candidateName === filterCandidate)
+   .filter(slot => !filterTime || slot.time === filterTime)
    .sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
 
   // Detect time conflicts
@@ -57,6 +75,41 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
 
   const conflicts = getConflicts();
 
+  // Get all unique conflicts with times and candidates
+  const getAllTimeConflicts = () => {
+    const timeConflicts: { time: string; candidates: string[]; date: string }[] = [];
+    const processedTimes = new Set<string>();
+
+    filteredSlots.forEach(slot => {
+      const timeKey = `${slot.date}-${slot.time}`;
+      if (!processedTimes.has(timeKey)) {
+        const conflictingSlots = filteredSlots.filter(
+          other => other.date === slot.date && other.time === slot.time
+        );
+        if (conflictingSlots.length > 1) {
+          timeConflicts.push({
+            time: slot.time,
+            candidates: conflictingSlots.map(s => s.candidateName),
+            date: slot.date
+          });
+          processedTimes.add(timeKey);
+        }
+      }
+    });
+    return timeConflicts;
+  };
+
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const h = parseInt(hours);
+    const m = minutes;
+    const period = h >= 12 ? 'PM' : 'AM';
+    const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${displayHours}:${m} ${period}`;
+  };
+
+  const timeConflicts = getAllTimeConflicts();
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-white mb-2">✅ Manage Confirmed Slots</h2>
@@ -69,10 +122,10 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
         </div>
       )}
 
-      {/* Date & Candidate Filter */}
+      {/* Date, Candidate & Time Filter */}
       {confirmedSlots.length > 0 && (
         <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
               <input
@@ -95,11 +148,25 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
                 ))}
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">⏰ Select Time</label>
+              <select
+                value={filterTime}
+                onChange={(e) => setFilterTime(e.target.value)}
+                className="input-field w-full"
+              >
+                <option value="">-- All Times --</option>
+                {getTimeSlotOptions().map(slot => (
+                  <option key={slot.value} value={slot.value}>{slot.label}</option>
+                ))}
+              </select>
+            </div>
             <div className="flex items-end">
               <button
                 onClick={() => {
                   setFilterDate('');
                   setFilterCandidate('');
+                  setFilterTime('');
                 }}
                 className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
               >
@@ -108,6 +175,22 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
             </div>
           </div>
           <p className="text-xs text-slate-400 mt-2">Showing {filteredSlots.length} of {confirmedSlots.length} confirmed bookings</p>
+        </div>
+      )}
+
+      {timeConflicts.length > 0 && (
+        <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <div className="text-red-300 font-semibold mb-2">Time Conflict Alert!</div>
+              {timeConflicts.map((conflict, idx) => (
+                <div key={idx} className="text-red-200 text-sm mb-1">
+                  <strong>{formatTime(conflict.time)}</strong>: {conflict.candidates.join(', ')}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

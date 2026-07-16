@@ -10,6 +10,23 @@ interface AllBookingsTabProps {
 export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
   const [filterDate, setFilterDate] = useState('');
   const [filterCandidate, setFilterCandidate] = useState('');
+  const [filterTime, setFilterTime] = useState('');
+
+  const getTimeSlotOptions = () => {
+    const slots: { label: string; value: string }[] = [];
+    for (let h = 6; h < 22; h++) {
+      for (let m of [0, 30]) {
+        const hours = String(h).padStart(2, '0');
+        const minutes = String(m).padStart(2, '0');
+        const timeValue = `${hours}:${minutes}`;
+        const period = h >= 12 ? 'PM' : 'AM';
+        const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
+        const label = `${displayHours}:${minutes} ${period}`;
+        slots.push({ label, value: timeValue });
+      }
+    }
+    return slots;
+  };
 
   const formatTime = (time: string) => {
     const [hours, minutes] = time.split(':');
@@ -27,12 +44,13 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
 
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
-  const uniqueCandidates = [...new Set(bookedSlots.map(s => s.candidateName))];
+  const uniqueCandidates = [...new Set(bookedSlots.map(s => s.candidateName))].sort();
 
   const filteredSlots = (filterDate
     ? bookedSlots.filter(slot => slot.date === filterDate)
     : bookedSlots
   ).filter(slot => !filterCandidate || slot.candidateName === filterCandidate)
+   .filter(slot => !filterTime || slot.time === filterTime)
    .sort((a, b) => {
     const dateA = new Date(a.date + 'T00:00:00').getTime();
     const dateB = new Date(b.date + 'T00:00:00').getTime();
@@ -96,9 +114,9 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
       <h2 className="text-2xl font-bold text-white mb-2">📋 All Interview Bookings</h2>
       <p className="text-slate-400 mb-6">View all scheduled interviews (read-only)</p>
 
-      {/* Date & Candidate Filter */}
+      {/* Date, Candidate & Time Filter */}
       <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Select Date</label>
             <input
@@ -121,11 +139,25 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
               ))}
             </select>
           </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">⏰ Select Time</label>
+            <select
+              value={filterTime}
+              onChange={(e) => setFilterTime(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">-- All Times --</option>
+              {getTimeSlotOptions().map(slot => (
+                <option key={slot.value} value={slot.value}>{slot.label}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-end">
             <button
               onClick={() => {
                 setFilterDate('');
                 setFilterCandidate('');
+                setFilterTime('');
               }}
               className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
             >
