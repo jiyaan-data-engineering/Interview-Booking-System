@@ -239,40 +239,6 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
         </div>
       )}
 
-      {timeConflicts.length > 0 && (
-        <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">⚠️</span>
-            <div className="w-full">
-              <div className="text-red-300 font-semibold mb-3">Time Conflict Alert!</div>
-              {timeConflicts.map((conflict, idx) => (
-                <div key={idx} className="text-red-200 text-sm mb-3 pb-3 border-b border-red-700/50 last:border-b-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <strong>{formatTime(conflict.time)}</strong>
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      conflict.type === 'Exact Conflict'
-                        ? 'bg-red-600 text-red-100'
-                        : 'bg-orange-600 text-orange-100'
-                    }`}>
-                      {conflict.type}
-                    </span>
-                  </div>
-                  <div className="ml-4 space-y-1">
-                    {conflict.details.map((detail, dIdx) => (
-                      <div key={dIdx} className="text-red-100 text-xs bg-slate-900/50 p-2 rounded">
-                        <div className="font-semibold">{detail.name}</div>
-                        <div className="text-red-200">
-                          {detail.startTime} - {detail.endTime} ({detail.duration})
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {filteredSlots.length === 0 ? (
         <div className="text-center py-16">
@@ -282,15 +248,14 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredSlots.map((slot) => (
+          {filteredSlots.map((slot) => {
+            const slotConflicts = timeConflicts.filter(c =>
+              c.details.some(d => d.name === slot.candidateName) &&
+              c.time === slot.time
+            );
+            return (
             <div key={slot.id}>
-              {conflicts[slot.id] && (
-                <div className="mb-2 p-3 bg-red-900/30 border-l-4 border-red-500 rounded flex items-center gap-2">
-                  <span className="text-red-400 font-semibold">⚠️ Time Conflict Alert!</span>
-                  <span className="text-red-300 text-sm">{conflicts[slot.id].length} candidate(s) at same time</span>
-                </div>
-              )}
-            <SlotCard key={slot.id} slot={slot} showCandidate={true}>
+            <SlotCard slot={slot} showCandidate={true}>
               <div className="mt-4 space-y-3 bg-slate-900/50 p-4 rounded-lg border border-slate-600">
                 <div>
                   <label className="block text-sm font-semibold text-slate-300 mb-2">🚪 Room Allocation</label>
@@ -340,8 +305,44 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
                 </div>
               </div>
             </SlotCard>
+
+            {slotConflicts.length > 0 && (
+              <div className="mt-4 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <span className="text-lg">⚠️</span>
+                  <div className="w-full">
+                    <div className="text-red-300 font-semibold mb-2">Time Conflict Alert!</div>
+                    {slotConflicts.map((conflict, idx) => (
+                      <div key={idx} className="text-red-200 text-sm mb-2 pb-2 border-b border-red-700/50 last:border-b-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <strong>{formatTime(conflict.time)}</strong>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            conflict.type === 'Exact Conflict'
+                              ? 'bg-red-600 text-red-100'
+                              : 'bg-orange-600 text-orange-100'
+                          }`}>
+                            {conflict.type}
+                          </span>
+                        </div>
+                        <div className="ml-4 space-y-1">
+                          {conflict.details.map((detail, dIdx) => (
+                            <div key={dIdx} className="text-red-100 text-xs bg-slate-900/50 p-2 rounded">
+                              <div className="font-semibold">{detail.name}</div>
+                              <div className="text-red-200">
+                                {detail.startTime} - {detail.endTime} ({detail.duration})
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
             </div>
-          ))}
+            );
+            })}
         </div>
       )}
     </div>

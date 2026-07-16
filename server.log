@@ -1087,3 +1087,9 @@ Import trace for requested module:
  ✓ Compiled in 5.2s (1133 modules)
  GET / 200 in 313ms
 <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ✓ Compiled in 4.9s (1133 modules)
+ GET / 200 in 302ms
+ ✓ Compiled in 1230ms (1133 modules)
+ GET / 200 in 202ms
+ ✓ Compiled in 939ms (1133 modules)
+ GET / 200 in 168ms
