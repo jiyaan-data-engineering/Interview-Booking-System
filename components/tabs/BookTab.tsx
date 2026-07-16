@@ -171,7 +171,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
 
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Scheduled Time (9 AM - 11 PM) *
+                  Scheduled Time (6 AM - 10 PM) *
                 </label>
                 <select
                   name="time"
@@ -182,6 +182,12 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                 >
                   <option value="">Select Time Slot</option>
                   <optgroup label="Morning (AM)">
+                    <option value="06:00">06:00 AM</option>
+                    <option value="06:30">06:30 AM</option>
+                    <option value="07:00">07:00 AM</option>
+                    <option value="07:30">07:30 AM</option>
+                    <option value="08:00">08:00 AM</option>
+                    <option value="08:30">08:30 AM</option>
                     <option value="09:00">09:00 AM</option>
                     <option value="09:30">09:30 AM</option>
                     <option value="10:00">10:00 AM</option>
@@ -213,8 +219,6 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                     <option value="21:00">09:00 PM</option>
                     <option value="21:30">09:30 PM</option>
                     <option value="22:00">10:00 PM</option>
-                    <option value="22:30">10:30 PM</option>
-                    <option value="23:00">11:00 PM</option>
                   </optgroup>
                 </select>
                 {formData.time && (

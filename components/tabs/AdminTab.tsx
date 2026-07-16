@@ -55,19 +55,49 @@ export default function AdminTab({
     return slots;
   };
 
-  // Detect conflicts
+  const timeToMinutes = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    return parseInt(hours) * 60 + parseInt(minutes);
+  };
+
+  const parseDuration = (duration: string) => {
+    const lowerDur = duration.toLowerCase();
+    if (lowerDur.includes('15')) return 15;
+    if (lowerDur.includes('30')) return 30;
+    if (lowerDur.includes('45')) return 45;
+    if (lowerDur.includes('1.5')) return 90;
+    if (lowerDur.includes('2 hour')) return 120;
+    if (lowerDur.includes('1 hour')) return 60;
+    return 30; // default
+  };
+
+  const hasTimeOverlap = (slot1: InterviewSlot, slot2: InterviewSlot) => {
+    if (slot1.date !== slot2.date) return false;
+
+    const start1 = timeToMinutes(slot1.time);
+    const start2 = timeToMinutes(slot2.time);
+    const end1 = start1 + parseDuration(slot1.duration || '30 min');
+    const end2 = start2 + parseDuration(slot2.duration || '30 min');
+
+    return start1 < end2 && start2 < end1;
+  };
+
+  // Detect conflicts and overlaps
+  const pendingSlots = slots.filter(slot => slot.status === 'pending' || !slot.status);
+
   const getConflicts = () => {
     const conflicts: Record<string, string[]> = {};
-    const pendingSlots = slots.filter(slot => slot.status === 'pending' || !slot.status);
 
-    pendingSlots.forEach(slot => {
-      const conflictingSlots = pendingSlots.filter(
-        other => other.id !== slot.id && other.date === slot.date && other.time === slot.time
-      );
-      if (conflictingSlots.length > 0) {
-        conflicts[slot.id] = conflictingSlots.map(s => s.id);
+    for (let i = 0; i < pendingSlots.length; i++) {
+      for (let j = i + 1; j < pendingSlots.length; j++) {
+        const slot1 = pendingSlots[i];
+        const slot2 = pendingSlots[j];
+        if (hasTimeOverlap(slot1, slot2)) {
+          conflicts[slot1.id] = [...(conflicts[slot1.id] || []), slot2.id];
+          conflicts[slot2.id] = [...(conflicts[slot2.id] || []), slot1.id];
+        }
       }
-    });
+    }
     return conflicts;
   };
 

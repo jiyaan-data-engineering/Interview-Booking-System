@@ -41,6 +41,37 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
     return parseInt(hours) * 60 + parseInt(minutes);
   };
 
+  const parseDuration = (duration: string) => {
+    const lowerDur = duration.toLowerCase();
+    if (lowerDur.includes('15')) return 15;
+    if (lowerDur.includes('30')) return 30;
+    if (lowerDur.includes('45')) return 45;
+    if (lowerDur.includes('1.5')) return 90;
+    if (lowerDur.includes('2 hour')) return 120;
+    if (lowerDur.includes('1 hour')) return 60;
+    return 30; // default
+  };
+
+  const hasTimeOverlap = (slot1: InterviewSlot, slot2: InterviewSlot) => {
+    if (slot1.date !== slot2.date) return false;
+
+    const start1 = timeToMinutes(slot1.time);
+    const start2 = timeToMinutes(slot2.time);
+    const end1 = start1 + parseDuration(slot1.duration || '30 min');
+    const end2 = start2 + parseDuration(slot2.duration || '30 min');
+
+    return start1 < end2 && start2 < end1;
+  };
+
+  const getEndTime = (startTimeStr: string, durationStr: string) => {
+    const start = timeToMinutes(startTimeStr);
+    const duration = parseDuration(durationStr || '30 min');
+    const endMinutes = start + duration;
+    const hours = Math.floor(endMinutes / 60);
+    const mins = endMinutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  };
+
   const getTomorrowDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -73,19 +104,52 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
     }
   });
 
-  // Detect time conflicts
-  const timeConflicts: { time: string; candidates: string[] }[] = [];
-  const timeMap = new Map<string, string[]>();
-  tomorrowConfirmedSlots.forEach(slot => {
-    const existing = timeMap.get(slot.time) || [];
-    existing.push(slot.candidateName);
-    timeMap.set(slot.time, existing);
-  });
-  timeMap.forEach((candidates, time) => {
-    if (candidates.length > 1) {
-      timeConflicts.push({ time, candidates });
+  // Detect time conflicts and overlaps
+  const getAllConflicts = () => {
+    const conflicts: {
+      time: string;
+      candidates: string[];
+      type: string;
+      details: { name: string; startTime: string; endTime: string; duration: string }[]
+    }[] = [];
+    const processed = new Set<string>();
+
+    for (let i = 0; i < tomorrowConfirmedSlots.length; i++) {
+      for (let j = i + 1; j < tomorrowConfirmedSlots.length; j++) {
+        const slot1 = tomorrowConfirmedSlots[i];
+        const slot2 = tomorrowConfirmedSlots[j];
+        const key = `${slot1.id}-${slot2.id}`;
+
+        if (!processed.has(key) && hasTimeOverlap(slot1, slot2)) {
+          processed.add(key);
+          const isExactConflict = slot1.time === slot2.time;
+          conflicts.push({
+            time: slot1.time,
+            candidates: [slot1.candidateName, slot2.candidateName],
+            type: isExactConflict ? 'Exact Conflict' : 'Overlap',
+            details: [
+              {
+                name: slot1.candidateName,
+                startTime: formatTime(slot1.time),
+                endTime: formatTime(getEndTime(slot1.time, slot1.duration)),
+                duration: slot1.duration || '30 min'
+              },
+              {
+                name: slot2.candidateName,
+                startTime: formatTime(slot2.time),
+                endTime: formatTime(getEndTime(slot2.time, slot2.duration)),
+                duration: slot2.duration || '30 min'
+              }
+            ]
+          });
+        }
+      }
     }
-  });
+
+    return conflicts.sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+  };
+
+  const timeConflicts = getAllConflicts();
 
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
@@ -172,11 +236,30 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
               <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
                 <div className="flex items-start gap-3">
                   <span className="text-2xl">⚠️</span>
-                  <div>
-                    <div className="text-red-300 font-semibold mb-2">Time Conflict Alert!</div>
+                  <div className="w-full">
+                    <div className="text-red-300 font-semibold mb-3">Time Conflict Alert!</div>
                     {timeConflicts.map((conflict, idx) => (
-                      <div key={idx} className="text-red-200 text-sm mb-1">
-                        <strong>{formatTime(conflict.time)}</strong>: {conflict.candidates.join(', ')}
+                      <div key={idx} className="text-red-200 text-sm mb-3 pb-3 border-b border-red-700/50 last:border-b-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <strong>{formatTime(conflict.time)}</strong>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            conflict.type === 'Exact Conflict'
+                              ? 'bg-red-600 text-red-100'
+                              : 'bg-orange-600 text-orange-100'
+                          }`}>
+                            {conflict.type}
+                          </span>
+                        </div>
+                        <div className="ml-4 space-y-1">
+                          {conflict.details.map((detail, dIdx) => (
+                            <div key={dIdx} className="text-red-100 text-xs bg-slate-900/50 p-2 rounded">
+                              <div className="font-semibold">{detail.name}</div>
+                              <div className="text-red-200">
+                                {detail.startTime} - {detail.endTime} ({detail.duration})
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -242,6 +325,12 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
                 <div>
                   <div className="text-slate-400 text-sm font-semibold mb-1">🚪 Room</div>
                   <div className="text-white text-lg font-bold bg-green-900/50 px-3 py-1 rounded inline-block">{slot.room}</div>
+                </div>
+              )}
+              {slot.interviewStatus && (
+                <div>
+                  <div className="text-slate-400 text-sm font-semibold mb-1">📋 Interview Invite Status</div>
+                  <div className="text-white text-lg font-semibold bg-blue-900/50 px-3 py-1 rounded inline-block">{slot.interviewStatus}</div>
                 </div>
               )}
             </div>

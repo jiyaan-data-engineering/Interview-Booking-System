@@ -214,6 +214,16 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                   <div className="text-white text-lg">{slot.round}</div>
                 </div>
               )}
+              {slot.room && (
+                <div>
+                  <div className="text-slate-400 text-sm font-semibold mb-1">🚪 Room</div>
+                  <div className="text-white text-lg font-bold bg-green-900/50 px-3 py-1 rounded inline-block">{slot.room}</div>
+                </div>
+              )}
+              <div>
+                <div className="text-slate-400 text-sm font-semibold mb-1">📋 Interview Invite Status</div>
+                <div className="text-white text-lg font-semibold bg-blue-900/50 px-3 py-1 rounded inline-block">{slot.interviewStatus || 'N/A'}</div>
+              </div>
             </div>
 
             {slot.reason && (slot.status === 'cancelled' || slot.status === 'postponed') && (

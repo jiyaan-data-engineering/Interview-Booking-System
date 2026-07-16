@@ -610,3 +610,349 @@ Import trace for requested module:
  GET / 200 in 909ms
  GET / 200 in 567ms
  GET / 200 in 1246ms
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for ResolverCachePlugin|normal|default|alias=[|server-only$=|next/dist/compiled/server-only/index|client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/server-only=|next/dist/compiled/server-only/index|C:\satishMudde\claude\intriviews_list\node_modules\next\head.js=|next/dist/client/components/noop-head|C:\satishMudde\claude\intriviews_list\node_modules\next\image.js=|next/dist/api/image|C:\satishMudde\claude\intriviews_list\node_modules\next\constants.js=|next/dist/api/constants|C:\satishMudde\claude\intriviews_list\node_modules\next\router.js=|next/dist/api/router|C:\satishMudde\claude\intriviews_list\node_modules\next\dynamic.js=|next/dist/api/app-dynamic|C:\satishMudde\claude\intriviews_list\node_modules\next\script.js=|next/dist/api/script|C:\satishMudde\claude\intriviews_list\node_modules\next\link.js=|next/dist/client/app-dir/link|C:\satishMudde\claude\intriviews_list\node_modules\next\form.js=|next/dist/client/app-dir/form|C:\satishMudde\claude\intriviews_list\node_modules\next\navigation.js=|next/dist/api/navigation|C:\satishMudde\claude\intriviews_list\node_modules\next\headers.js=|next/dist/api/headers|C:\satishMudde\claude\intriviews_list\node_modules\next\og.js=|next/dist/api/og|C:\satishMudde\claude\intriviews_list\node_modules\next\server.js=|next/dist/api/server|C:\satishMudde\claude\intriviews_list\node_modules\next\document.js=|next/dist/api/document|C:\satishMudde\claude\intriviews_list\node_modules\next\app.js=|next/dist/api/app|react$=|next/dist/compiled/react|react/compiler-runtime$=|next/dist/compiled/react/compiler-runtime|react/jsx-dev-runtime$=|next/dist/compiled/react/jsx-dev-runtime|react/jsx-runtime$=|next/dist/compiled/react/jsx-runtime|react-dom$=|next/dist/compiled/react-dom|react-dom/client$=|next/dist/compiled/react-dom/client|react-dom/server$=|next/dist/compiled/react-dom/server.browser|react-dom/server.browser$=|next/dist/compiled/react-dom/server.browser|react-dom/server.edge$=|next/dist/build/webpack/alias/react-dom-server.js|react-dom/static$=|next/dist/compiled/react-dom/static.browser|react-dom/static.browser$=|next/dist/compiled/react-dom/static.browser|react-dom/static.edge$=|next/dist/compiled/react-dom/static.edge|react-server-dom-webpack/client$=|next/dist/compiled/react-server-dom-webpack/client.browser|react-server-dom-webpack/server$=|next/dist/compiled/react-server-dom-webpack/server.browser|react-server-dom-webpack/server.node$=|next/dist/compiled/react-server-dom-webpack/server.node|react-server-dom-webpack/static$=|next/dist/compiled/react-server-dom-webpack/static.browser|@vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts=|next/dist/client/dev/noop-turbopack-hmr|next=|C:\satishMudde\claude\intriviews_list\node_modules\next|]|mainFields=[|0=|browser|1=|module|2=|main|]|fallback=[|assert=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\assert\assert.js|buffer=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\buffer\index.js|constants=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\constants-browserify\constants.json|crypto=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\crypto-browserify\index.js|domain=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\domain-browser\index.js|http=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\stream-http\index.js|https=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\https-browserify\index.js|os=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\os-browserify\browser.js|path=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\path-browserify\index.js|punycode=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\punycode\punycode.js|process=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\build\polyfills\process.js|querystring=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\querystring-es3\index.js|stream=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\stream-browserify\index.js|string_decoder=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\string_decoder\string_decoder.js|sys=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\util\util.js|timers=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\timers-browserify\main.js|tty=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\tty-browserify\index.js|util=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\util\util.js|vm=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\vm-browserify\index.js|zlib=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\browserify-zlib\index.js|events=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\events\events.js|setImmediate=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\setimmediate\setImmediate.js|]|dependencyType=|esm|path=|C:\satishMudde\claude\intriviews_list\components\tabs|request=|@/components/SlotCard from pack: Error: invalid block type
+ ✓ Compiled in 18.4s (1133 modules)
+ GET / 200 in 1673ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ✓ Compiled in 2.8s (1133 modules)
+ GET / 200 in 334ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ✓ Compiled in 2.6s (1133 modules)
+ GET / 200 in 2098ms
+ GET / 200 in 80ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1283ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ✓ Compiled in 604ms (420 modules)
+ GET / 200 in 212ms
+ GET / 200 in 182ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack failed from C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development.pack.gz: Error: incorrect header check
+ ✓ Compiled in 2.5s (420 modules)
+ GET / 200 in 344ms
+ GET / 200 in 115ms
+ GET / 200 in 1415ms
+ ✓ Compiled in 2.2s (420 modules)
+ GET / 200 in 291ms
+ GET / 200 in 189ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 188ms
+ GET / 200 in 145ms
+ ✓ Compiled in 2.2s (420 modules)
+ GET / 200 in 277ms
+ GET / 200 in 107ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 241ms
+ GET / 200 in 162ms
+ GET / 200 in 211ms
+ ✓ Compiled in 7.5s (1133 modules)
+ GET / 200 in 556ms
+ GET / 200 in 105ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1501ms
+ ✓ Compiled in 3.2s (1133 modules)
+ GET / 200 in 328ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ✓ Compiled in 2.2s (1133 modules)
+ GET / 200 in 388ms
+ GET / 200 in 108ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1061ms
+ GET / 200 in 134ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 2.4s (1133 modules)
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 3083ms
+ GET / 200 in 1682ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 3.1s (1133 modules)
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 2724ms
+ GET / 200 in 1430ms
+ ✓ Compiled in 14.7s (1133 modules)
+ GET / 200 in 1679ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 605ms
+ GET / 200 in 266ms
+ GET / 200 in 166ms
+ ✓ Compiled in 3.6s (1133 modules)
+ GET / 200 in 500ms
+ GET / 200 in 647ms
+ ✓ Compiled in 5.3s (1133 modules)
+ GET / 200 in 391ms
+ GET / 200 in 377ms
+ ✓ Compiled in 4.5s (1133 modules)
+ GET / 200 in 926ms
+ GET / 200 in 96ms
+ ✓ Compiled in 1938ms (1133 modules)
+ GET / 200 in 339ms
+ GET / 200 in 136ms
+ ✓ Compiled in 1315ms (1133 modules)
+ GET / 200 in 415ms
+ GET / 200 in 404ms
+ ✓ Compiled in 1207ms (1133 modules)
+ GET / 200 in 282ms
+ GET / 200 in 104ms
+ ✓ Compiled in 1911ms (1133 modules)
+ GET / 200 in 383ms
+ GET / 200 in 374ms
+ ✓ Compiled in 2.1s (1133 modules)
+ GET / 200 in 2276ms
+ GET / 200 in 133ms
+ ✓ Compiled in 2.1s (1133 modules)
+ GET / 200 in 395ms
+ GET / 200 in 139ms
+ ✓ Compiled in 3.3s (1133 modules)
+ GET / 200 in 365ms
+ GET / 200 in 161ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ✓ Compiled in 4.1s (1133 modules)
+ GET / 200 in 424ms
+ GET / 200 in 104ms
+ ✓ Compiled in 1946ms (1133 modules)
+ GET / 200 in 464ms
+ GET / 200 in 464ms
+ ✓ Compiled in 3.4s (1133 modules)
+ GET / 200 in 416ms
+ GET / 200 in 408ms
+ ✓ Compiled in 2.2s (1133 modules)
+ GET / 200 in 1063ms
+ GET / 200 in 112ms
+ ✓ Compiled in 2.2s (1133 modules)
+ GET / 200 in 729ms
+ GET / 200 in 102ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1409ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 4.7s (1133 modules)
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 888ms
+ GET / 200 in 1357ms
+ GET / 200 in 1148ms
+ ✓ Compiled in 2.3s (1133 modules)
+ GET / 200 in 1485ms
+ ✓ Compiled in 1430ms (1133 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1087ms
+ GET / 200 in 956ms
+ ✓ Compiled in 1677ms (1133 modules)
+ GET / 200 in 339ms
+ GET / 200 in 312ms
+ ✓ Compiled in 1872ms (1133 modules)
+ GET / 200 in 269ms
+ GET / 200 in 282ms
+ ✓ Compiled in 1709ms (1133 modules)
+ GET / 200 in 318ms
+ GET / 200 in 135ms
+ ✓ Compiled in 1636ms (1133 modules)
+ GET / 200 in 308ms
+ GET / 200 in 321ms
+ ✓ Compiled in 5.1s (1133 modules)
+ GET / 200 in 355ms
+ GET / 200 in 347ms
+ ✓ Compiled in 1786ms (1133 modules)
+ GET / 200 in 342ms
+ GET / 200 in 371ms
+ ✓ Compiled in 1576ms (1133 modules)
+ GET / 200 in 284ms
+ GET / 200 in 304ms
+ ✓ Compiled in 1506ms (1133 modules)
+ GET / 200 in 317ms
+ GET / 200 in 342ms
+ ✓ Compiled in 2s (1133 modules)
+ GET / 200 in 291ms
+ GET / 200 in 297ms
+ ✓ Compiled in 1584ms (1133 modules)
+ GET / 200 in 345ms
+ GET / 200 in 365ms
+ ✓ Compiled in 2.1s (1133 modules)
+ GET / 200 in 1383ms
+ GET / 200 in 118ms
+ ✓ Compiled in 1428ms (1133 modules)
+ GET / 200 in 715ms
+ GET / 200 in 88ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+ ✓ Compiled in 5.1s (1133 modules)
+ GET / 200 in 258ms
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for ResolverCachePlugin|normal|default|alias=[|server-only$=|next/dist/compiled/server-only/index|client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/server-only=|next/dist/compiled/server-only/index|C:\satishMudde\claude\intriviews_list\node_modules\next\head.js=|next/dist/client/components/noop-head|C:\satishMudde\claude\intriviews_list\node_modules\next\image.js=|next/dist/api/image|C:\satishMudde\claude\intriviews_list\node_modules\next\constants.js=|next/dist/api/constants|C:\satishMudde\claude\intriviews_list\node_modules\next\router.js=|next/dist/api/router|C:\satishMudde\claude\intriviews_list\node_modules\next\dynamic.js=|next/dist/api/app-dynamic|C:\satishMudde\claude\intriviews_list\node_modules\next\script.js=|next/dist/api/script|C:\satishMudde\claude\intriviews_list\node_modules\next\link.js=|next/dist/client/app-dir/link|C:\satishMudde\claude\intriviews_list\node_modules\next\form.js=|next/dist/client/app-dir/form|C:\satishMudde\claude\intriviews_list\node_modules\next\navigation.js=|next/dist/api/navigation|C:\satishMudde\claude\intriviews_list\node_modules\next\headers.js=|next/dist/api/headers|C:\satishMudde\claude\intriviews_list\node_modules\next\og.js=|next/dist/api/og|C:\satishMudde\claude\intriviews_list\node_modules\next\server.js=|next/dist/api/server|C:\satishMudde\claude\intriviews_list\node_modules\next\document.js=|next/dist/api/document|C:\satishMudde\claude\intriviews_list\node_modules\next\app.js=|next/dist/api/app|react$=|next/dist/compiled/react|react/compiler-runtime$=|next/dist/compiled/react/compiler-runtime|react/jsx-dev-runtime$=|next/dist/compiled/react/jsx-dev-runtime|react/jsx-runtime$=|next/dist/compiled/react/jsx-runtime|react-dom$=|next/dist/compiled/react-dom|react-dom/client$=|next/dist/compiled/react-dom/client|react-dom/server$=|next/dist/compiled/react-dom/server.browser|react-dom/server.browser$=|next/dist/compiled/react-dom/server.browser|react-dom/server.edge$=|next/dist/build/webpack/alias/react-dom-server.js|react-dom/static$=|next/dist/compiled/react-dom/static.browser|react-dom/static.browser$=|next/dist/compiled/react-dom/static.browser|react-dom/static.edge$=|next/dist/compiled/react-dom/static.edge|react-server-dom-webpack/client$=|next/dist/compiled/react-server-dom-webpack/client.browser|react-server-dom-webpack/server$=|next/dist/compiled/react-server-dom-webpack/server.browser|react-server-dom-webpack/server.node$=|next/dist/compiled/react-server-dom-webpack/server.node|react-server-dom-webpack/static$=|next/dist/compiled/react-server-dom-webpack/static.browser|@vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts=|next/dist/client/dev/noop-turbopack-hmr|next=|C:\satishMudde\claude\intriviews_list\node_modules\next|]|mainFields=[|0=|browser|1=|module|2=|main|]|fallback=[|assert=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\assert\assert.js|buffer=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\buffer\index.js|constants=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\constants-browserify\constants.json|crypto=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\crypto-browserify\index.js|domain=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\domain-browser\index.js|http=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\stream-http\index.js|https=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\https-browserify\index.js|os=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\os-browserify\browser.js|path=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\path-browserify\index.js|punycode=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\punycode\punycode.js|process=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\build\polyfills\process.js|querystring=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\querystring-es3\index.js|stream=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\stream-browserify\index.js|string_decoder=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\string_decoder\string_decoder.js|sys=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\util\util.js|timers=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\timers-browserify\main.js|tty=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\tty-browserify\index.js|util=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\util\util.js|vm=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\vm-browserify\index.js|zlib=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\browserify-zlib\index.js|events=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\events\events.js|setImmediate=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\setimmediate\setImmediate.js|]|dependencyType=|esm|path=|C:\satishMudde\claude\intriviews_list\components\tabs|request=|@/components/SlotCard from pack: Error: invalid stored block lengths
+ ✓ Compiled in 4.6s (1133 modules)
+ GET / 200 in 915ms
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for ResolverCachePlugin|normal|default|alias=[|server-only$=|next/dist/compiled/server-only/index|client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/client-only$=|next/dist/compiled/client-only/index|next/dist/compiled/server-only=|next/dist/compiled/server-only/index|C:\satishMudde\claude\intriviews_list\node_modules\next\head.js=|next/dist/client/components/noop-head|C:\satishMudde\claude\intriviews_list\node_modules\next\image.js=|next/dist/api/image|C:\satishMudde\claude\intriviews_list\node_modules\next\constants.js=|next/dist/api/constants|C:\satishMudde\claude\intriviews_list\node_modules\next\router.js=|next/dist/api/router|C:\satishMudde\claude\intriviews_list\node_modules\next\dynamic.js=|next/dist/api/app-dynamic|C:\satishMudde\claude\intriviews_list\node_modules\next\script.js=|next/dist/api/script|C:\satishMudde\claude\intriviews_list\node_modules\next\link.js=|next/dist/client/app-dir/link|C:\satishMudde\claude\intriviews_list\node_modules\next\form.js=|next/dist/client/app-dir/form|C:\satishMudde\claude\intriviews_list\node_modules\next\navigation.js=|next/dist/api/navigation|C:\satishMudde\claude\intriviews_list\node_modules\next\headers.js=|next/dist/api/headers|C:\satishMudde\claude\intriviews_list\node_modules\next\og.js=|next/dist/api/og|C:\satishMudde\claude\intriviews_list\node_modules\next\server.js=|next/dist/api/server|C:\satishMudde\claude\intriviews_list\node_modules\next\document.js=|next/dist/api/document|C:\satishMudde\claude\intriviews_list\node_modules\next\app.js=|next/dist/api/app|react$=|next/dist/compiled/react|react/compiler-runtime$=|next/dist/compiled/react/compiler-runtime|react/jsx-dev-runtime$=|next/dist/compiled/react/jsx-dev-runtime|react/jsx-runtime$=|next/dist/compiled/react/jsx-runtime|react-dom$=|next/dist/compiled/react-dom|react-dom/client$=|next/dist/compiled/react-dom/client|react-dom/server$=|next/dist/compiled/react-dom/server.browser|react-dom/server.browser$=|next/dist/compiled/react-dom/server.browser|react-dom/server.edge$=|next/dist/build/webpack/alias/react-dom-server.js|react-dom/static$=|next/dist/compiled/react-dom/static.browser|react-dom/static.browser$=|next/dist/compiled/react-dom/static.browser|react-dom/static.edge$=|next/dist/compiled/react-dom/static.edge|react-server-dom-webpack/client$=|next/dist/compiled/react-server-dom-webpack/client.browser|react-server-dom-webpack/server$=|next/dist/compiled/react-server-dom-webpack/server.browser|react-server-dom-webpack/server.node$=|next/dist/compiled/react-server-dom-webpack/server.node|react-server-dom-webpack/static$=|next/dist/compiled/react-server-dom-webpack/static.browser|@vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts=|next/dist/client/dev/noop-turbopack-hmr|next=|C:\satishMudde\claude\intriviews_list\node_modules\next|]|mainFields=[|0=|browser|1=|module|2=|main|]|fallback=[|assert=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\assert\assert.js|buffer=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\buffer\index.js|constants=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\constants-browserify\constants.json|crypto=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\crypto-browserify\index.js|domain=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\domain-browser\index.js|http=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\stream-http\index.js|https=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\https-browserify\index.js|os=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\os-browserify\browser.js|path=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\path-browserify\index.js|punycode=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\punycode\punycode.js|process=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\build\polyfills\process.js|querystring=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\querystring-es3\index.js|stream=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\stream-browserify\index.js|string_decoder=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\string_decoder\string_decoder.js|sys=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\util\util.js|timers=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\timers-browserify\main.js|tty=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\tty-browserify\index.js|util=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\util\util.js|vm=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\vm-browserify\index.js|zlib=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\browserify-zlib\index.js|events=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\events\events.js|setImmediate=|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\setimmediate\setImmediate.js|]|dependencyType=|esm|path=|C:\satishMudde\claude\intriviews_list\components\tabs|request=|@/lib/storage from pack: Error: invalid stored block lengths
+ ✓ Compiled in 2s (1133 modules)
+ GET / 200 in 264ms
+ ✓ Compiled in 1760ms (1133 modules)
+ GET / 200 in 223ms
+ ✓ Compiled in 1648ms (1133 modules)
+ GET / 200 in 217ms
+ GET / 200 in 145ms
+ GET / 200 in 112ms
+ GET / 200 in 99ms
+ GET / 200 in 100ms
+ GET / 200 in 133ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1134ms
+ GET / 200 in 202ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ✓ Compiled in 1900ms (1133 modules)
+ GET / 200 in 257ms
+ GET / 200 in 292ms
+ ✓ Compiled in 2.2s (1133 modules)
+ GET / 200 in 1859ms
+ GET / 200 in 250ms
+ ✓ Compiled in 1180ms (1133 modules)
+ GET / 200 in 277ms
+ GET / 200 in 286ms
+ ✓ Compiled in 1540ms (1133 modules)
+ GET / 200 in 267ms
+ GET / 200 in 281ms
+ ✓ Compiled in 1735ms (1133 modules)
+ GET / 200 in 275ms
+ GET / 200 in 116ms
+ ✓ Compiled in 1636ms (1133 modules)
+ GET / 200 in 247ms
+ ✓ Compiled in 1462ms (1133 modules)
+ GET / 200 in 263ms
+ ✓ Compiled in 1476ms (1133 modules)
+ GET / 200 in 209ms
+ ✓ Compiled in 1823ms (1133 modules)
+ GET / 200 in 3113ms
+ ✓ Compiled in 3.1s (1133 modules)
+ GET / 200 in 269ms
+ GET / 200 in 117ms
+ GET / 200 in 136ms
+ GET / 200 in 385ms
+ GET / 200 in 358ms
+ GET / 200 in 374ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1196ms
+ ✓ Compiled in 2.6s (1133 modules)
+ GET / 200 in 377ms
+ GET / 200 in 146ms
+ ✓ Compiled in 4.5s (1133 modules)
+ GET / 200 in 331ms
+ GET / 200 in 341ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 820ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'

@@ -77,6 +77,10 @@ export default function SlotCard({ slot, children, showCandidate = true }: SlotC
             <div className="text-white text-lg font-semibold text-green-400 bg-green-900/30 px-3 py-1 rounded">{slot.room}</div>
           </div>
         )}
+        <div>
+          <div className="text-slate-400 text-sm font-semibold mb-1">📋 Interview Invite Status</div>
+          <div className="text-white text-lg font-semibold bg-blue-900/50 px-3 py-1 rounded inline-block">{slot.interviewStatus || 'N/A'}</div>
+        </div>
       </div>
 
       {showCandidate && isBooked && (

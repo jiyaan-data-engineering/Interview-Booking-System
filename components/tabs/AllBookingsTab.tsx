@@ -42,6 +42,29 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
     return parseInt(hours) * 60 + parseInt(minutes);
   };
 
+  const parseDuration = (duration: string) => {
+    const lowerDur = duration.toLowerCase();
+    if (lowerDur.includes('15')) return 15;
+    if (lowerDur.includes('30')) return 30;
+    if (lowerDur.includes('45')) return 45;
+    if (lowerDur.includes('1.5')) return 90;
+    if (lowerDur.includes('2 hour')) return 120;
+    if (lowerDur.includes('1 hour')) return 60;
+    return 30; // default
+  };
+
+  const hasTimeOverlap = (slot1: InterviewSlot, slot2: InterviewSlot) => {
+    if (slot1.date !== slot2.date) return false;
+
+    const start1 = timeToMinutes(slot1.time);
+    const start2 = timeToMinutes(slot2.time);
+    const end1 = start1 + parseDuration(slot1.duration || '30 min');
+    const end2 = start2 + parseDuration(slot2.duration || '30 min');
+
+    // Check if they overlap
+    return start1 < end2 && start2 < end1;
+  };
+
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
   const uniqueCandidates = [...new Set(bookedSlots.map(s => s.candidateName))].sort();
@@ -60,22 +83,69 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
     return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
 
-  // Detect time conflicts for filtered date
-  let timeConflicts: { time: string; candidates: string[]; date: string }[] = [];
-  if (filterDate) {
-    const dateSlots = bookedSlots.filter(slot => slot.date === filterDate);
-    const timeMap = new Map<string, string[]>();
-    dateSlots.forEach(slot => {
-      const existing = timeMap.get(slot.time) || [];
-      existing.push(slot.candidateName);
-      timeMap.set(slot.time, existing);
-    });
-    timeMap.forEach((candidates, time) => {
-      if (candidates.length > 1) {
-        timeConflicts.push({ time, candidates, date: filterDate });
+  // Detect time conflicts and overlaps (for selected date only)
+  const getAllConflicts = () => {
+    const conflicts: {
+      time: string;
+      candidates: string[];
+      date: string;
+      type: string;
+      details: { name: string; startTime: string; endTime: string; duration: string }[]
+    }[] = [];
+    const processed = new Set<string>();
+
+    // Filter slots by selected date
+    const slotsToCheck = filterDate
+      ? bookedSlots.filter(slot => slot.date === filterDate)
+      : bookedSlots;
+
+    const getEndTime = (startTimeStr: string, durationStr: string) => {
+      const start = timeToMinutes(startTimeStr);
+      const duration = parseDuration(durationStr || '30 min');
+      const endMinutes = start + duration;
+      const hours = Math.floor(endMinutes / 60);
+      const mins = endMinutes % 60;
+      return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+    };
+
+    for (let i = 0; i < slotsToCheck.length; i++) {
+      for (let j = i + 1; j < slotsToCheck.length; j++) {
+        const slot1 = slotsToCheck[i];
+        const slot2 = slotsToCheck[j];
+        const key = `${slot1.id}-${slot2.id}`;
+
+        if (!processed.has(key) && hasTimeOverlap(slot1, slot2)) {
+          processed.add(key);
+          const isExactConflict = slot1.time === slot2.time;
+          conflicts.push({
+            time: slot1.time,
+            candidates: [slot1.candidateName, slot2.candidateName],
+            date: slot1.date,
+            type: isExactConflict ? 'Exact Conflict' : 'Overlap',
+            details: [
+              {
+                name: slot1.candidateName,
+                startTime: formatTime(slot1.time),
+                endTime: formatTime(getEndTime(slot1.time, slot1.duration)),
+                duration: slot1.duration || '30 min'
+              },
+              {
+                name: slot2.candidateName,
+                startTime: formatTime(slot2.time),
+                endTime: formatTime(getEndTime(slot2.time, slot2.duration)),
+                duration: slot2.duration || '30 min'
+              }
+            ]
+          });
+        }
       }
-    });
-  }
+    }
+
+    // Sort by time in ascending order
+    return conflicts.sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+  };
+
+  let timeConflicts = getAllConflicts();
 
   const getStatusColor = (status: string | undefined) => {
     switch (status) {
@@ -168,21 +238,6 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
         <p className="text-xs text-slate-400 mt-2">Showing {filteredSlots.length} of {bookedSlots.length} bookings</p>
       </div>
 
-      {timeConflicts.length > 0 && (
-        <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">⚠️</span>
-            <div>
-              <div className="text-red-300 font-semibold mb-2">Time Conflict Alert!</div>
-              {timeConflicts.map((conflict, idx) => (
-                <div key={idx} className="text-red-200 text-sm mb-1">
-                  <strong>{formatTime(conflict.time)}</strong>: {conflict.candidates.join(', ')}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {filteredSlots.length === 0 ? (
         <div className="text-center py-8">
@@ -230,12 +285,10 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
                   <div className="text-white text-lg font-bold bg-green-900/50 px-3 py-1 rounded inline-block">{slot.room}</div>
                 </div>
               )}
-              {slot.interviewStatus && (
-                <div>
-                  <div className="text-slate-400 text-sm font-semibold mb-1">📋 Interview Invite Status</div>
-                  <div className="text-white text-lg font-semibold bg-blue-900/50 px-3 py-1 rounded inline-block">{slot.interviewStatus}</div>
-                </div>
-              )}
+              <div>
+                <div className="text-slate-400 text-sm font-semibold mb-1">📋 Interview Invite Status</div>
+                <div className="text-white text-lg font-semibold bg-blue-900/50 px-3 py-1 rounded inline-block">{slot.interviewStatus || 'N/A'}</div>
+              </div>
             </div>
 
           </div>
