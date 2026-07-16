@@ -16,19 +16,19 @@ export async function POST(_request: NextRequest) {
     const db = (admin as any).firestore();
     const slotsRef = db.collection('interview_slots');
 
-    // Define candidate name mappings for cleanup
-    const candidateMappings: Record<string, string> = {
-      'satya': 'Satyanarayanaraju',
-      'Satya': 'Satyanarayanaraju',
-      'SATYA': 'Satyanarayanaraju',
-      'chandra srikiran': 'Chandra Srikiran',
-      'Chandra srikiran': 'Chandra Srikiran',
-      'CHANDRA SRIKIRAN': 'Chandra Srikiran',
-      'candra srikiran kongara': 'Chandra Srikiran Kongara',
-      'PADMINI G': 'Padmini G',
-      'padmini g': 'Padmini G',
-      'Padmini g': 'Padmini G',
-    };
+    // Define candidate name mappings (case-insensitive matching)
+    const candidateMappings: Array<{ patterns: string[], standardized: string }> = [
+      { patterns: ['satya'], standardized: 'Satyanarayanaraju' },
+      { patterns: ['chandra srikiran', 'chandra srikiran kongara'], standardized: 'Chandra Srikiran Kongara' },
+      { patterns: ['padmini g'], standardized: 'Padmini G' },
+      { patterns: ['avula venkata kiran'], standardized: 'Avula Venkata Kiran' },
+      { patterns: ['phani kumar chetla'], standardized: 'Phani Kumar Chetla' },
+      { patterns: ['manoj kumar varma chintalapati'], standardized: 'Manoj Kumar Varma Chintalapati' },
+      { patterns: ['satyanarayanaraju'], standardized: 'Satyanarayanaraju' },
+      { patterns: ['chitala swathi thanuja'], standardized: 'Chitala Swathi Thanuja' },
+      { patterns: ['thamosh kalla'], standardized: 'Thamosh Kalla' },
+      { patterns: ['sivannarayana ch'], standardized: 'Sivannarayana CH' },
+    ];
 
     let updatedCount = 0;
     const snapshot = await slotsRef.get();
@@ -39,12 +39,18 @@ export async function POST(_request: NextRequest) {
       const data = doc.data();
       const currentName = data.candidateName;
 
-      // Check if this candidate name needs to be standardized
-      if (currentName && candidateMappings[currentName]) {
-        const standardizedName = candidateMappings[currentName];
-        if (currentName !== standardizedName) {
-          batch.update(doc.ref, { candidateName: standardizedName });
-          updatedCount++;
+      if (currentName) {
+        const lowerCurrentName = currentName.toLowerCase().trim();
+
+        // Find matching mapping
+        for (const mapping of candidateMappings) {
+          if (mapping.patterns.some(pattern => lowerCurrentName === pattern.toLowerCase())) {
+            if (currentName !== mapping.standardized) {
+              batch.update(doc.ref, { candidateName: mapping.standardized });
+              updatedCount++;
+            }
+            break;
+          }
         }
       }
     });
