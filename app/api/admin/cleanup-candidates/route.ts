@@ -11,7 +11,7 @@ if ((admin as any).apps?.length === 0) {
   });
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const db = (admin as any).firestore();
     const slotsRef = db.collection('interview_slots');
