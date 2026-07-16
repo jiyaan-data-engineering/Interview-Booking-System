@@ -1093,3 +1093,113 @@ Import trace for requested module:
  GET / 200 in 202ms
  ✓ Compiled in 939ms (1133 modules)
  GET / 200 in 168ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ⨯ ./components/tabs/TomorrowScheduleTab.tsx
+Error:   [31mx[0m Expected '</', got ')'
+     ,-[[36;1;4mC:\satishMudde\claude\intriviews_list\components\tabs\TomorrowScheduleTab.tsx[0m:306:1]
+ [2m303[0m |               )}
+ [2m304[0m |             </div>
+ [2m305[0m |           </div>
+ [2m306[0m |                 ))}
+     : [35;1m                 ^[0m
+ [2m307[0m |               </div>
+ [2m308[0m |             )}
+ [2m309[0m |           </>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/tabs/TomorrowScheduleTab.tsx
+./components/Dashboard.tsx
+./app/page.tsx
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ✓ Compiled in 9.8s (1133 modules)
+ GET / 200 in 653ms
+ GET / 200 in 122ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1549ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ✓ Compiled in 6.5s (1133 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ GET / 200 in 2922ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 1038ms
+ ✓ Compiled in 8.3s (1133 modules)
+ GET / 200 in 360ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ GET / 200 in 1695ms
+ ⨯ ./components/tabs/ManageConfirmedSlotsTab.tsx
+Error:   [31mx[0m Expected '</', got ')'
+     ,-[[36;1;4mC:\satishMudde\claude\intriviews_list\components\tabs\ManageConfirmedSlotsTab.tsx[0m:309:1]
+ [2m306[0m |               </div>
+ [2m307[0m |             </SlotCard>
+ [2m308[0m |             </div>
+ [2m309[0m |           ))}
+     : [35;1m           ^[0m
+ [2m310[0m |         </div>
+ [2m311[0m |       )}
+ [2m312[0m |     </div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./components/tabs/ManageConfirmedSlotsTab.tsx
+./components/Dashboard.tsx
+./app/page.tsx
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 500 in 122ms
+ GET / 200 in 43ms
+ GET / 500 in 92ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 10.6s (1133 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 88ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ GET / 200 in 2314ms

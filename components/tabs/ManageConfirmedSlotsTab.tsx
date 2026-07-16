@@ -82,22 +82,6 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
    .filter(slot => !filterTime || slot.time === filterTime)
    .sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
 
-  // Detect time conflicts
-  const getConflicts = () => {
-    const conflicts: Record<string, string[]> = {};
-    filteredSlots.forEach(slot => {
-      const conflictingSlots = filteredSlots.filter(
-        other => other.id !== slot.id && other.date === slot.date && other.time === slot.time
-      );
-      if (conflictingSlots.length > 0) {
-        conflicts[slot.id] = conflictingSlots.map(s => s.id);
-      }
-    });
-    return conflicts;
-  };
-
-  const conflicts = getConflicts();
-
   // Get conflicts for selected date only (or all if no date selected)
   const getAllTimeConflicts = () => {
     const timeConflicts: {
