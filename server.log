@@ -956,3 +956,134 @@ Import trace for requested module:
 ✅ Firebase initialized successfully!
  GET / 200 in 820ms
 <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\client-development\0.pack.gz'
+ ✓ Compiled in 6.1s (1133 modules)
+ ✓ Compiled in 1451ms (1133 modules)
+ ✓ Compiled in 1597ms (1133 modules)
+ ✓ Compiled in 7s (1133 modules)
+ ✓ Compiled in 1404ms (1133 modules)
+ ✓ Compiled in 853ms (1133 modules)
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 874ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+ ✓ Compiled in 3.6s (1133 modules)
+ ✓ Compiled in 1333ms (1133 modules)
+ GET / 200 in 201ms
+ GET / 200 in 164ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 384ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ GET / 200 in 292ms
+ ✓ Compiled in 4.8s (1133 modules)
+ GET / 200 in 401ms
+ ✓ Compiled in 1408ms (1133 modules)
+ GET / 200 in 550ms
+ ✓ Compiled in 1456ms (1133 modules)
+ GET / 200 in 188ms
+ ✓ Compiled in 1418ms (1133 modules)
+ GET / 200 in 147ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 728ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 3.5s (1133 modules)
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 547ms
+ GET / 200 in 1783ms
+ ✓ Compiled in 1328ms (1133 modules)
+ GET / 200 in 191ms
+ ✓ Compiled in 2.7s (1133 modules)
+ GET / 200 in 180ms
+ ✓ Compiled in 1151ms (1133 modules)
+ GET / 200 in 121ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+ ✓ Compiled in 2.7s (1133 modules)
+ GET / 200 in 196ms
+ ✓ Compiled in 1370ms (1133 modules)
+ GET / 200 in 212ms
+ ✓ Compiled in 1023ms (1133 modules)
+ GET / 200 in 162ms
+ ✓ Compiled in 923ms (1133 modules)
+ GET / 200 in 171ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 431ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ✓ Compiled in 3.8s (1133 modules)
+ GET / 200 in 229ms
+🔍 Firebase Config Check: {
+  apiKey: '✅ SET',
+  authDomain: '✅ SET',
+  projectId: '✅ SET',
+  storageBucket: '✅ SET',
+  messagingSenderId: '✅ SET',
+  appId: '✅ SET'
+}
+🔥 Initializing Firebase...
+✅ Firebase initialized successfully!
+ GET / 200 in 390ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+ ✓ Compiled in 3.1s (1133 modules)
+ GET / 200 in 190ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz_' -> 'C:\satishMudde\claude\intriviews_list\.next\cache\webpack\server-development\0.pack.gz'
+ ✓ Compiled in 3.3s (1133 modules)
+ GET / 200 in 316ms
+ ✓ Compiled in 1312ms (1133 modules)
+ GET / 200 in 198ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ✓ Compiled in 4s (1133 modules)
+ GET / 200 in 234ms
+<w> [webpack.cache.PackFileCacheStrategy] Restoring failed for FlagDependencyExportsPlugin|javascript/auto|C:\satishMudde\claude\intriviews_list\node_modules\next\dist\compiled\@next\react-refresh-utils\dist\loader.js!C:\satishMudde\claude\intriviews_list\node_modules\next\dist\build\webpack\loaders\next-flight-client-module-loader.js!C:\satishMudde\claude\intriviews_list\node_modules\next\dist\build\webpack\loaders\next-swc-loader.js??ruleSet[1].rules[17].oneOf[6].use[1]!C:\satishMudde\claude\intriviews_list\components\tabs\AdminTab.tsx|app-pages-browser from pack: Error: invalid literal/lengths set
+ ✓ Compiled in 3.2s (1133 modules)
+ GET / 200 in 264ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
+ ✓ Compiled in 5.2s (1133 modules)
+ GET / 200 in 313ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: invalid literal/lengths set
