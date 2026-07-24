@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as admin from 'firebase-admin';
 
-// Initialize Firebase Admin SDK
+let auth: any = null;
+
 const initializeFirebase = () => {
+  const adminAny = admin as any;
+
   try {
+    // Check if already initialized
+    if (adminAny.apps?.length > 0) {
+      return adminAny.auth();
+    }
+
     const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
     if (!serviceAccountKey) {
@@ -12,20 +20,16 @@ const initializeFirebase = () => {
 
     const serviceAccount = JSON.parse(serviceAccountKey);
 
-    if ((admin as any).apps?.length === 0) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-      });
-    }
+    adminAny.initializeApp({
+      credential: adminAny.credential.cert(serviceAccount),
+    });
 
-    return admin.auth();
+    return adminAny.auth();
   } catch (error: any) {
     console.error('Firebase initialization error:', error.message);
     throw error;
   }
 };
-
-let auth: any;
 
 export async function POST(request: NextRequest) {
   try {
