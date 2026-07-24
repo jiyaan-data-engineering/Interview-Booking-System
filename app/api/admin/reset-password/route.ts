@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import admin from 'firebase-admin';
+import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin SDK
-let auth: any;
-
-try {
+const initializeFirebase = () => {
   try {
-    // Try to get existing app
-    admin.app();
-  } catch {
-    // App doesn't exist, initialize it
     const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
     if (!serviceAccountKey) {
@@ -18,23 +12,26 @@ try {
 
     const serviceAccount = JSON.parse(serviceAccountKey);
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-  }
+    if ((admin as any).apps?.length === 0) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    }
 
-  auth = admin.auth();
-} catch (error: any) {
-  console.error('Firebase initialization error:', error.message);
-}
+    return admin.auth();
+  } catch (error: any) {
+    console.error('Firebase initialization error:', error.message);
+    throw error;
+  }
+};
+
+let auth: any;
 
 export async function POST(request: NextRequest) {
   try {
+    // Initialize Firebase on first request
     if (!auth) {
-      return NextResponse.json(
-        { error: 'Firebase Admin SDK is not initialized. Check environment variables.' },
-        { status: 500 }
-      );
+      auth = initializeFirebase();
     }
 
     const { targetEmail, newPassword } = await request.json();
