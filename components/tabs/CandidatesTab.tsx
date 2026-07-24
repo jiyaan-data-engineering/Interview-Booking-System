@@ -13,6 +13,8 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
   const [filterActive, setFilterActive] = useState('');
   const [inactiveCandidates, setInactiveCandidates] = useState(new Set<string>());
   const [showPasswordReset, setShowPasswordReset] = useState<string | null>(null);
+  const [statusBreakdownDate, setStatusBreakdownDate] = useState('');
+  const [statusBreakdownFilter, setStatusBreakdownFilter] = useState('');
 
   // Get unique candidates with their details
   const candidatesMap = new Map<string, {
@@ -63,6 +65,26 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
     .filter(c => !inactiveCandidates.has(c.email)).length;
   const inactiveCount = Array.from(candidatesMap.values())
     .filter(c => inactiveCandidates.has(c.email)).length;
+
+  // Calculate overall statistics
+  const allCandidates = Array.from(candidatesMap.values());
+  const overallStats = {
+    pending: 0,
+    confirmed: 0,
+    completed: 0,
+    cancelled: 0,
+    postponed: 0,
+  };
+
+  allCandidates.forEach(candidate => {
+    candidate.interviews.forEach(interview => {
+      if (interview.status === 'pending') overallStats.pending++;
+      else if (interview.status === 'confirmed') overallStats.confirmed++;
+      else if (interview.status === 'completed') overallStats.completed++;
+      else if (interview.status === 'cancelled') overallStats.cancelled++;
+      else if (interview.status === 'postponed') overallStats.postponed++;
+    });
+  });
 
   const toggleCandidateStatus = async (email: string) => {
     try {
@@ -118,7 +140,7 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
       <h2 className="text-2xl font-bold text-white mb-2">👥 All Candidates</h2>
       <p className="text-slate-400 mb-6">View and manage candidate information and their interview history</p>
 
-      {/* Statistics Cards */}
+      {/* Candidate Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-gradient-to-br from-blue-900/30 to-blue-900/10 border border-blue-500/50 rounded-lg p-4">
           <div className="text-blue-400 text-sm font-semibold mb-1">Total Candidates</div>
@@ -133,6 +155,7 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
           <div className="text-3xl font-bold text-white">{inactiveCount}</div>
         </div>
       </div>
+
 
       {/* Filter */}
       <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
@@ -255,11 +278,84 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
                 </div>
               </div>
 
+              {/* Status Summary - Candidate Wise Statistics */}
+              <div className="mb-4 pb-4 border-b border-slate-600">
+                <h4 className="text-sm font-bold text-slate-300 mb-3">📊 Interview Status Breakdown:</h4>
+                <div className="grid grid-cols-5 gap-2">
+                  {['pending', 'confirmed', 'completed', 'cancelled', 'postponed'].map(status => {
+                    const count = candidate.interviews.filter(i => i.status === status).length;
+                    const icons: Record<string, string> = {
+                      pending: '⏳',
+                      confirmed: '✅',
+                      completed: '✓',
+                      cancelled: '❌',
+                      postponed: '⏸️'
+                    };
+                    const colors: Record<string, string> = {
+                      pending: 'bg-yellow-900/30 border-yellow-600 text-yellow-300',
+                      confirmed: 'bg-green-900/30 border-green-600 text-green-300',
+                      completed: 'bg-blue-900/30 border-blue-600 text-blue-300',
+                      cancelled: 'bg-red-900/30 border-red-600 text-red-300',
+                      postponed: 'bg-orange-900/30 border-orange-600 text-orange-300'
+                    };
+                    return (
+                      <div key={status} className={`text-center p-2 rounded border ${colors[status]}`}>
+                        <div className="text-xl mb-1">{icons[status]}</div>
+                        <div className="text-xs font-semibold capitalize">{status}</div>
+                        <div className="font-bold text-lg">{count}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Interview Details */}
               <div>
                 <h4 className="text-sm font-semibold text-slate-300 mb-3">📋 Interview History:</h4>
+
+                {/* Filters for Interview History */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Filter by Date</label>
+                    <input
+                      type="date"
+                      value={statusBreakdownDate}
+                      onChange={(e) => setStatusBreakdownDate(e.target.value)}
+                      className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Filter by Status</label>
+                    <select
+                      value={statusBreakdownFilter}
+                      onChange={(e) => setStatusBreakdownFilter(e.target.value)}
+                      className="w-full px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white"
+                    >
+                      <option value="">-- All Status --</option>
+                      <option value="pending">⏳ Pending</option>
+                      <option value="confirmed">✅ Confirmed</option>
+                      <option value="completed">✓ Completed</option>
+                      <option value="cancelled">❌ Cancelled</option>
+                      <option value="postponed">⏸️ Postponed</option>
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => {
+                        setStatusBreakdownDate('');
+                        setStatusBreakdownFilter('');
+                      }}
+                      className="w-full px-2 py-1 bg-slate-600 hover:bg-slate-700 text-white rounded text-xs font-semibold transition-all"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
                 <div className="space-y-3">
                   {candidate.interviews
+                    .filter(i => !statusBreakdownDate || i.date === statusBreakdownDate)
+                    .filter(i => !statusBreakdownFilter || i.status === statusBreakdownFilter)
                     .sort((a, b) => new Date(b.date + 'T00:00:00').getTime() - new Date(a.date + 'T00:00:00').getTime())
                     .map((interview) => (
                       <div key={interview.id} className="bg-slate-700/50 rounded p-3 border border-slate-600">
@@ -327,26 +423,6 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
                 </div>
               </div>
 
-              {/* Status Summary */}
-              <div className="mt-4 pt-4 border-t border-slate-600 grid grid-cols-5 gap-2">
-                {['pending', 'confirmed', 'completed', 'cancelled', 'postponed'].map(status => {
-                  const count = candidate.interviews.filter(i => i.status === status).length;
-                  const icons: Record<string, string> = {
-                    pending: '⏳',
-                    confirmed: '✅',
-                    completed: '✓',
-                    cancelled: '❌',
-                    postponed: '⏸️'
-                  };
-                  return (
-                    <div key={status} className="text-center text-xs">
-                      <div className="text-lg">{icons[status]}</div>
-                      <div className="text-slate-400 capitalize">{status}</div>
-                      <div className="font-bold text-white text-sm">{count}</div>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           ))}
         </div>
