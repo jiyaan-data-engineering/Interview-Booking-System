@@ -5,7 +5,11 @@ import admin from 'firebase-admin';
 let auth: any;
 
 try {
-  if (!admin.apps.length) {
+  try {
+    // Try to get existing app
+    admin.app();
+  } catch {
+    // App doesn't exist, initialize it
     const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
     if (!serviceAccountKey) {
