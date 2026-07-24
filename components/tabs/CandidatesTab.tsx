@@ -261,7 +261,7 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
                 <div className="space-y-3">
                   {candidate.interviews
                     .sort((a, b) => new Date(b.date + 'T00:00:00').getTime() - new Date(a.date + 'T00:00:00').getTime())
-                    .map((interview, iIdx) => (
+                    .map((interview) => (
                       <div key={interview.id} className="bg-slate-700/50 rounded p-3 border border-slate-600">
                         <div className="flex justify-between items-start mb-2">
                           <div className="text-sm font-semibold text-white">
