@@ -10,6 +10,7 @@ import Header from './Header';
 import TabNavigation from './TabNavigation';
 import BookTab from './tabs/BookTab';
 import MyBookingsTab from './tabs/MyBookingsTab';
+import TodayScheduleTab from './tabs/TodayScheduleTab';
 import TomorrowScheduleTab from './tabs/TomorrowScheduleTab';
 import AllBookingsTab from './tabs/AllBookingsTab';
 import FeedbackAnalyticsTab from './tabs/FeedbackAnalyticsTab';
@@ -21,7 +22,7 @@ import Alert from './Alert';
 import LoginForm from './auth/LoginForm';
 import LoginPage from './LoginPage';
 
-type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'cancelled' | 'admin';
+type TabType = 'book' | 'mybookings' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'cancelled' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('allbookings');
@@ -549,6 +550,10 @@ export default function Dashboard() {
                 onUpdateInterviewStatus={handleUpdateInterviewStatus}
                 candidateEmail={candidateUser?.email || (isAdmin ? 'admin@system' : '') || ''}
               />
+            )}
+
+            {activeTab === 'today' && (candidateUser || isAdmin) && (
+              <TodayScheduleTab slots={slots} />
             )}
 
             {activeTab === 'tomorrow' && (candidateUser || isAdmin) && (

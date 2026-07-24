@@ -1,4 +1,4 @@
-type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'cancelled' | 'candidates' | 'admin';
+type TabType = 'book' | 'mybookings' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'cancelled' | 'candidates' | 'admin';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -12,6 +12,7 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
     ? [
         { id: 'book', label: 'Book Interview', icon: '📋' },
         { id: 'mybookings', label: 'My Bookings', icon: '📌' },
+        { id: 'today', label: "Today's Schedule", icon: '📅' },
         { id: 'tomorrow', label: "Tomorrow's Schedule", icon: '📆' },
         { id: 'allbookings', label: 'All Bookings', icon: '👥' },
       ]
@@ -22,6 +23,7 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
   const adminTabs: { id: TabType; label: string; icon: string }[] = [
     { id: 'book', label: 'Book Interview', icon: '📋' },
     { id: 'mybookings', label: 'My Bookings', icon: '📌' },
+    { id: 'today', label: "Today's Schedule", icon: '📅' },
     { id: 'tomorrow', label: "Tomorrow's Schedule", icon: '📆' },
     { id: 'allbookings', label: 'All Bookings', icon: '👥' },
     { id: 'feedbackanalytics', label: 'Feedback', icon: '💬' },
