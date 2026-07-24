@@ -14,13 +14,14 @@ import TomorrowScheduleTab from './tabs/TomorrowScheduleTab';
 import AllBookingsTab from './tabs/AllBookingsTab';
 import FeedbackAnalyticsTab from './tabs/FeedbackAnalyticsTab';
 import ManageConfirmedSlotsTab from './tabs/ManageConfirmedSlotsTab';
+import CandidatesTab from './tabs/CandidatesTab';
 import CancelledInterviewsTab from './tabs/CancelledInterviewsTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
 import LoginForm from './auth/LoginForm';
 import LoginPage from './LoginPage';
 
-type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'cancelled' | 'admin';
+type TabType = 'book' | 'mybookings' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'cancelled' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('allbookings');
@@ -112,7 +113,8 @@ export default function Dashboard() {
       await loginCandidate(email, password);
       showAlert('Login successful! Welcome back!', 'success');
     } catch (error: any) {
-      showAlert(error.message || 'Login failed', 'error');
+      // Re-throw the error so LoginForm can display it
+      throw error;
     }
   };
 
@@ -563,6 +565,10 @@ export default function Dashboard() {
 
             {activeTab === 'confirmedslots' && isAdmin && (
               <ManageConfirmedSlotsTab slots={slots} onUpdateStatus={handleUpdateStatus} onDeleteSlot={handleDeleteSlot} />
+            )}
+
+            {activeTab === 'candidates' && isAdmin && (
+              <CandidatesTab slots={slots} />
             )}
 
             {activeTab === 'cancelled' && isAdmin && (

@@ -9,6 +9,7 @@ import {
 import { auth } from './firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
+import { isInactiveCandidate } from './firestore';
 
 interface CandidateProfile {
   name: string;
@@ -54,6 +55,12 @@ export const loginCandidate = async (email: string, password: string): Promise<U
   }
 
   try {
+    // Check if candidate is inactive
+    const inactive = await isInactiveCandidate(email);
+    if (inactive) {
+      throw new Error('❌ Your account has been deactivated by admin. Please contact admin.');
+    }
+
     // Enable persistence
     await setPersistence(auth, browserLocalPersistence);
 

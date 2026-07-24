@@ -242,36 +242,65 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
             <SlotCard slot={slot} showCandidate={true}>
               <div className="mt-4 space-y-3 bg-slate-900/50 p-4 rounded-lg border border-slate-600">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">🚪 Room Allocation</label>
-                  <div className="flex gap-2">
-                    <select
-                      className="input-field flex-1"
-                      value={roomAllocation[slot.id] || slot.room || ''}
-                      onChange={e => setRoomAllocation(prev => ({ ...prev, [slot.id]: e.target.value }))}
-                    >
-                      <option value="">Select Room</option>
-                      <option value="ROOM-1">🚪 ROOM-1</option>
-                      <option value="ROOM-2">🚪 ROOM-2</option>
-                      <option value="ROOM-3">🚪 ROOM-3</option>
-                    </select>
-                    <button
-                      onClick={() => {
-                        const selectedRoom = roomAllocation[slot.id];
-                        if (selectedRoom) {
-                          onUpdateStatus(slot.id, 'confirmed', undefined, selectedRoom);
-                        }
-                      }}
-                      className="btn-success whitespace-nowrap"
-                    >
-                      Save Room
-                    </button>
-                    <button
-                      onClick={() => onDeleteSlot(slot.id)}
-                      className="px-4 py-2 bg-red-900/50 hover:bg-red-800/70 text-red-300 hover:text-red-100 rounded-lg font-semibold transition-all border border-red-500/50 whitespace-nowrap"
-                    >
-                      🗑️ Delete
-                    </button>
-                  </div>
+                  {(() => {
+                    // Find overlapping interviews on same day
+                    const overlappingSlots = confirmedSlots.filter(s => {
+                      if (s.id === slot.id) return false;
+                      if (s.date !== slot.date) return false;
+                      return hasTimeOverlap(slot, s);
+                    });
+
+                    // Get rooms already in use by overlapping interviews
+                    const occupiedRooms = new Set(overlappingSlots.filter(s => s.room).map(s => s.room));
+
+                    // Get which candidate is using each room
+                    const roomToCandidate: Record<string, string> = {};
+                    overlappingSlots.forEach(s => {
+                      if (s.room) roomToCandidate[s.room] = s.candidateName;
+                    });
+
+                    return (
+                      <>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">🚪 Room Allocation</label>
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <select
+                              className="input-field w-full"
+                              value={roomAllocation[slot.id] || slot.room || ''}
+                              onChange={e => setRoomAllocation(prev => ({ ...prev, [slot.id]: e.target.value }))}
+                            >
+                              <option value="">Select Room</option>
+                              {['ROOM-1', 'ROOM-2', 'ROOM-3'].map(room => (
+                                <option key={room} value={room} disabled={occupiedRooms.has(room)}>
+                                  🚪 {room} {occupiedRooms.has(room) ? `(${roomToCandidate[room]})` : ''}
+                                </option>
+                              ))}
+                            </select>
+                            {occupiedRooms.size > 0 && (
+                              <p className="text-xs text-orange-400 mt-1">⚠️ Occupied rooms shown in parentheses (disabled)</p>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => {
+                              const selectedRoom = roomAllocation[slot.id];
+                              if (selectedRoom) {
+                                onUpdateStatus(slot.id, 'confirmed', undefined, selectedRoom);
+                              }
+                            }}
+                            className="btn-success whitespace-nowrap"
+                          >
+                            Save Room
+                          </button>
+                          <button
+                            onClick={() => onDeleteSlot(slot.id)}
+                            className="px-4 py-2 bg-red-900/50 hover:bg-red-800/70 text-red-300 hover:text-red-100 rounded-lg font-semibold transition-all border border-red-500/50 whitespace-nowrap"
+                          >
+                            🗑️ Delete
+                          </button>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div>

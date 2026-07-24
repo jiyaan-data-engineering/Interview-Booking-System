@@ -138,3 +138,53 @@ export const exportToCSV = (slots: InterviewSlot[]): void => {
   link.click();
   URL.revokeObjectURL(url);
 };
+
+// Inactive Candidates Management
+const INACTIVE_CANDIDATES_COLLECTION = 'inactive_candidates';
+
+// Check if candidate is inactive
+export const isInactiveCandidate = async (email: string): Promise<boolean> => {
+  try {
+    if (!db) return false;
+    const querySnapshot = await getDocs(collection(db, INACTIVE_CANDIDATES_COLLECTION));
+    for (const doc of querySnapshot.docs) {
+      if (doc.data().email === email) {
+        return true;
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking inactive status:', error);
+    return false;
+  }
+};
+
+// Mark candidate as inactive
+export const markCandidateInactive = async (email: string): Promise<void> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    await addDoc(collection(db, INACTIVE_CANDIDATES_COLLECTION), {
+      email,
+      inactiveSince: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Error marking candidate inactive:', error);
+    throw error;
+  }
+};
+
+// Mark candidate as active
+export const markCandidateActive = async (email: string): Promise<void> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    const querySnapshot = await getDocs(collection(db, INACTIVE_CANDIDATES_COLLECTION));
+    for (const docSnap of querySnapshot.docs) {
+      if (docSnap.data().email === email) {
+        await deleteDoc(doc(db, INACTIVE_CANDIDATES_COLLECTION, docSnap.id));
+      }
+    }
+  } catch (error) {
+    console.error('Error marking candidate active:', error);
+    throw error;
+  }
+};
