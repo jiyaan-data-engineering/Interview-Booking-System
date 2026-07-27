@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface BookTabProps {
-  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string) => Promise<void> | void;
+  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string, hrName?: string, hrNumber?: string) => Promise<void> | void;
   candidateEmail?: string;
   candidateName?: string;
   candidatePhone?: string;
@@ -20,6 +20,8 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
     duration: '',
     round: '',
     interviewStatus: '',
+    hrName: '',
+    hrNumber: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -33,7 +35,8 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
     e.preventDefault();
 
     if (formData.name && formData.email && formData.phone && formData.date &&
-        formData.time && formData.company && formData.duration && formData.round && formData.interviewStatus) {
+        formData.time && formData.company && formData.duration && formData.round && formData.interviewStatus &&
+        formData.hrName && formData.hrNumber) {
 
       onBook(
         formData.name,
@@ -44,7 +47,9 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         formData.company,
         formData.duration,
         formData.round,
-        formData.interviewStatus
+        formData.interviewStatus,
+        formData.hrName,
+        formData.hrNumber
       );
 
       setSubmitted(true);
@@ -58,6 +63,8 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         duration: '',
         round: '',
         interviewStatus: '',
+        hrName: '',
+        hrNumber: '',
       });
 
       setTimeout(() => setSubmitted(false), 5000);
@@ -75,6 +82,8 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
       duration: '',
       round: '',
       interviewStatus: '',
+      hrName: '',
+      hrNumber: '',
     });
   };
 
@@ -299,6 +308,41 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                   <option value="Received">Received</option>
                   <option value="Waiting for Invite">Waiting for Invite</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-600 pt-6 mt-6">
+              <h3 className="text-lg font-bold text-white mb-4">HR Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    HR Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="hrName"
+                    className="input-field"
+                    placeholder="e.g., Sarah Johnson"
+                    value={formData.hrName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    HR Number *
+                  </label>
+                  <input
+                    type="tel"
+                    name="hrNumber"
+                    className="input-field"
+                    placeholder="e.g., +1 (555) 123-4567"
+                    value={formData.hrNumber}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>

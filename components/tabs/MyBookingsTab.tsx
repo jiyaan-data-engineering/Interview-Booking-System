@@ -16,7 +16,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
   const [rescheduleData, setRescheduleData] = useState<Record<string, { date: string; time: string }>>({});
   const [cancelReason, setCancelReason] = useState<Record<string, string>>({});
-  const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber: string; feedback: string; comments: string }>>({});
+  const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber?: string; feedback: string; comments: string }>>({});
   const [interviewStatusData, setInterviewStatusData] = useState<Record<string, string>>({});
   const [filterDate, setFilterDate] = useState('');
   const [filterTime, setFilterTime] = useState('');
@@ -310,12 +310,6 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                       <span className="text-white font-semibold">{slot.panelName}</span>
                     </div>
                   )}
-                  {slot.hrNumber && (
-                    <div>
-                      <span className="text-slate-400">HR Number: </span>
-                      <span className="text-white font-semibold">{slot.hrNumber}</span>
-                    </div>
-                  )}
                   {slot.feedback && (
                     <div>
                       <span className="text-slate-400">Feedback: </span>
@@ -459,8 +453,8 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                   onSubmit={e => {
                     e.preventDefault();
                     const data = completeFormData[slot.id];
-                    if (data && data.supportPerson && data.hrName && data.panelName && data.hrNumber && onMarkCompleted) {
-                      onMarkCompleted(slot.id, data.supportPerson, data.hrName, data.panelName, data.hrNumber, data.feedback, data.comments);
+                    if (data && data.supportPerson && data.hrName && data.panelName && onMarkCompleted) {
+                      onMarkCompleted(slot.id, data.supportPerson, data.hrName, data.panelName, data.hrNumber || '', data.feedback, data.comments);
                       setExpandedSlot(null);
                       setCompleteFormData(prev => {
                         const updated = { ...prev };
@@ -533,43 +527,25 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
 
                     <div>
                       <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        HR Number *
+                        Feedback/Rating (optional)
                       </label>
-                      <input
-                        type="tel"
+                      <select
                         className="input-field"
-                        placeholder="e.g., +1 (555) 123-4567"
-                        value={completeFormData[slot.id]?.hrNumber || ''}
+                        value={completeFormData[slot.id]?.feedback || ''}
                         onChange={e =>
                           setCompleteFormData(prev => ({
                             ...prev,
-                            [slot.id]: { ...prev[slot.id], hrNumber: e.target.value },
+                            [slot.id]: { ...prev[slot.id], feedback: e.target.value },
                           }))
                         }
-                        required
-                      />
+                      >
+                        <option value="">Select Feedback Rating</option>
+                        <option value="GOOD">🟢 GOOD - Excellent Performance</option>
+                        <option value="AVG">🟡 AVERAGE - Satisfactory Performance</option>
+                        <option value="BAD">🔴 BAD - Needs Improvement</option>
+                      </select>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-300 mb-2">
-                      Feedback/Rating (optional)
-                    </label>
-                    <select
-                      className="input-field"
-                      value={completeFormData[slot.id]?.feedback || ''}
-                      onChange={e =>
-                        setCompleteFormData(prev => ({
-                          ...prev,
-                          [slot.id]: { ...prev[slot.id], feedback: e.target.value },
-                        }))
-                      }
-                    >
-                      <option value="">Select Feedback Rating</option>
-                      <option value="GOOD">🟢 GOOD - Excellent Performance</option>
-                      <option value="AVG">🟡 AVERAGE - Satisfactory Performance</option>
-                      <option value="BAD">🔴 BAD - Needs Improvement</option>
-                    </select>
                   </div>
 
                   <div>

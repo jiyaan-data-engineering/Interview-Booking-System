@@ -164,7 +164,7 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 4000);
   };
 
-  const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string) => {
+  const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string, hrName?: string, hrNumber?: string) => {
     try {
       const newSlot: Omit<InterviewSlot, 'id'> = {
         date,
@@ -177,6 +177,8 @@ export default function Dashboard() {
         candidatePhone: phone,
         status: 'pending' as const,
         interviewStatus,
+        hrName,
+        hrNumber,
         createdAt: new Date().toISOString(),
       };
       const slotId = await saveSlot(newSlot);
