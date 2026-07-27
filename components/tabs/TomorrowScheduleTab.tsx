@@ -237,7 +237,16 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
               <div className="text-slate-300 font-semibold mb-2 text-sm">👥 Candidate Breakdown:</div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Array.from(candidateCount.entries()).map(([name, count]) => {
-                  const candidateCompanies = [...new Set(tomorrowConfirmedSlots.filter(s => s.candidateName === name).map(s => s.company))];
+                  const candidateSlots = tomorrowConfirmedSlots.filter(s => s.candidateName === name);
+                  const companyRounds = new Map<string, Set<string>>();
+                  candidateSlots.forEach(slot => {
+                    if (!companyRounds.has(slot.company)) {
+                      companyRounds.set(slot.company, new Set());
+                    }
+                    if (slot.round) {
+                      companyRounds.get(slot.company)?.add(slot.round);
+                    }
+                  });
                   return (
                     <div key={name} className="bg-slate-700 rounded p-2 border border-slate-600">
                       <div className="flex justify-between items-start mb-0.5">
@@ -245,8 +254,10 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
                         <div className="text-blue-400 font-bold text-sm ml-1">{count}</div>
                       </div>
                       <div className="space-y-0.5">
-                        {candidateCompanies.map((company, idx) => (
-                          <div key={idx} className="text-xs text-slate-400 truncate">🏢 {company}</div>
+                        {Array.from(companyRounds.entries()).map(([company, rounds]) => (
+                          <div key={company} className="text-xs text-slate-400 truncate">
+                            🏢 {company}  ({Array.from(rounds).join(' or ')})
+                          </div>
                         ))}
                       </div>
                     </div>
