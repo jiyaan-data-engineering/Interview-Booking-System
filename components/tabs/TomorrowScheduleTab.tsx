@@ -233,15 +233,25 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
         ) : (
           <>
 
-            <div className="mb-6 p-4 bg-slate-800 rounded-lg border border-slate-700">
-              <div className="text-slate-300 font-semibold mb-3">👥 Candidate Breakdown:</div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {Array.from(candidateCount.entries()).map(([name, count]) => (
-                  <div key={name} className="bg-slate-700 rounded-lg p-3 text-center border border-slate-600">
-                    <div className="text-white font-semibold text-sm truncate">{name}</div>
-                    <div className="text-blue-400 text-lg font-bold">{count}</div>
-                  </div>
-                ))}
+            <div className="mb-6 p-3 bg-slate-800 rounded-lg border border-slate-700">
+              <div className="text-slate-300 font-semibold mb-2 text-sm">👥 Candidate Breakdown:</div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {Array.from(candidateCount.entries()).map(([name, count]) => {
+                  const candidateCompanies = [...new Set(tomorrowConfirmedSlots.filter(s => s.candidateName === name).map(s => s.company))];
+                  return (
+                    <div key={name} className="bg-slate-700 rounded p-2 border border-slate-600">
+                      <div className="flex justify-between items-start mb-0.5">
+                        <div className="text-white font-semibold text-xs truncate">{name}</div>
+                        <div className="text-blue-400 font-bold text-sm ml-1">{count}</div>
+                      </div>
+                      <div className="space-y-0.5">
+                        {candidateCompanies.map((company, idx) => (
+                          <div key={idx} className="text-xs text-slate-400 truncate">🏢 {company}</div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
