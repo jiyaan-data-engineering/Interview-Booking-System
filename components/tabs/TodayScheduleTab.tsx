@@ -347,22 +347,10 @@ export default function TodayScheduleTab({ slots }: TodayScheduleTabProps) {
                         <div className="text-white text-lg">{slot.supportPerson}</div>
                       </div>
                     )}
-                    {slot.hrName && (
-                      <div>
-                        <div className="text-slate-400 text-sm font-semibold mb-1">👔 HR Name</div>
-                        <div className="text-white text-lg">{slot.hrName}</div>
-                      </div>
-                    )}
                     {slot.panelName && (
                       <div>
                         <div className="text-slate-400 text-sm font-semibold mb-1">📊 Panel Name</div>
                         <div className="text-white text-lg">{slot.panelName}</div>
-                      </div>
-                    )}
-                    {slot.hrNumber && (
-                      <div>
-                        <div className="text-slate-400 text-sm font-semibold mb-1">📱 HR Number</div>
-                        <div className="text-white text-lg">{slot.hrNumber}</div>
                       </div>
                     )}
                   </div>
