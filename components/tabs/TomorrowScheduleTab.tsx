@@ -109,7 +109,7 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
     }
   });
   const candidateCount = new Map(
-    Array.from(candidateCountMap.entries()).map(([key, value]) => [value.displayName, value.count])
+    Array.from(candidateCountMap.entries()).map(([, value]) => [value.displayName, value.count])
   );
 
   // Detect time conflicts and overlaps

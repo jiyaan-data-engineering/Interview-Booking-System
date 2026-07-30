@@ -77,7 +77,7 @@ export default function TodayScheduleTab({ slots }: TodayScheduleTabProps) {
     }
   });
   const candidateCount = new Map(
-    Array.from(candidateCountMap.entries()).map(([key, value]) => [value.displayName, value.count])
+    Array.from(candidateCountMap.entries()).map(([, value]) => [value.displayName, value.count])
   );
 
   const getStatusColor = (status: string | undefined) => {
