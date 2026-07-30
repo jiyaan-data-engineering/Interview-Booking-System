@@ -41,10 +41,11 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
   let candidates = Array.from(candidatesMap.values());
   const totalCandidates = candidates.length;
 
-  // Get unique candidate names for dropdown
-  const candidateNames = Array.from(candidatesMap.values())
-    .map(c => c.name)
-    .sort((a, b) => a.localeCompare(b));
+  // Get unique candidate names for dropdown (deduplicated)
+  const candidateNames = Array.from(new Set(
+    Array.from(candidatesMap.values())
+      .map(c => c.name)
+  )).sort((a, b) => a.localeCompare(b));
 
   // Filter by candidate name
   if (filterCandidate) {
