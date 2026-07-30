@@ -44,7 +44,14 @@ export default function AllBookingsTab({ slots }: AllBookingsTabProps) {
 
   const bookedSlots = slots.filter(slot => slot.candidateName);
 
-  const uniqueCandidates = [...new Set(bookedSlots.map(s => s.candidateName))].sort();
+  const uniqueCandidatesMap = new Map<string, string>();
+  bookedSlots.forEach(slot => {
+    const normalizedName = slot.candidateName.trim().toLowerCase();
+    if (!uniqueCandidatesMap.has(normalizedName)) {
+      uniqueCandidatesMap.set(normalizedName, slot.candidateName.trim());
+    }
+  });
+  const uniqueCandidates = Array.from(uniqueCandidatesMap.values()).sort();
 
   const filteredSlots = (filterDate
     ? bookedSlots.filter(slot => slot.date === filterDate)

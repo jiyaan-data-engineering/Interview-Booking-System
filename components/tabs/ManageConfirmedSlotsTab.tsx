@@ -73,7 +73,14 @@ export default function ManageConfirmedSlotsTab({ slots, onUpdateStatus, onDelet
   // Show all confirmed slots, default filter to tomorrow
   const confirmedSlots = slots.filter(slot => slot.status === 'confirmed' && slot.candidateName);
 
-  const uniqueCandidates = [...new Set(confirmedSlots.map(s => s.candidateName))].sort();
+  const uniqueCandidatesMap = new Map<string, string>();
+  confirmedSlots.forEach(slot => {
+    const normalizedName = slot.candidateName.trim().toLowerCase();
+    if (!uniqueCandidatesMap.has(normalizedName)) {
+      uniqueCandidatesMap.set(normalizedName, slot.candidateName.trim());
+    }
+  });
+  const uniqueCandidates = Array.from(uniqueCandidatesMap.values()).sort();
 
   const filteredSlots = (filterDate
     ? confirmedSlots.filter(slot => slot.date === filterDate)

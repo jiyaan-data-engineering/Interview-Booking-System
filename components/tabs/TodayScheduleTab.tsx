@@ -64,13 +64,21 @@ export default function TodayScheduleTab({ slots }: TodayScheduleTabProps) {
     return matchesName && matchesTime;
   });
 
-  // Get unique candidates and their count
-  const candidateCount = new Map<string, number>();
+  // Get unique candidates and their count (case-insensitive, trimmed)
+  const candidateCountMap = new Map<string, { count: number; displayName: string }>();
   todayConfirmedSlots.forEach(slot => {
     if (slot.candidateName) {
-      candidateCount.set(slot.candidateName, (candidateCount.get(slot.candidateName) || 0) + 1);
+      const normalizedName = slot.candidateName.trim().toLowerCase();
+      if (!candidateCountMap.has(normalizedName)) {
+        candidateCountMap.set(normalizedName, { count: 0, displayName: slot.candidateName.trim() });
+      }
+      const entry = candidateCountMap.get(normalizedName)!;
+      entry.count++;
     }
   });
+  const candidateCount = new Map(
+    Array.from(candidateCountMap.entries()).map(([key, value]) => [value.displayName, value.count])
+  );
 
   const getStatusColor = (status: string | undefined) => {
     switch (status) {

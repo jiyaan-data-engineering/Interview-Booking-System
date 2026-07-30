@@ -25,7 +25,14 @@ export default function FeedbackAnalyticsTab({ slots }: FeedbackAnalyticsTabProp
     });
   }, [completedSlots, filterDate, filterCandidate, filterRound, filterFeedback]);
 
-  const uniqueCandidates = [...new Set(completedSlots.map(s => s.candidateName))];
+  const uniqueCandidatesMap = new Map<string, string>();
+  completedSlots.forEach(slot => {
+    const normalizedName = slot.candidateName.trim().toLowerCase();
+    if (!uniqueCandidatesMap.has(normalizedName)) {
+      uniqueCandidatesMap.set(normalizedName, slot.candidateName.trim());
+    }
+  });
+  const uniqueCandidates = Array.from(uniqueCandidatesMap.values());
   const uniqueRounds = [...new Set(completedSlots.map(s => s.round || 'Unknown'))];
 
   // Overall statistics (filtered by candidate if selected)
