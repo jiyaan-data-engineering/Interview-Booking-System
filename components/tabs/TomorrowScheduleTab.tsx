@@ -83,9 +83,9 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
 
   const tomorrowDate = getTomorrowDate();
 
-  // Tomorrow's confirmed interviews
+  // Tomorrow's confirmed and pending interviews
   const tomorrowConfirmedSlots = slots.filter(
-    slot => slot.date === tomorrowDate && slot.candidateName && slot.status === 'confirmed'
+    slot => slot.date === tomorrowDate && slot.candidateName && (slot.status === 'confirmed' || slot.status === 'pending')
   ).sort((a, b) => {
     return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
@@ -186,7 +186,7 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
       {/* Tomorrow's Schedule Section */}
         <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
           <span className="text-2xl">📅</span>
-          Tomorrow's Schedule - Confirmed ({tomorrowDate})
+          Tomorrow's Schedule - Confirmed & Pending ({tomorrowDate})
         </h3>
 
         <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
@@ -236,7 +236,7 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
         {tomorrowConfirmedSlots.length === 0 ? (
           <div className="text-center py-8 bg-slate-800/50 rounded-lg">
             <div className="text-3xl mb-4">📭</div>
-            <p className="text-slate-400">No confirmed interviews scheduled for tomorrow</p>
+            <p className="text-slate-400">No interviews scheduled for tomorrow</p>
           </div>
         ) : (
           <>
@@ -274,7 +274,7 @@ export default function TomorrowScheduleTab({ slots }: TomorrowScheduleTabProps)
               </div>
             </div>
 
-            <p className="text-slate-400 mb-6 font-semibold">Confirmed interviews sorted by time (6AM - 11PM) | Total: {filteredTomorrowSlots.length}</p>
+            <p className="text-slate-400 mb-6 font-semibold">Interviews sorted by time (Confirmed & Pending) | Total: {filteredTomorrowSlots.length}</p>
             {filteredTomorrowSlots.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-slate-400">No candidates match your search</p>

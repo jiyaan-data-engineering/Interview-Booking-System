@@ -51,9 +51,9 @@ export default function TodayScheduleTab({ slots }: TodayScheduleTabProps) {
 
   const todayDate = getTodayDate();
 
-  // Today's confirmed interviews
+  // Today's confirmed and pending interviews
   const todayConfirmedSlots = slots.filter(
-    slot => slot.date === todayDate && slot.candidateName && slot.status === 'confirmed'
+    slot => slot.date === todayDate && slot.candidateName && (slot.status === 'confirmed' || slot.status === 'pending')
   ).sort((a, b) => {
     return timeToMinutes(a.time) - timeToMinutes(b.time);
   });
@@ -205,7 +205,7 @@ export default function TodayScheduleTab({ slots }: TodayScheduleTabProps) {
       {/* Today's Schedule Section */}
       <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <span className="text-2xl">📅</span>
-        Today's Schedule - Confirmed ({todayDate})
+        Today's Schedule - Confirmed & Pending ({todayDate})
       </h3>
 
       <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
@@ -295,7 +295,7 @@ export default function TodayScheduleTab({ slots }: TodayScheduleTabProps) {
           )}
 
 
-          <p className="text-slate-400 mb-6 font-semibold">Upcoming interviews sorted by time | Total: {filteredTodaySlots.filter(s => timeToMinutes(s.time) >= currentTimeInMinutes).length}</p>
+          <p className="text-slate-400 mb-6 font-semibold">Interviews sorted by time (Confirmed & Pending) | Total: {filteredTodaySlots.filter(s => timeToMinutes(s.time) >= currentTimeInMinutes).length}</p>
           {filteredTodaySlots.filter(s => timeToMinutes(s.time) >= currentTimeInMinutes).length === 0 ? (
             <div className="text-center py-8">
               <p className="text-slate-400">No upcoming candidates match your search</p>

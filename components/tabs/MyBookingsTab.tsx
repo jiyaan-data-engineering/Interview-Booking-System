@@ -193,6 +193,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                   })}{' '}
                   @ {formatTime(slot.time)}
                 </div>
+                <div className="text-sm text-slate-400 font-semibold">👤 {slot.candidateName}</div>
               </div>
               <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(slot.status)}`}>
                 {getStatusLabel(slot.status)}
