@@ -7,9 +7,10 @@ interface BookTabProps {
   candidateEmail?: string;
   candidateName?: string;
   candidatePhone?: string;
+  isInactive?: boolean;
 }
 
-export default function BookTab({ onBook, candidateEmail = '', candidateName = '', candidatePhone = '' }: BookTabProps) {
+export default function BookTab({ onBook, candidateEmail = '', candidateName = '', candidatePhone = '', isInactive = false }: BookTabProps) {
   const [formData, setFormData] = useState({
     name: candidateName || 'Your Name',
     email: candidateEmail || 'your.email@example.com',
@@ -86,6 +87,18 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
       hrNumber: '',
     });
   };
+
+  if (isInactive) {
+    return (
+      <div className="text-center py-16">
+        <div className="text-6xl mb-4">🔒</div>
+        <h2 className="text-2xl font-bold text-white mb-2">Account Deactivated</h2>
+        <p className="text-red-300 text-lg mb-4">Your account has been deactivated by the admin.</p>
+        <p className="text-slate-400 mb-4">You cannot submit new interview requests at this time.</p>
+        <p className="text-slate-500">Please contact the admin if you believe this is a mistake.</p>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (

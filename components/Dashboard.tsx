@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { InterviewSlot } from '@/lib/types';
-import { getSlots, saveSlot, updateSlot, deleteSlot } from '@/lib/firestore';
+import { getSlots, saveSlot, updateSlot, deleteSlot, isInactiveCandidate } from '@/lib/firestore';
 import { registerCandidate, loginCandidate, logoutCandidate, getCandidateProfile } from '@/lib/auth';
 import Header from './Header';
 import TabNavigation from './TabNavigation';
@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [candidateUser, setCandidateUser] = useState<User | null>(null);
   const [candidateProfile, setCandidateProfile] = useState<{ name: string; phone: string } | null>(null);
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [candidateIsInactive, setCandidateIsInactive] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -58,11 +59,15 @@ export default function Dashboard() {
                 phone: profile.phone
               });
             }
+            // Check if candidate is inactive
+            const inactive = await isInactiveCandidate(user.email || '');
+            setCandidateIsInactive(inactive);
             // If candidate is logged in, default to 'book' tab
             setActiveTab('book');
           } else {
             // If not logged in, default to 'allbookings' tab
             setCandidateProfile(null);
+            setCandidateIsInactive(false);
             setActiveTab('allbookings');
           }
         });
@@ -540,6 +545,7 @@ export default function Dashboard() {
                 candidateEmail={candidateUser?.email || ''}
                 candidateName={candidateProfile?.name || candidateUser?.displayName || ''}
                 candidatePhone={candidateProfile?.phone || ''}
+                isInactive={candidateIsInactive}
               />
             )}
 

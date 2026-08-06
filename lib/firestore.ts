@@ -142,6 +142,24 @@ export const exportToCSV = (slots: InterviewSlot[]): void => {
 // Inactive Candidates Management
 const INACTIVE_CANDIDATES_COLLECTION = 'inactive_candidates';
 
+// Get all inactive candidates
+export const getAllInactiveCandidates = async (): Promise<string[]> => {
+  try {
+    if (!db) return [];
+    const querySnapshot = await getDocs(collection(db, INACTIVE_CANDIDATES_COLLECTION));
+    const inactiveEmails: string[] = [];
+    querySnapshot.forEach(doc => {
+      if (doc.data().email) {
+        inactiveEmails.push(doc.data().email);
+      }
+    });
+    return inactiveEmails;
+  } catch (error) {
+    console.error('Error fetching inactive candidates:', error);
+    return [];
+  }
+};
+
 // Check if candidate is inactive
 export const isInactiveCandidate = async (email: string): Promise<boolean> => {
   try {

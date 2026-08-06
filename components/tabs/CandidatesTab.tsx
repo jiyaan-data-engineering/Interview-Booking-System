@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import { markCandidateInactive, markCandidateActive } from '@/lib/firestore';
+import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates } from '@/lib/firestore';
 
 interface CandidatesTabProps {
   slots: InterviewSlot[];
@@ -15,6 +15,15 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
   const [showPasswordReset, setShowPasswordReset] = useState<string | null>(null);
   const [statusBreakdownDate, setStatusBreakdownDate] = useState('');
   const [statusBreakdownFilter, setStatusBreakdownFilter] = useState('');
+
+  // Load inactive candidates from Firestore on mount
+  useEffect(() => {
+    const loadInactiveCandidates = async () => {
+      const inactiveEmails = await getAllInactiveCandidates();
+      setInactiveCandidates(new Set(inactiveEmails));
+    };
+    loadInactiveCandidates();
+  }, []);
 
   // Get unique candidates with their details
   const candidatesMap = new Map<string, {
