@@ -23,6 +23,9 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
       setInactiveCandidates(new Set(inactiveEmails));
     };
     loadInactiveCandidates();
+    // Reset filters on mount to show all candidates
+    setFilterCandidate('');
+    setFilterActive('');
   }, []);
 
   // Get unique candidates with their details
@@ -61,9 +64,9 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
   const candidateNames = Array.from(uniqueNameMap.values())
     .sort((a, b) => a.localeCompare(b));
 
-  // Filter by candidate name
+  // Filter by candidate name (case-insensitive, trimmed)
   if (filterCandidate) {
-    candidates = candidates.filter(c => c.name === filterCandidate);
+    candidates = candidates.filter(c => c.name.trim().toLowerCase() === filterCandidate.trim().toLowerCase());
   }
 
   // Filter by active/inactive status
