@@ -299,6 +299,8 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                 >
                   <option value="">Select Round</option>
                   <option value="Screening">Screening</option>
+                  <option value="Online test">Online test</option>
+                  <option value="AI Round">AI Round</option>
                   <option value="L1">L1</option>
                   <option value="L2">L2</option>
                   <option value="Client">Client</option>
