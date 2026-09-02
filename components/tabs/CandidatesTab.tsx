@@ -292,6 +292,9 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
                   <div className="text-sm text-slate-400 space-y-1">
                     <div>📧 {candidate.email}</div>
                     <div>📱 {candidate.phone}</div>
+                    <div className="text-sm text-slate-300 font-semibold pt-2">
+                      📦 Batch No: <span className="text-white bg-slate-700 px-2 py-1 rounded">{candidate.interviews[0]?.batchNo || 'Not Set'}</span>
+                    </div>
                     <div className="text-xs text-slate-500 pt-1">
                       <div>🔐 Password Protected</div>
                       {showPasswordReset === candidate.email && (
