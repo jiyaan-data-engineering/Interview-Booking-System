@@ -315,7 +315,7 @@ export default function TodayScheduleTab({ slots }: TodayScheduleTabProps) {
                         <span className="bg-purple-600 px-3 py-1 rounded-full mr-3 text-lg font-bold">{index + 1}</span>
                         {formatTime(slot.time)}
                       </div>
-                      <div className="text-sm text-slate-400 font-semibold">👤 {slot.candidateName}</div>
+                      <div className="text-sm text-slate-400 font-semibold">👤 {slot.candidateName} {slot.batchNo && `- ${slot.batchNo}`}</div>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(slot.status)}`}>
                       {getStatusLabel(slot.status)}
