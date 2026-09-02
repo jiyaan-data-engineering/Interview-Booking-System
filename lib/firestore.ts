@@ -5,6 +5,8 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  query,
+  where,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { InterviewSlot } from './types';
@@ -203,6 +205,30 @@ export const markCandidateActive = async (email: string): Promise<void> => {
     }
   } catch (error) {
     console.error('Error marking candidate active:', error);
+    throw error;
+  }
+};
+
+// Update candidate profile by email
+export const updateCandidateProfileByEmail = async (
+  email: string,
+  updates: { name?: string; phone?: string; batchNo?: string }
+): Promise<void> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    const candidatesRef = collection(db, 'candidates');
+    const q = query(candidatesRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      throw new Error(`Candidate with email ${email} not found`);
+    }
+
+    for (const docSnap of querySnapshot.docs) {
+      await updateDoc(doc(db, 'candidates', docSnap.id), updates);
+    }
+  } catch (error) {
+    console.error('Error updating candidate profile:', error);
     throw error;
   }
 };
