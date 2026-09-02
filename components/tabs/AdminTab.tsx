@@ -26,6 +26,7 @@ export default function AdminTab({
     email: '',
     phone: '',
     password: '',
+    batchNo: '',
   });
 
 
@@ -106,9 +107,9 @@ export default function AdminTab({
 
   const handleRegisterCandidate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (candidateFormData.name && candidateFormData.email && candidateFormData.phone && candidateFormData.password && onRegisterCandidate) {
+    if (candidateFormData.name && candidateFormData.email && candidateFormData.phone && candidateFormData.password && candidateFormData.batchNo && onRegisterCandidate) {
       onRegisterCandidate(candidateFormData.name, candidateFormData.email, candidateFormData.phone, candidateFormData.password);
-      setCandidateFormData({ name: '', email: '', phone: '', password: '' });
+      setCandidateFormData({ name: '', email: '', phone: '', password: '', batchNo: '' });
     }
   };
 
@@ -359,6 +360,20 @@ export default function AdminTab({
                 className="input-field"
                 placeholder="••••••••"
                 value={candidateFormData.password}
+                onChange={handleCandidateFormChange}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Batch No *
+              </label>
+              <input
+                type="text"
+                name="batchNo"
+                className="input-field"
+                placeholder="e.g., Batch#9"
+                value={candidateFormData.batchNo}
                 onChange={handleCandidateFormChange}
                 required
               />
