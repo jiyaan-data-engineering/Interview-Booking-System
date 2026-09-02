@@ -141,30 +141,35 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
 
     if (window.confirm('⚠️ Save changes?\n\nName: ' + editFormData.name + '\nEmail: ' + editFormData.email + '\nPhone: ' + editFormData.phone + '\nBatch: ' + editFormData.batchNo)) {
       try {
+        console.log('Saving candidate profile for:', editingEmail);
+
         // Update candidate profile in Firestore
         await updateCandidateProfileByEmail(editingEmail, {
           name: editFormData.name,
           phone: editFormData.phone,
           batchNo: editFormData.batchNo,
         });
+        console.log('✅ Candidate profile updated');
 
         // Update all slots with old email to new candidate info
-        for (const slot of slots) {
-          if (slot.candidateEmail === editingEmail) {
-            await updateSlot(slot.id, {
-              candidateName: editFormData.name,
-              candidateEmail: editFormData.email,
-              candidatePhone: editFormData.phone,
-              batchNo: editFormData.batchNo,
-            });
-          }
+        const slotsToUpdate = slots.filter(slot => slot.candidateEmail === editingEmail);
+        console.log(`Updating ${slotsToUpdate.length} interview slots`);
+
+        for (const slot of slotsToUpdate) {
+          await updateSlot(slot.id, {
+            candidateName: editFormData.name,
+            candidateEmail: editFormData.email,
+            candidatePhone: editFormData.phone,
+            batchNo: editFormData.batchNo,
+          });
         }
+        console.log('✅ All slots updated');
 
         alert('✅ Changes saved successfully!');
         setEditingEmail(null);
       } catch (error) {
-        alert('❌ Failed to save changes');
-        console.error(error);
+        console.error('Error saving changes:', error);
+        alert('❌ Failed to save changes: ' + (error instanceof Error ? error.message : 'Unknown error'));
       }
     }
   };

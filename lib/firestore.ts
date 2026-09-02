@@ -235,16 +235,22 @@ export const updateCandidateProfileByEmail = async (
 ): Promise<void> => {
   try {
     if (!db) throw new Error('Firestore not initialized');
+    console.log('updateCandidateProfileByEmail called with email:', email);
+
     const candidatesRef = collection(db, 'candidates');
     const q = query(candidatesRef, where('email', '==', email));
     const querySnapshot = await getDocs(q);
 
+    console.log('Query result - found', querySnapshot.docs.length, 'documents');
+
     if (querySnapshot.empty) {
-      throw new Error(`Candidate with email ${email} not found`);
+      throw new Error(`Candidate with email ${email} not found in database`);
     }
 
     for (const docSnap of querySnapshot.docs) {
+      console.log('Updating candidate document:', docSnap.id);
       await updateDoc(doc(db, 'candidates', docSnap.id), updates);
+      console.log('Document updated successfully');
     }
   } catch (error) {
     console.error('Error updating candidate profile:', error);
