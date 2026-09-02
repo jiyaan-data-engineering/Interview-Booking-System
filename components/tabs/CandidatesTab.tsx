@@ -142,7 +142,6 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
         // Update candidate profile in Firestore
         await updateCandidateProfileByEmail(editingEmail, {
           name: editFormData.name,
-          email: editFormData.email,
           phone: editFormData.phone,
           batchNo: editFormData.batchNo,
         });
