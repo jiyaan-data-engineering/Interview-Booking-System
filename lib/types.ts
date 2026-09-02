@@ -10,6 +10,7 @@ export interface InterviewSlot {
   candidateName: string;
   candidateEmail: string;
   candidatePhone: string;
+  batchNo?: string;
   status: InterviewStatus;
   reason?: string;
   room?: string;

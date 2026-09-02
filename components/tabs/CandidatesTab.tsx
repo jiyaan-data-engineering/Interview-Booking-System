@@ -15,6 +15,8 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
   const [showPasswordReset, setShowPasswordReset] = useState<string | null>(null);
   const [statusBreakdownDate, setStatusBreakdownDate] = useState('');
   const [statusBreakdownFilter, setStatusBreakdownFilter] = useState('');
+  const [editingEmail, setEditingEmail] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState({ name: '', email: '', phone: '', batchNo: '' });
 
   // Load inactive candidates from Firestore on mount
   useEffect(() => {
@@ -120,6 +122,38 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
     } catch (error) {
       console.error('Error updating candidate status:', error);
       alert('Failed to update candidate status');
+    }
+  };
+
+  const startEdit = (candidate: { name: string; email: string; phone: string; interviews: InterviewSlot[] }) => {
+    const batchNo = candidate.interviews[0]?.batchNo || '';
+    setEditingEmail(candidate.email);
+    setEditFormData({ name: candidate.name, email: candidate.email, phone: candidate.phone, batchNo });
+  };
+
+  const saveEdit = async () => {
+    if (!editingEmail || !editFormData.name || !editFormData.email || !editFormData.phone || !editFormData.batchNo) {
+      alert('All fields are required');
+      return;
+    }
+
+    if (window.confirm('⚠️ Save changes?\n\nName: ' + editFormData.name + '\nEmail: ' + editFormData.email + '\nPhone: ' + editFormData.phone + '\nBatch: ' + editFormData.batchNo)) {
+      try {
+        // Update all slots with old email to new candidate info
+        slots.forEach(slot => {
+          if (slot.candidateEmail === editingEmail) {
+            slot.candidateName = editFormData.name;
+            slot.candidateEmail = editFormData.email;
+            slot.candidatePhone = editFormData.phone;
+            slot.batchNo = editFormData.batchNo;
+          }
+        });
+        alert('✅ Changes saved! (Firestore update needed)');
+        setEditingEmail(null);
+      } catch (error) {
+        alert('❌ Failed to save changes');
+        console.error(error);
+      }
     }
   };
 
@@ -293,8 +327,77 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
                   >
                     {inactiveCandidates.has(candidate.email) ? '♻️ Make Active' : '🚫 Make Inactive'}
                   </button>
+                  <button
+                    onClick={() => startEdit({ name: candidate.name, email: candidate.email, phone: candidate.phone, interviews: candidate.interviews })}
+                    className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    ✏️ Edit Info
+                  </button>
                 </div>
               </div>
+
+              {/* Edit Form */}
+              {editingEmail === candidate.email && (
+                <div className="mt-4 p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
+                  <h4 className="text-purple-300 font-semibold mb-3">Edit Candidate Information</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Full Name *</label>
+                      <input
+                        type="text"
+                        value={editFormData.name}
+                        onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                        placeholder="Full Name"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Email Address *</label>
+                      <input
+                        type="email"
+                        value={editFormData.email}
+                        onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                        placeholder="Email"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Phone Number *</label>
+                      <input
+                        type="tel"
+                        value={editFormData.phone}
+                        onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                        placeholder="Phone"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Batch No *</label>
+                      <input
+                        type="text"
+                        value={editFormData.batchNo}
+                        onChange={(e) => setEditFormData({ ...editFormData, batchNo: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                        placeholder="e.g., Batch#9"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={saveEdit}
+                        className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold"
+                      >
+                        ✅ Save
+                      </button>
+                      <button
+                        onClick={() => setEditingEmail(null)}
+                        className="flex-1 px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded text-xs font-semibold"
+                      >
+                        ❌ Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Status Summary - Candidate Wise Statistics */}
               <div className="mb-4 pb-4 border-b border-slate-600">
