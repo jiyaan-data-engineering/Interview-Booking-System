@@ -170,6 +170,23 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 4000);
   };
 
+  // Refresh candidate profile when BookTab is active
+  useEffect(() => {
+    if (activeTab === 'book' && candidateUser) {
+      const refreshProfile = async () => {
+        const profile = await getCandidateProfile(candidateUser.uid);
+        if (profile) {
+          setCandidateProfile({
+            name: profile.name,
+            phone: profile.phone,
+            batchNo: profile.batchNo
+          });
+        }
+      };
+      refreshProfile();
+    }
+  }, [activeTab, candidateUser]);
+
   const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string, hrName?: string, hrNumber?: string, batchNo?: string) => {
     try {
       const newSlot: Omit<InterviewSlot, 'id'> = {
