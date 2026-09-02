@@ -2,7 +2,7 @@ export default function Header() {
   return (
     <div className="rounded-xl overflow-hidden shadow-2xl">
       <img
-        src="/images/jiyaan-logo.svg"
+        src="/images/jiyaan_gap_h.jpg"
         alt="JIYAAN Institute of Technology"
         className="w-full h-auto"
       />
