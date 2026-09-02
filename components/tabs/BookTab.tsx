@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 interface BookTabProps {
-  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string, hrName?: string, hrNumber?: string) => Promise<void> | void;
+  onBook: (name: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string, hrName?: string, hrNumber?: string, batchNo?: string) => Promise<void> | void;
   candidateEmail?: string;
   candidateName?: string;
   candidatePhone?: string;
@@ -23,6 +23,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
     interviewStatus: '',
     hrName: '',
     hrNumber: '',
+    batchNo: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -37,7 +38,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
 
     if (formData.name && formData.email && formData.phone && formData.date &&
         formData.time && formData.company && formData.duration && formData.round && formData.interviewStatus &&
-        formData.hrName && formData.hrNumber) {
+        formData.hrName && formData.hrNumber && formData.batchNo) {
 
       onBook(
         formData.name,
@@ -50,7 +51,8 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         formData.round,
         formData.interviewStatus,
         formData.hrName,
-        formData.hrNumber
+        formData.hrNumber,
+        formData.batchNo
       );
 
       setSubmitted(true);
@@ -66,6 +68,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         interviewStatus: '',
         hrName: '',
         hrNumber: '',
+        batchNo: '',
       });
 
       setTimeout(() => setSubmitted(false), 5000);
@@ -85,6 +88,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
       interviewStatus: '',
       hrName: '',
       hrNumber: '',
+      batchNo: '',
     });
   };
 
@@ -354,6 +358,21 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                     className="input-field"
                     placeholder="e.g., +1 (555) 123-4567"
                     value={formData.hrNumber}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-2">
+                    Batch No *
+                  </label>
+                  <input
+                    type="text"
+                    name="batchNo"
+                    className="input-field"
+                    placeholder="e.g., Batch#9"
+                    value={formData.batchNo}
                     onChange={handleChange}
                     required
                   />

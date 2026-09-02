@@ -169,7 +169,7 @@ export default function Dashboard() {
     setTimeout(() => setAlert(null), 4000);
   };
 
-  const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string, hrName?: string, hrNumber?: string) => {
+  const handleCandidateRegistration = async (candidateName: string, email: string, phone: string, date: string, time: string, company: string, duration: string, round?: string, interviewStatus?: string, hrName?: string, hrNumber?: string, batchNo?: string) => {
     try {
       const newSlot: Omit<InterviewSlot, 'id'> = {
         date,
@@ -180,6 +180,7 @@ export default function Dashboard() {
         candidateName,
         candidateEmail: email,
         candidatePhone: phone,
+        batchNo,
         status: 'pending' as const,
         interviewStatus,
         hrName,
