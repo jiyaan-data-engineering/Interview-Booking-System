@@ -193,7 +193,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                   })}{' '}
                   @ {formatTime(slot.time)}
                 </div>
-                <div className="text-sm text-slate-400 font-semibold">👤 {slot.candidateName} {slot.batchNo && `- ${slot.batchNo}`}</div>
+                <div className="text-sm text-slate-400 font-semibold">👤 {slot.candidateName} <span className="text-white">- {slot.batchNo || 'Null'}</span></div>
               </div>
               <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(slot.status)}`}>
                 {getStatusLabel(slot.status)}
