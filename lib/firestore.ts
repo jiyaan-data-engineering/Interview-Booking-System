@@ -209,6 +209,25 @@ export const markCandidateActive = async (email: string): Promise<void> => {
   }
 };
 
+// Get candidate profile by email
+export const getCandidateProfileByEmail = async (email: string): Promise<any | null> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    const candidatesRef = collection(db, 'candidates');
+    const q = query(candidatesRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return null;
+    }
+
+    return querySnapshot.docs[0].data();
+  } catch (error) {
+    console.error('Error fetching candidate profile by email:', error);
+    return null;
+  }
+};
+
 // Update candidate profile by email
 export const updateCandidateProfileByEmail = async (
   email: string,

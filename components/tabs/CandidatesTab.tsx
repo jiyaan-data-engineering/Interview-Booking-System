@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot } from '@/lib/firestore';
+import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot, getCandidateProfileByEmail } from '@/lib/firestore';
 
 interface CandidatesTabProps {
   slots: InterviewSlot[];
@@ -125,8 +125,10 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
     }
   };
 
-  const startEdit = (candidate: { name: string; email: string; phone: string; interviews: InterviewSlot[] }) => {
-    const batchNo = candidate.interviews[0]?.batchNo || '';
+  const startEdit = async (candidate: { name: string; email: string; phone: string; interviews: InterviewSlot[] }) => {
+    // Fetch candidate profile from Firestore to get the latest batchNo
+    const profile = await getCandidateProfileByEmail(candidate.email);
+    const batchNo = profile?.batchNo || '';
     setEditingEmail(candidate.email);
     setEditFormData({ name: candidate.name, email: candidate.email, phone: candidate.phone, batchNo });
   };
