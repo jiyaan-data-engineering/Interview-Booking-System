@@ -7,10 +7,11 @@ interface BookTabProps {
   candidateEmail?: string;
   candidateName?: string;
   candidatePhone?: string;
+  candidateBatchNo?: string;
   isInactive?: boolean;
 }
 
-export default function BookTab({ onBook, candidateEmail = '', candidateName = '', candidatePhone = '', isInactive = false }: BookTabProps) {
+export default function BookTab({ onBook, candidateEmail = '', candidateName = '', candidatePhone = '', candidateBatchNo = '', isInactive = false }: BookTabProps) {
   const [formData, setFormData] = useState({
     name: candidateName || 'Your Name',
     email: candidateEmail || 'your.email@example.com',
@@ -23,7 +24,6 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
     interviewStatus: '',
     hrName: '',
     hrNumber: '',
-    batchNo: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -38,7 +38,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
 
     if (formData.name && formData.email && formData.phone && formData.date &&
         formData.time && formData.company && formData.duration && formData.round && formData.interviewStatus &&
-        formData.hrName && formData.hrNumber && formData.batchNo) {
+        formData.hrName && formData.hrNumber) {
 
       onBook(
         formData.name,
@@ -52,7 +52,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         formData.interviewStatus,
         formData.hrName,
         formData.hrNumber,
-        formData.batchNo
+        candidateBatchNo
       );
 
       setSubmitted(true);
@@ -68,7 +68,6 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
         interviewStatus: '',
         hrName: '',
         hrNumber: '',
-        batchNo: '',
       });
 
       setTimeout(() => setSubmitted(false), 5000);
@@ -88,7 +87,6 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
       interviewStatus: '',
       hrName: '',
       hrNumber: '',
-      batchNo: '',
     });
   };
 
@@ -159,19 +157,35 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
               </div>
             </div>
 
-            <div className="mt-4">
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
-                Phone Number * <span className="text-xs text-slate-500">(Read-only)</span>
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                className="input-field bg-slate-600 cursor-not-allowed"
-                placeholder="+1 (555) 123-4567"
-                value={formData.phone}
-                disabled
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Phone Number * <span className="text-xs text-slate-500">(Read-only)</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  className="input-field bg-slate-600 cursor-not-allowed"
+                  placeholder="+1 (555) 123-4567"
+                  value={formData.phone}
+                  disabled
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Batch No * <span className="text-xs text-slate-500">(Read-only)</span>
+                </label>
+                <input
+                  type="text"
+                  className="input-field bg-slate-600 cursor-not-allowed"
+                  placeholder="Auto-filled from database"
+                  value={candidateBatchNo}
+                  disabled
+                  required
+                />
+              </div>
             </div>
           </div>
 
@@ -358,21 +372,6 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                     className="input-field"
                     placeholder="e.g., +1 (555) 123-4567"
                     value={formData.hrNumber}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-300 mb-2">
-                    Batch No *
-                  </label>
-                  <input
-                    type="text"
-                    name="batchNo"
-                    className="input-field"
-                    placeholder="e.g., Batch#9"
-                    value={formData.batchNo}
                     onChange={handleChange}
                     required
                   />

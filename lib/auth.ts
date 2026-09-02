@@ -15,6 +15,7 @@ interface CandidateProfile {
   name: string;
   email: string;
   phone: string;
+  batchNo?: string;
   createdAt: string;
 }
 
@@ -22,7 +23,8 @@ export const registerCandidate = async (
   name: string,
   email: string,
   phone: string,
-  password: string
+  password: string,
+  batchNo?: string
 ): Promise<User> => {
   if (!auth) {
     throw new Error('Firebase Authentication not initialized');
@@ -39,6 +41,7 @@ export const registerCandidate = async (
         name,
         email,
         phone,
+        batchNo,
         createdAt: new Date().toISOString(),
       } as CandidateProfile);
     }

@@ -37,7 +37,7 @@ export default function Dashboard() {
 
   // Candidate auth
   const [candidateUser, setCandidateUser] = useState<User | null>(null);
-  const [candidateProfile, setCandidateProfile] = useState<{ name: string; phone: string } | null>(null);
+  const [candidateProfile, setCandidateProfile] = useState<{ name: string; phone: string; batchNo?: string } | null>(null);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [candidateIsInactive, setCandidateIsInactive] = useState(false);
 
@@ -56,7 +56,8 @@ export default function Dashboard() {
             if (profile) {
               setCandidateProfile({
                 name: profile.name,
-                phone: profile.phone
+                phone: profile.phone,
+                batchNo: profile.batchNo
               });
             }
             // Check if candidate is inactive
@@ -105,9 +106,9 @@ export default function Dashboard() {
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin@123';
 
-  const handleAdminRegisterCandidate = async (name: string, email: string, phone: string, password: string) => {
+  const handleAdminRegisterCandidate = async (name: string, email: string, phone: string, password: string, batchNo?: string) => {
     try {
-      await registerCandidate(name, email, phone, password);
+      await registerCandidate(name, email, phone, password, batchNo);
       showAlert(`Candidate "${name}" registered successfully!`, 'success');
     } catch (error: any) {
       showAlert(error.message || 'Registration failed', 'error');
@@ -546,6 +547,7 @@ export default function Dashboard() {
                 candidateEmail={candidateUser?.email || ''}
                 candidateName={candidateProfile?.name || candidateUser?.displayName || ''}
                 candidatePhone={candidateProfile?.phone || ''}
+                candidateBatchNo={candidateProfile?.batchNo || ''}
                 isInactive={candidateIsInactive}
               />
             )}
