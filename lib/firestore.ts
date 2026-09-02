@@ -5,6 +5,7 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  setDoc,
   query,
   where,
 } from 'firebase/firestore';
@@ -228,7 +229,7 @@ export const getCandidateProfileByEmail = async (email: string): Promise<any | n
   }
 };
 
-// Update candidate profile by email
+// Update candidate profile by email (creates if doesn't exist)
 export const updateCandidateProfileByEmail = async (
   email: string,
   updates: { name?: string; phone?: string; batchNo?: string }
@@ -244,7 +245,17 @@ export const updateCandidateProfileByEmail = async (
     console.log('Query result - found', querySnapshot.docs.length, 'documents');
 
     if (querySnapshot.empty) {
-      throw new Error(`Candidate with email ${email} not found in database`);
+      console.log('Candidate profile not found, creating new one...');
+      // Create new candidate profile document with a generated ID
+      const newDocRef = doc(candidatesRef);
+      const profileData = {
+        email,
+        ...updates,
+        createdAt: new Date().toISOString(),
+      };
+      await setDoc(newDocRef, profileData);
+      console.log('New candidate profile created with ID:', newDocRef.id);
+      return;
     }
 
     for (const docSnap of querySnapshot.docs) {
