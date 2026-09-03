@@ -392,6 +392,35 @@ export default function Dashboard() {
     }
   };
 
+  const handleDeleteOffer = async (slotId: string) => {
+    try {
+      await updateSlot(slotId, {
+        offerStatus: '',
+        offerReleasedDate: '',
+        joiningDate: '',
+        packageLPA: '',
+        documentRequestMessage: ''
+      });
+      const updated = slots.map(slot =>
+        slot.id === slotId
+          ? {
+              ...slot,
+              offerStatus: '',
+              offerReleasedDate: '',
+              joiningDate: '',
+              packageLPA: '',
+              documentRequestMessage: ''
+            }
+          : slot
+      );
+      updateSlots(updated);
+      showAlert('✓ Offer deleted successfully!');
+    } catch (error) {
+      showAlert('Failed to delete offer. Please try again.', 'error');
+      console.error(error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen py-8 px-4 flex items-center justify-center">
@@ -632,7 +661,9 @@ export default function Dashboard() {
               <DocumentRequestsTab
                 slots={slots}
                 onSubmitDocumentRequest={handleSubmitDocumentRequest}
+                onDeleteOffer={handleDeleteOffer}
                 candidateEmail={candidateUser?.email || ''}
+                isAdmin={isAdmin}
               />
             )}
 

@@ -14,10 +14,12 @@ interface DocumentRequestsTabProps {
     joiningDate?: string,
     packageLPA?: string
   ) => Promise<void> | void;
+  onDeleteOffer?: (slotId: string) => Promise<void> | void;
   candidateEmail?: string;
+  isAdmin?: boolean;
 }
 
-export default function DocumentRequestsTab({ slots, onSubmitDocumentRequest, candidateEmail }: DocumentRequestsTabProps) {
+export default function DocumentRequestsTab({ slots, onSubmitDocumentRequest, onDeleteOffer, candidateEmail, isAdmin = false }: DocumentRequestsTabProps) {
   const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
   const [formData, setFormData] = useState<Record<string, {
     documents: string[];
@@ -94,6 +96,14 @@ export default function DocumentRequestsTab({ slots, onSubmitDocumentRequest, ca
     }
   };
 
+  const handleDeleteOffer = async (slotId: string, candidateName: string) => {
+    if (confirm(`Delete offer for ${candidateName}? This action cannot be undone.`)) {
+      if (onDeleteOffer) {
+        await onDeleteOffer(slotId);
+      }
+    }
+  };
+
   if (hrCompletedInterviews.length === 0) {
     return (
       <div className="text-center py-16">
@@ -123,6 +133,7 @@ export default function DocumentRequestsTab({ slots, onSubmitDocumentRequest, ca
                   <th className="text-left py-4 px-4 text-slate-300 font-semibold">Package LPA</th>
                   <th className="text-left py-4 px-4 text-slate-300 font-semibold">Settlement (Monthly)</th>
                   <th className="text-left py-4 px-4 text-slate-300 font-semibold">Offer Status</th>
+                  {isAdmin && <th className="text-center py-4 px-4 text-slate-300 font-semibold">Action</th>}
                 </tr>
               </thead>
               <tbody>
@@ -155,6 +166,16 @@ export default function DocumentRequestsTab({ slots, onSubmitDocumentRequest, ca
                         {interview.offerStatus || 'Pending'}
                       </span>
                     </td>
+                    {isAdmin && (
+                      <td className="py-4 px-4 text-center">
+                        <button
+                          onClick={() => handleDeleteOffer(interview.id, interview.candidateName)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-semibold transition-all"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
