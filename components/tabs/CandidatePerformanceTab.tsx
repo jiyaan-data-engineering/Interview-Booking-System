@@ -332,7 +332,7 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
         <div class="page">
           <!-- Header -->
           <div class="header">
-            <img src="${window.location.origin}/images/jiyaan_gap_h.jpg" alt="Jiyaan Institute of Technology" style="max-width: 300px; margin: 0 auto 20px; display: block; border-radius: 8px;">
+            <img src="${window.location.origin}/images/jiyaan_gap_h.jpg?v=2" alt="Jiyaan Institute of Technology" style="max-width: 300px; margin: 0 auto 20px; display: block; border-radius: 8px;">
             <div class="candidate-name">${candidate.name}</div>
             <div class="candidate-info">
               <div>📧 ${candidate.email}</div>
