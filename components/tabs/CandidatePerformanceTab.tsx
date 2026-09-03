@@ -243,15 +243,6 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
     return Math.round((successCount / roundData.count) * 100);
   };
 
-  const getNextRound = (candidate: any) => {
-    const rounds = Array.from(candidate.rounds.keys());
-    const commonRounds = ['Screening', 'Online test', 'AI Round', 'L1', 'L2', 'Client', 'HR'];
-    for (const round of commonRounds) {
-      if (!rounds.includes(round)) return round;
-    }
-    return 'Final Round';
-  };
-
   const exportToCSV = (candidate: any) => {
     const headers = ['Date', 'Round', 'Company', 'HR Name', 'HR Number', 'Status'];
     const rows = candidate.interviews
