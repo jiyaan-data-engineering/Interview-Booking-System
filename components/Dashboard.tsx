@@ -17,12 +17,13 @@ import FeedbackAnalyticsTab from './tabs/FeedbackAnalyticsTab';
 import ManageConfirmedSlotsTab from './tabs/ManageConfirmedSlotsTab';
 import CandidatesTab from './tabs/CandidatesTab';
 import CancelledInterviewsTab from './tabs/CancelledInterviewsTab';
+import CandidatePerformanceTab from './tabs/CandidatePerformanceTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
 import LoginForm from './auth/LoginForm';
 import LoginPage from './LoginPage';
 
-type TabType = 'book' | 'mybookings' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'cancelled' | 'admin';
+type TabType = 'book' | 'mybookings' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'performance' | 'cancelled' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('allbookings');
@@ -602,6 +603,10 @@ export default function Dashboard() {
 
             {activeTab === 'candidates' && isAdmin && (
               <CandidatesTab slots={slots} />
+            )}
+
+            {activeTab === 'performance' && isAdmin && (
+              <CandidatePerformanceTab slots={slots} />
             )}
 
             {activeTab === 'cancelled' && isAdmin && (
