@@ -55,20 +55,6 @@ export default function DocumentRequestsTab({ slots, onSubmitDocumentRequest, ca
     }
   };
 
-  const handleDocumentToggle = (slotId: string, doc: string) => {
-    setFormData(prev => {
-      const data = prev[slotId] || { documents: [], offerStatus: 'Pending Review', message: '' };
-      const docs = data.documents;
-      return {
-        ...prev,
-        [slotId]: {
-          ...data,
-          documents: docs.includes(doc) ? docs.filter(d => d !== doc) : [...docs, doc]
-        }
-      };
-    });
-  };
-
   const handleSubmitRequest = async (slotId: string) => {
     const data = formData[slotId];
     if (!data) {
