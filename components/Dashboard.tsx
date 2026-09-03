@@ -632,7 +632,7 @@ export default function Dashboard() {
               <DocumentRequestsTab
                 slots={slots}
                 onSubmitDocumentRequest={handleSubmitDocumentRequest}
-                candidateEmail={candidateUser?.email}
+                candidateEmail={candidateUser?.email || ''}
               />
             )}
 
