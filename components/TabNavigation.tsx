@@ -1,4 +1,4 @@
-type TabType = 'book' | 'mybookings' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'performance' | 'cancelled' | 'admin';
+type TabType = 'book' | 'mybookings' | 'myperformance' | 'documents' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'performance' | 'cancelled' | 'admin';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -12,6 +12,8 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
     ? [
         { id: 'book', label: 'Book Interview', icon: '📋' },
         { id: 'mybookings', label: 'My Bookings', icon: '📌' },
+        { id: 'myperformance', label: 'My Performance', icon: '📊' },
+        { id: 'documents', label: 'Offer Status', icon: '💼' },
         { id: 'today', label: "Today's Schedule - Confirmed", icon: '📅' },
         { id: 'tomorrow', label: "Tomorrow's Schedule - Confirmed", icon: '📆' },
         { id: 'allbookings', label: 'All Bookings', icon: '👥' },
@@ -30,6 +32,7 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
     { id: 'confirmedslots', label: 'Confirmed Slots', icon: '✅' },
     { id: 'candidates', label: 'Candidates', icon: '👥' },
     { id: 'performance', label: 'Performance', icon: '📊' },
+    { id: 'documents', label: 'Document Requests', icon: '📄' },
     { id: 'cancelled', label: 'Cancelled', icon: '❌' },
     { id: 'admin', label: 'Admin Panel', icon: '⚙️' },
   ];

@@ -47,6 +47,12 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       averageFeedback: number;
       interviews: InterviewSlot[];
       batchAvgCompletion?: number;
+      offerStatus: string;
+      packageLPA: string;
+      offerReleasedDate: string;
+      joiningDate: string;
+      offerCompany: string;
+      offerCount: number;
     }>();
 
     slots.forEach(slot => {
@@ -74,6 +80,12 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
           feedback: [],
           averageFeedback: 0,
           interviews: [],
+          offerStatus: '',
+          packageLPA: '',
+          offerReleasedDate: '',
+          joiningDate: '',
+          offerCompany: '',
+          offerCount: 0,
         });
       }
 
@@ -87,6 +99,18 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       else if (slot.status === 'confirmed') data.confirmed++;
       else if (slot.status === 'cancelled') data.cancelled++;
       else if (slot.status === 'postponed') data.postponed++;
+
+      // Capture offer information from HR-completed interviews
+      if (slot.round === 'HR' && slot.status === 'completed') {
+        if (slot.offerStatus) {
+          data.offerStatus = slot.offerStatus;
+          data.offerCount++;
+        }
+        if (slot.packageLPA) data.packageLPA = slot.packageLPA;
+        if (slot.offerReleasedDate) data.offerReleasedDate = slot.offerReleasedDate;
+        if (slot.joiningDate) data.joiningDate = slot.joiningDate;
+        if (slot.company) data.offerCompany = slot.company;
+      }
 
       // Track rounds with status
       if (slot.round) {
@@ -195,9 +219,29 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
     return 'text-red-400 bg-red-900/30';
   };
 
-  const getRoundSuccessRate = (completed: number, total: number) => {
-    if (total === 0) return 0;
-    return Math.round((completed / total) * 100);
+  const getRoundSuccessRate = (candidate: any, roundName: string) => {
+    // Success = completed this round AND scheduled for next round
+    const roundData = candidate.rounds.get(roundName);
+    if (!roundData || roundData.count === 0) return 0;
+
+    // Define next round for each round
+    const nextRoundMap: { [key: string]: string } = {
+      'Screening': 'Online test',
+      'Online test': 'AI Round',
+      'AI Round': 'L1',
+      'L1': 'L2',
+      'L2': 'Client',
+      'Client': 'HR',
+      'HR': 'Offer'
+    };
+
+    const nextRound = nextRoundMap[roundName];
+    const nextRoundData = nextRound ? candidate.rounds.get(nextRound) : null;
+
+    // Success count: candidates who completed this round AND have interviews in next round
+    const successCount = nextRoundData ? nextRoundData.count : 0;
+
+    return Math.round((successCount / roundData.count) * 100);
   };
 
   const getNextRound = (candidate: any) => {
@@ -207,6 +251,37 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       if (!rounds.includes(round)) return round;
     }
     return 'Final Round';
+  };
+
+  const exportToCSV = (candidate: any) => {
+    const headers = ['Date', 'Round', 'Company', 'HR Name', 'HR Number', 'Status'];
+    const rows = candidate.interviews
+      .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .map((interview: any) => [
+        new Date(interview.date).toLocaleDateString(),
+        interview.round || 'N/A',
+        interview.company || 'N/A',
+        interview.hrName || 'N/A',
+        interview.hrNumber || 'N/A',
+        interview.status || 'N/A',
+      ]);
+
+    const csvContent = [
+      [`Interview History for ${candidate.name}`],
+      [`Email: ${candidate.email}`],
+      [`Batch: ${candidate.batchNo}`],
+      [],
+      [headers.join(',')],
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${candidate.name.replace(/\s+/g, '_')}_interviews.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   if (candidatePerformance.length === 0) {
@@ -291,8 +366,11 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <h3 className="text-lg font-bold text-white">{candidate.name}</h3>
+                    {candidate.offerStatus === 'Received' && (
+                      <span className="bg-green-900/50 border border-green-500 text-green-300 text-xs px-2 py-1 rounded-full font-semibold">🎯 Placed</span>
+                    )}
                     {candidate.completionRate === 100 && (
                       <span className="bg-green-900/50 border border-green-500 text-green-300 text-xs px-2 py-1 rounded-full font-semibold">⭐ High Performer</span>
                     )}
@@ -309,6 +387,29 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                   <div className="text-sm text-slate-400">
                     <div>📧 {candidate.email}</div>
                     <div>📦 {candidate.batchNo}</div>
+                    <div className="mt-1">📱 Interviews: {candidate.totalInterviews}</div>
+                    {candidate.offerCount > 0 && (
+                      <div className="mt-1 text-green-400 font-semibold">💌 Offers: {candidate.offerCount}</div>
+                    )}
+                    {candidate.offerStatus && (
+                      <div className="mt-2 flex gap-2 items-center flex-wrap">
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          candidate.offerStatus === 'Received' ? 'bg-green-900/50 text-green-300' :
+                          candidate.offerStatus === 'Not Received' ? 'bg-red-900/50 text-red-300' :
+                          'bg-yellow-900/50 text-yellow-300'
+                        }`}>
+                          💼 {candidate.offerStatus}
+                        </span>
+                        {candidate.packageLPA && (
+                          <span className="text-white font-semibold">💰 {candidate.packageLPA} LPA</span>
+                        )}
+                        {candidate.offerStatus === 'Received' && candidate.offerReleasedDate && candidate.firstInterviewDate && (
+                          <span className="text-blue-300 font-semibold">
+                            ⏱️ {Math.ceil((new Date(candidate.offerReleasedDate).getTime() - new Date(candidate.firstInterviewDate).getTime()) / (1000 * 60 * 60 * 24))} days
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="text-right">
@@ -344,6 +445,54 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                     ></div>
                   </div>
                 </div>
+
+                {/* Offer Information */}
+                {candidate.offerStatus && (
+                  <div className="bg-gradient-to-r from-purple-900/30 to-slate-900/30 border border-purple-500/50 rounded p-4">
+                    <div className="text-sm font-semibold text-slate-300 mb-3">💼 Offer Information</div>
+                    {candidate.offerCompany && (
+                      <div className="mb-3 pb-3 border-b border-purple-500/30">
+                        <div className="text-white font-bold text-lg">{candidate.offerCompany}</div>
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      <div className="text-center">
+                        <div className="text-xs text-slate-400 mb-1">Offer Status</div>
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          candidate.offerStatus === 'Received' ? 'bg-green-900/50 text-green-300' :
+                          candidate.offerStatus === 'Not Received' ? 'bg-red-900/50 text-red-300' :
+                          'bg-yellow-900/50 text-yellow-300'
+                        }`}>
+                          {candidate.offerStatus}
+                        </span>
+                      </div>
+                      {candidate.packageLPA && (
+                        <>
+                          <div className="text-center">
+                            <div className="text-xs text-slate-400 mb-1">Package</div>
+                            <div className="text-white font-semibold">₹ {candidate.packageLPA} LPA</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-xs text-slate-400 mb-1">Settlement</div>
+                            <div className="text-green-400 font-semibold">₹ {(parseFloat(candidate.packageLPA) / 12).toFixed(2)} L/month</div>
+                          </div>
+                        </>
+                      )}
+                      {candidate.offerReleasedDate && (
+                        <div className="text-center">
+                          <div className="text-xs text-slate-400 mb-1">Released</div>
+                          <div className="text-white font-semibold">{new Date(candidate.offerReleasedDate).toLocaleDateString()}</div>
+                        </div>
+                      )}
+                      {candidate.joiningDate && (
+                        <div className="text-center">
+                          <div className="text-xs text-slate-400 mb-1">Joining</div>
+                          <div className="text-white font-semibold">{new Date(candidate.joiningDate).toLocaleDateString()}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Status Breakdown */}
                 <div>
@@ -407,10 +556,10 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                   <div>
                     <div className="text-sm font-semibold text-slate-300 mb-3">🎯 Round-wise Success Rates</div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {['Screening', 'L1', 'L2', 'Client'].map(roundName => {
+                      {['Screening', 'L1', 'L2', 'Client', 'HR'].map(roundName => {
                         const data = candidate.rounds.get(roundName);
                         if (!data) return null;
-                        const successRate = getRoundSuccessRate(data.completed, data.count);
+                        const successRate = getRoundSuccessRate(candidate, roundName);
                         return (
                           <div key={roundName} className="bg-slate-700/50 border border-slate-600 rounded-lg p-3">
                             <div className="text-xs text-slate-400 font-semibold mb-2">{roundName} Success Rate</div>
@@ -418,15 +567,15 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                               {successRate}%
                             </div>
                             <div className="text-xs text-slate-300">
-                              <div>✅ {data.completed}/{data.count} passed</div>
-                              <div>❌ {data.cancelled} cancelled</div>
+                              <div>📊 {data.count} appeared</div>
+                              <div>✅ {successRate}% progressed to next round</div>
                             </div>
                           </div>
                         );
                       })}
                       {Array.from(candidate.rounds.entries()).map(([round, data]) => {
-                        if (['Screening', 'L1', 'L2', 'Client'].includes(round)) return null;
-                        const successRate = getRoundSuccessRate(data.completed, data.count);
+                        if (['Screening', 'Online test', 'AI Round', 'L1', 'L2', 'Client', 'HR'].includes(round)) return null;
+                        const successRate = getRoundSuccessRate(candidate, round);
                         return (
                           <div key={round} className="bg-slate-700/50 border border-slate-600 rounded-lg p-3">
                             <div className="text-xs text-slate-400 font-semibold mb-2">{round} Success Rate</div>
@@ -434,11 +583,69 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                               {successRate}%
                             </div>
                             <div className="text-xs text-slate-300">
-                              <div>✅ {data.completed}/{data.count} passed</div>
+                              <div>📊 {data.count} appeared</div>
+                              <div>✅ {successRate}% progressed to next round</div>
                             </div>
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Interview History */}
+                {candidate.interviews.length > 0 && (
+                  <div>
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="text-sm font-semibold text-slate-300">📋 Interview History</div>
+                      <button
+                        onClick={() => exportToCSV(candidate)}
+                        className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-all"
+                      >
+                        📥 Export CSV
+                      </button>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-slate-600">
+                            <th className="text-left py-2 px-3 text-slate-300">Date</th>
+                            <th className="text-left py-2 px-3 text-slate-300">Round</th>
+                            <th className="text-left py-2 px-3 text-slate-300">Company</th>
+                            <th className="text-left py-2 px-3 text-slate-300">HR Name</th>
+                            <th className="text-left py-2 px-3 text-slate-300">HR Number</th>
+                            <th className="text-left py-2 px-3 text-slate-300">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {candidate.interviews
+                            .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                            .map((interview: any, idx: number) => (
+                              <tr key={idx} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
+                                <td className="py-2 px-3 text-slate-300">{new Date(interview.date).toLocaleDateString()}</td>
+                                <td className="py-2 px-3">
+                                  <span className="bg-purple-900/50 text-purple-300 px-2 py-1 rounded text-xs font-semibold">
+                                    {interview.round || 'N/A'}
+                                  </span>
+                                </td>
+                                <td className="py-2 px-3 text-slate-300">{interview.company || 'N/A'}</td>
+                                <td className="py-2 px-3 text-slate-300">{interview.hrName || 'N/A'}</td>
+                                <td className="py-2 px-3 text-slate-300">{interview.hrNumber || 'N/A'}</td>
+                                <td className="py-2 px-3">
+                                  <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                    interview.status === 'completed' ? 'bg-green-900/50 text-green-300' :
+                                    interview.status === 'confirmed' ? 'bg-blue-900/50 text-blue-300' :
+                                    interview.status === 'pending' ? 'bg-yellow-900/50 text-yellow-300' :
+                                    interview.status === 'cancelled' ? 'bg-red-900/50 text-red-300' :
+                                    'bg-slate-700 text-slate-300'
+                                  }`}>
+                                    {interview.status || 'N/A'}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}

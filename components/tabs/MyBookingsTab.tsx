@@ -657,6 +657,80 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
         ))}
       </div>
       )}
+
+      {/* Document Requests & Offer Status Table */}
+      {(() => {
+        const submittedRequests = bookedSlots.filter(slot =>
+          slot.round === 'HR' && slot.status === 'completed' &&
+          (slot.offerStatus || slot.packageLPA || slot.offerReleasedDate || slot.joiningDate)
+        );
+
+        if (submittedRequests.length === 0) return null;
+
+        const getOfferStatusColor = (status?: string) => {
+          switch (status) {
+            case 'Accepted':
+              return 'bg-green-900/50 text-green-300 border-green-600';
+            case 'Rejected':
+              return 'bg-red-900/50 text-red-300 border-red-600';
+            case 'Negotiating':
+              return 'bg-yellow-900/50 text-yellow-300 border-yellow-600';
+            default:
+              return 'bg-blue-900/50 text-blue-300 border-blue-600';
+          }
+        };
+
+        return (
+          <div className="mt-8">
+            <h3 className="text-2xl font-bold text-white mb-2">📄 Submitted Requests</h3>
+            <p className="text-slate-400 mb-6">Your document requests and offer status</p>
+            <div className="overflow-x-auto bg-slate-800 rounded-lg border border-slate-600">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-600 bg-slate-900/50">
+                    <th className="text-left py-4 px-4 text-slate-300 font-semibold">Company</th>
+                    <th className="text-left py-4 px-4 text-slate-300 font-semibold">Released Date</th>
+                    <th className="text-left py-4 px-4 text-slate-300 font-semibold">Joining Date</th>
+                    <th className="text-left py-4 px-4 text-slate-300 font-semibold">Package LPA</th>
+                    <th className="text-left py-4 px-4 text-slate-300 font-semibold">Settlement (Monthly)</th>
+                    <th className="text-left py-4 px-4 text-slate-300 font-semibold">Offer Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {submittedRequests.map((interview) => (
+                    <tr key={interview.id} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
+                      <td className="py-4 px-4 text-slate-300">{interview.company}</td>
+                      <td className="py-4 px-4 text-slate-300">
+                        {interview.offerReleasedDate ? new Date(interview.offerReleasedDate).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="py-4 px-4 text-slate-300">
+                        {interview.joiningDate ? new Date(interview.joiningDate).toLocaleDateString() : 'N/A'}
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-white font-semibold">
+                          {interview.packageLPA ? `₹ ${interview.packageLPA} LPA` : 'N/A'}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className="text-green-400 font-semibold">
+                          {interview.packageLPA
+                            ? `₹ ${(parseFloat(interview.packageLPA) / 12).toFixed(2)} L/month`
+                            : 'N/A'}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className={`px-3 py-1 rounded text-xs font-semibold border ${getOfferStatusColor(interview.offerStatus)}`}>
+                          {interview.offerStatus || 'Pending'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

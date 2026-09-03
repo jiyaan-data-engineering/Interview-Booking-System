@@ -18,12 +18,14 @@ import ManageConfirmedSlotsTab from './tabs/ManageConfirmedSlotsTab';
 import CandidatesTab from './tabs/CandidatesTab';
 import CancelledInterviewsTab from './tabs/CancelledInterviewsTab';
 import CandidatePerformanceTab from './tabs/CandidatePerformanceTab';
+import MyPerformanceTab from './tabs/MyPerformanceTab';
+import DocumentRequestsTab from './tabs/DocumentRequestsTab';
 import AdminTab from './tabs/AdminTab';
 import Alert from './Alert';
 import LoginForm from './auth/LoginForm';
 import LoginPage from './LoginPage';
 
-type TabType = 'book' | 'mybookings' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'performance' | 'cancelled' | 'admin';
+type TabType = 'book' | 'mybookings' | 'myperformance' | 'documents' | 'today' | 'tomorrow' | 'allbookings' | 'feedbackanalytics' | 'confirmedslots' | 'candidates' | 'performance' | 'cancelled' | 'admin';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('allbookings');
@@ -352,6 +354,44 @@ export default function Dashboard() {
     }
   };
 
+  const handleSubmitDocumentRequest = async (
+    slotId: string,
+    documents: string[],
+    offerStatus: string,
+    message: string,
+    offerReleasedDate?: string,
+    joiningDate?: string,
+    packageLPA?: string
+  ) => {
+    try {
+      await updateSlot(slotId, {
+        requestedDocuments: documents,
+        offerStatus,
+        documentRequestMessage: message,
+        offerReleasedDate,
+        joiningDate,
+        packageLPA
+      });
+      const updated = slots.map(slot =>
+        slot.id === slotId
+          ? {
+              ...slot,
+              requestedDocuments: documents,
+              offerStatus,
+              offerReleasedDate,
+              joiningDate,
+              packageLPA
+            }
+          : slot
+      );
+      updateSlots(updated);
+      showAlert(`✓ Offer status updated! Status: ${offerStatus} | Package: ${packageLPA ? packageLPA + ' LPA' : 'N/A'}`);
+    } catch (error) {
+      showAlert('Failed to update offer status. Please try again.', 'error');
+      console.error(error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen py-8 px-4 flex items-center justify-center">
@@ -578,6 +618,21 @@ export default function Dashboard() {
                 onMarkCompleted={handleMarkCompleted}
                 onUpdateInterviewStatus={handleUpdateInterviewStatus}
                 candidateEmail={candidateUser?.email || (isAdmin ? 'admin@system' : '') || ''}
+              />
+            )}
+
+            {activeTab === 'myperformance' && candidateUser && (
+              <MyPerformanceTab
+                slots={slots}
+                candidateEmail={candidateUser?.email || ''}
+              />
+            )}
+
+            {activeTab === 'documents' && (candidateUser || isAdmin) && (
+              <DocumentRequestsTab
+                slots={slots}
+                onSubmitDocumentRequest={handleSubmitDocumentRequest}
+                candidateEmail={candidateUser?.email}
               />
             )}
 

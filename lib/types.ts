@@ -23,6 +23,11 @@ export interface InterviewSlot {
   interviewStatus?: string;
   createdAt?: string;
   completedAt?: string;
+  requestedDocuments?: string[];
+  offerStatus?: string;
+  offerReleasedDate?: string;
+  joiningDate?: string;
+  packageLPA?: string;
 }
 
 export interface SlotFormData {
