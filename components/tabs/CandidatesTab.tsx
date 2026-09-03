@@ -86,6 +86,10 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
   const inactiveCount = Array.from(candidatesMap.values())
     .filter(c => inactiveCandidates.has(c.email)).length;
 
+  // Count placed candidates (those with at least one offer received)
+  const placedCount = Array.from(candidatesMap.values())
+    .filter(c => c.interviews.some(i => i.offerStatus === 'Received')).length;
+
   // Calculate overall statistics
   const allCandidates = Array.from(candidatesMap.values());
   const overallStats = {
@@ -210,7 +214,7 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
       <p className="text-slate-400 mb-6">View and manage candidate information and their interview history</p>
 
       {/* Candidate Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-gradient-to-br from-blue-900/30 to-blue-900/10 border border-blue-500/50 rounded-lg p-4">
           <div className="text-blue-400 text-sm font-semibold mb-1">Total Candidates</div>
           <div className="text-3xl font-bold text-white">{totalCandidates}</div>
@@ -222,6 +226,10 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
         <div className="bg-gradient-to-br from-red-900/30 to-red-900/10 border border-red-500/50 rounded-lg p-4">
           <div className="text-red-400 text-sm font-semibold mb-1">Inactive</div>
           <div className="text-3xl font-bold text-white">{inactiveCount}</div>
+        </div>
+        <div className="bg-gradient-to-br from-purple-900/30 to-purple-900/10 border border-purple-500/50 rounded-lg p-4">
+          <div className="text-purple-400 text-sm font-semibold mb-1">Placed</div>
+          <div className="text-3xl font-bold text-white">{placedCount}</div>
         </div>
       </div>
 
