@@ -9,7 +9,7 @@ import {
 import { auth } from './firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
-import { isInactiveCandidate } from './firestore';
+import { isInactiveCandidate, isDroppedCandidate } from './firestore';
 
 interface CandidateProfile {
   name: string;
@@ -58,6 +58,12 @@ export const loginCandidate = async (email: string, password: string): Promise<U
   }
 
   try {
+    // Check if candidate is dropped
+    const dropped = await isDroppedCandidate(email);
+    if (dropped) {
+      throw new Error('⛔ Your account has been marked as dropped and cannot access the system. Please contact admin.');
+    }
+
     // Check if candidate is inactive
     const inactive = await isInactiveCandidate(email);
     if (inactive) {

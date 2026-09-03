@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot, getCandidateProfileByEmail, markCandidatePlaced } from '@/lib/firestore';
+import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot, getCandidateProfileByEmail, markCandidatePlaced, markCandidateDropped, markCandidateNotDropped, getAllDroppedCandidates } from '@/lib/firestore';
 
 interface CandidatesTabProps {
   slots: InterviewSlot[];
@@ -13,19 +13,22 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
   const [filterCandidate, setFilterCandidate] = useState('');
   const [filterActive, setFilterActive] = useState('');
   const [inactiveCandidates, setInactiveCandidates] = useState(new Set<string>());
+  const [droppedCandidates, setDroppedCandidates] = useState(new Set<string>());
   const [showPasswordReset, setShowPasswordReset] = useState<string | null>(null);
   const [statusBreakdownDate, setStatusBreakdownDate] = useState('');
   const [statusBreakdownFilter, setStatusBreakdownFilter] = useState('');
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState({ name: '', email: '', phone: '', batchNo: '' });
 
-  // Load inactive candidates from Firestore on mount
+  // Load inactive and dropped candidates from Firestore on mount
   useEffect(() => {
-    const loadInactiveCandidates = async () => {
+    const loadCandidateStatuses = async () => {
       const inactiveEmails = await getAllInactiveCandidates();
       setInactiveCandidates(new Set(inactiveEmails));
+      const droppedEmails = await getAllDroppedCandidates();
+      setDroppedCandidates(new Set(droppedEmails));
     };
-    loadInactiveCandidates();
+    loadCandidateStatuses();
     // Reset filters on mount to show all candidates
     setFilterCandidate('');
     setFilterActive('');
@@ -83,13 +86,16 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
   candidates.sort((a, b) => a.name.localeCompare(b.name));
 
   const activeCandidates = Array.from(candidatesMap.values())
-    .filter(c => !inactiveCandidates.has(c.email)).length;
+    .filter(c => !inactiveCandidates.has(c.email) && !droppedCandidates.has(c.email)).length;
   const inactiveCount = Array.from(candidatesMap.values())
     .filter(c => inactiveCandidates.has(c.email)).length;
 
   // Count placed candidates (those with at least one offer received)
   const placedCount = Array.from(candidatesMap.values())
     .filter(c => c.interviews.some(i => i.offerStatus === 'Received')).length;
+
+  // Count dropped candidates
+  const droppedCount = droppedCandidates.size;
 
   // Calculate overall statistics
   const allCandidates = Array.from(candidatesMap.values());
@@ -139,6 +145,36 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
       } catch (error) {
         console.error('Error marking candidate as placed:', error);
         alert('❌ Failed to mark candidate as placed');
+      }
+    }
+  };
+
+  const handleMarkAsDrop = async (email: string, candidateName: string) => {
+    if (confirm(`⚠️ Mark ${candidateName} as Drop?\n\nThey will NOT be able to login to the system.\n\nThis action cannot be easily undone.`)) {
+      try {
+        const newSet = new Set(droppedCandidates);
+        await markCandidateDropped(email);
+        newSet.add(email);
+        setDroppedCandidates(newSet);
+        alert('✅ Candidate marked as dropped successfully!');
+      } catch (error) {
+        console.error('Error marking candidate as dropped:', error);
+        alert('❌ Failed to mark candidate as dropped');
+      }
+    }
+  };
+
+  const handleMarkAsNotDrop = async (email: string, candidateName: string) => {
+    if (confirm(`Remove drop status for ${candidateName}? They will be able to login again.`)) {
+      try {
+        const newSet = new Set(droppedCandidates);
+        await markCandidateNotDropped(email);
+        newSet.delete(email);
+        setDroppedCandidates(newSet);
+        alert('✅ Drop status removed successfully!');
+      } catch (error) {
+        console.error('Error removing drop status:', error);
+        alert('❌ Failed to remove drop status');
       }
     }
   };
@@ -228,22 +264,26 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
       <p className="text-slate-400 mb-6">View and manage candidate information and their interview history</p>
 
       {/* Candidate Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-blue-900/30 to-blue-900/10 border border-blue-500/50 rounded-lg p-4">
-          <div className="text-blue-400 text-sm font-semibold mb-1">Total Candidates</div>
-          <div className="text-3xl font-bold text-white">{totalCandidates}</div>
+      <div className="flex gap-3 mb-8 justify-start">
+        <div className="border-2 border-blue-500 rounded-lg px-6 py-3 bg-slate-800 flex-1">
+          <div className="text-blue-400 text-base font-semibold">Total</div>
+          <div className="text-white text-3xl font-bold">{totalCandidates}</div>
         </div>
-        <div className="bg-gradient-to-br from-green-900/30 to-green-900/10 border border-green-500/50 rounded-lg p-4">
-          <div className="text-green-400 text-sm font-semibold mb-1">Active</div>
-          <div className="text-3xl font-bold text-white">{activeCandidates}</div>
+        <div className="border-2 border-green-500 rounded-lg px-6 py-3 bg-slate-800 flex-1">
+          <div className="text-green-400 text-base font-semibold">Active</div>
+          <div className="text-white text-3xl font-bold">{activeCandidates}</div>
         </div>
-        <div className="bg-gradient-to-br from-red-900/30 to-red-900/10 border border-red-500/50 rounded-lg p-4">
-          <div className="text-red-400 text-sm font-semibold mb-1">Inactive</div>
-          <div className="text-3xl font-bold text-white">{inactiveCount}</div>
+        <div className="border-2 border-red-500 rounded-lg px-6 py-3 bg-slate-800 flex-1">
+          <div className="text-red-400 text-base font-semibold">Inactive</div>
+          <div className="text-white text-3xl font-bold">{inactiveCount}</div>
         </div>
-        <div className="bg-gradient-to-br from-purple-900/30 to-purple-900/10 border border-purple-500/50 rounded-lg p-4">
-          <div className="text-purple-400 text-sm font-semibold mb-1">Placed</div>
-          <div className="text-3xl font-bold text-white">{placedCount}</div>
+        <div className="border-2 border-purple-500 rounded-lg px-6 py-3 bg-slate-800 flex-1">
+          <div className="text-purple-400 text-base font-semibold">Placed</div>
+          <div className="text-white text-3xl font-bold">{placedCount}</div>
+        </div>
+        <div className="border-2 border-gray-500 rounded-lg px-6 py-3 bg-slate-800 flex-1">
+          <div className="text-gray-400 text-base font-semibold">Dropped</div>
+          <div className="text-white text-3xl font-bold">{droppedCount}</div>
         </div>
       </div>
 
@@ -308,13 +348,19 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                   <div className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                     <span className="bg-purple-600 px-3 py-1 rounded-full text-sm font-bold">{idx + 1}</span>
                     {candidate.name}
-                    <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                      inactiveCandidates.has(candidate.email)
-                        ? 'bg-red-900/50 text-red-300 border border-red-500'
-                        : 'bg-green-900/50 text-green-300 border border-green-500'
-                    }`}>
-                      {inactiveCandidates.has(candidate.email) ? '❌ Inactive' : '✅ Active'}
-                    </span>
+                    {droppedCandidates.has(candidate.email) ? (
+                      <span className="text-xs px-2 py-1 rounded-full font-semibold bg-black/50 text-gray-300 border border-gray-600">
+                        ⛔ Dropped
+                      </span>
+                    ) : (
+                      <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                        inactiveCandidates.has(candidate.email)
+                          ? 'bg-red-900/50 text-red-300 border border-red-500'
+                          : 'bg-green-900/50 text-green-300 border border-green-500'
+                      }`}>
+                        {inactiveCandidates.has(candidate.email) ? '❌ Inactive' : '✅ Active'}
+                      </span>
+                    )}
                   </div>
                   <div className="text-sm text-slate-400 space-y-1">
                     <div>📧 {candidate.email}</div>
@@ -360,12 +406,27 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                     🔐 Reset Password
                   </button>
                   {isAdmin && (
-                    <button
-                      onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-                    >
-                      🎯 Mark as Placed
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
+                        className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
+                        🎯 Mark as Placed
+                      </button>
+                      <button
+                        onClick={() => droppedCandidates.has(candidate.email)
+                          ? handleMarkAsNotDrop(candidate.email, candidate.name)
+                          : handleMarkAsDrop(candidate.email, candidate.name)
+                        }
+                        className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full ${
+                          droppedCandidates.has(candidate.email)
+                            ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                            : 'bg-orange-600 hover:bg-orange-700 text-white'
+                        }`}
+                      >
+                        {droppedCandidates.has(candidate.email) ? '↩️ Restore Drop' : '⛔ Mark as Drop'}
+                      </button>
+                    </>
                   )}
                   <button
                     onClick={() => toggleCandidateStatus(candidate.email)}

@@ -279,3 +279,71 @@ export const markCandidatePlaced = async (email: string): Promise<void> => {
     throw error;
   }
 };
+
+// Dropped Candidates Management
+const DROPPED_CANDIDATES_COLLECTION = 'dropped_candidates';
+
+// Get all dropped candidates
+export const getAllDroppedCandidates = async (): Promise<string[]> => {
+  try {
+    if (!db) return [];
+    const querySnapshot = await getDocs(collection(db, DROPPED_CANDIDATES_COLLECTION));
+    const droppedEmails: string[] = [];
+    querySnapshot.forEach(doc => {
+      if (doc.data().email) {
+        droppedEmails.push(doc.data().email);
+      }
+    });
+    return droppedEmails;
+  } catch (error) {
+    console.error('Error fetching dropped candidates:', error);
+    return [];
+  }
+};
+
+// Check if candidate is dropped
+export const isDroppedCandidate = async (email: string): Promise<boolean> => {
+  try {
+    if (!db) return false;
+    const querySnapshot = await getDocs(collection(db, DROPPED_CANDIDATES_COLLECTION));
+    for (const doc of querySnapshot.docs) {
+      if (doc.data().email === email) {
+        return true;
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking dropped status:', error);
+    return false;
+  }
+};
+
+// Mark candidate as dropped
+export const markCandidateDropped = async (email: string): Promise<void> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    await addDoc(collection(db, DROPPED_CANDIDATES_COLLECTION), {
+      email,
+      droppedSince: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Error marking candidate as dropped:', error);
+    throw error;
+  }
+};
+
+// Mark candidate as not dropped
+export const markCandidateNotDropped = async (email: string): Promise<void> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    const querySnapshot = await getDocs(collection(db, DROPPED_CANDIDATES_COLLECTION));
+    for (const docSnap of querySnapshot.docs) {
+      if (docSnap.data().email === email) {
+        await deleteDoc(doc(db, DROPPED_CANDIDATES_COLLECTION, docSnap.id));
+      }
+    }
+  } catch (error) {
+    console.error('Error marking candidate as not dropped:', error);
+    throw error;
+  }
+};
