@@ -284,6 +284,179 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
     URL.revokeObjectURL(url);
   };
 
+  const exportToPDF = (candidate: any) => {
+    const completionRate = candidate.completionRate;
+    const daysToOffer = candidate.offerStatus === 'Received' && candidate.offerReleasedDate && candidate.firstInterviewDate
+      ? Math.ceil((new Date(candidate.offerReleasedDate).getTime() - new Date(candidate.firstInterviewDate).getTime()) / (1000 * 60 * 60 * 24))
+      : null;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${candidate.name} - Performance Report</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; }
+          .page { background: #ffffff; min-height: 100vh; padding: 40px; max-width: 900px; margin: auto; }
+          .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 40px; border-radius: 12px; margin-bottom: 30px; text-align: center; border: 2px solid #667eea; }
+          .logo { font-size: 28px; font-weight: bold; margin-bottom: 15px; color: #a78bfa; }
+          .candidate-name { font-size: 36px; font-weight: bold; margin: 15px 0; color: #f1f5f9; }
+          .candidate-info { font-size: 14px; color: #cbd5e1; line-height: 1.6; }
+          .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+          .metric-card { background: #f8fafc; padding: 25px; border-radius: 10px; border-left: 6px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+          .metric-value { font-size: 36px; font-weight: bold; color: #667eea; }
+          .metric-label { font-size: 12px; color: #64748b; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+          .section { margin: 35px 0; }
+          .section-title { font-size: 18px; font-weight: bold; color: #1e293b; margin-bottom: 15px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
+          .offer-info { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 25px; border-radius: 10px; border: 2px solid #a78bfa; }
+          .offer-company { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #c4b5fd; }
+          .offer-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+          .offer-detail { padding: 15px; background: rgba(167, 139, 250, 0.1); border-radius: 8px; border-left: 3px solid #a78bfa; }
+          .offer-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+          .offer-value { font-size: 18px; font-weight: bold; margin-top: 8px; color: #f1f5f9; }
+          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+          th { background: #334155; color: #f1f5f9; padding: 14px; text-align: left; font-size: 12px; font-weight: 600; border: 1px solid #475569; }
+          td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 12px; color: #1e293b; }
+          tr:nth-child(even) { background: #f8fafc; }
+          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+          .status-completed { background: #d1fae5; color: #065f46; }
+          .status-confirmed { background: #dbeafe; color: #0c4a6e; }
+          .status-pending { background: #fef3c7; color: #78350f; }
+          .status-cancelled { background: #fee2e2; color: #7f1d1d; }
+          .round-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; background: #e0e7ff; color: #4c1d95; font-size: 11px; font-weight: 600; }
+          .footer { text-align: center; margin-top: 40px; color: #94a3b8; font-size: 12px; border-top: 2px solid #e2e8f0; padding-top: 20px; }
+          .completion-bar { width: 100%; background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 12px; }
+          .completion-fill { height: 100%; background: linear-gradient(90deg, #667eea 0%, #7c3aed 100%); width: ${completionRate}%; }
+          .success-table { font-size: 12px; }
+          .success-table td { padding: 12px; }
+          .success-rate-high { color: #059669; font-weight: bold; }
+          .success-rate-medium { color: #d97706; font-weight: bold; }
+          .success-rate-low { color: #dc2626; font-weight: bold; }
+          @media print { body { background: white; } .page { box-shadow: none; } }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <!-- Header -->
+          <div class="header">
+            <div class="logo">🎓 Jiyaan Institute of Technology</div>
+            <div class="candidate-name">${candidate.name}</div>
+            <div class="candidate-info">
+              <div>📧 ${candidate.email}</div>
+              <div>📦 Batch: ${candidate.batchNo}</div>
+            </div>
+          </div>
+
+          <!-- Completion Rate -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-value">${completionRate}%</div>
+              <div class="metric-label">Completion Rate</div>
+              <div class="completion-bar"><div class="completion-fill"></div></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">${candidate.totalInterviews}</div>
+              <div class="metric-label">Total Interviews</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">${candidate.completed}</div>
+              <div class="metric-label">Completed</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value">${candidate.confirmed}</div>
+              <div class="metric-label">Confirmed</div>
+            </div>
+          </div>
+
+          ${candidate.offerStatus ? `
+          <!-- Offer Information -->
+          <div class="section">
+            <div class="offer-info">
+              <div class="offer-company">${candidate.offerCompany || 'Offer Details'}</div>
+              <div class="offer-details">
+                <div class="offer-detail">
+                  <div class="offer-label">Offer Status</div>
+                  <div class="offer-value">✓ ${candidate.offerStatus}</div>
+                </div>
+                <div class="offer-detail">
+                  <div class="offer-label">Package</div>
+                  <div class="offer-value">₹ ${candidate.packageLPA || 'N/A'} LPA</div>
+                </div>
+                ${candidate.packageLPA ? `
+                <div class="offer-detail">
+                  <div class="offer-label">Monthly Settlement</div>
+                  <div class="offer-value">₹ ${(parseFloat(candidate.packageLPA) / 12).toFixed(2)} L</div>
+                </div>
+                ` : ''}
+                ${daysToOffer ? `
+                <div class="offer-detail">
+                  <div class="offer-label">Days to Offer</div>
+                  <div class="offer-value">⏱️ ${daysToOffer} days</div>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+          ` : ''}
+
+          <!-- Interview History -->
+          <div class="section">
+            <div class="section-title">📋 Interview History</div>
+            <table class="success-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Round</th>
+                  <th>Company</th>
+                  <th>HR Name</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${candidate.interviews
+                  .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                  .map((interview: any) => {
+                    const statusClass = interview.status === 'completed' ? 'status-completed' :
+                                       interview.status === 'confirmed' ? 'status-confirmed' :
+                                       interview.status === 'pending' ? 'status-pending' :
+                                       interview.status === 'cancelled' ? 'status-cancelled' : '';
+                    return `
+                      <tr>
+                        <td>${new Date(interview.date).toLocaleDateString()}</td>
+                        <td><span class="round-badge">${interview.round || 'N/A'}</span></td>
+                        <td>${interview.company || 'N/A'}</td>
+                        <td>${interview.hrName || 'N/A'}</td>
+                        <td><span class="status-badge ${statusClass}">${interview.status || 'N/A'}</span></td>
+                      </tr>
+                    `;
+                  }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Footer -->
+          <div class="footer">
+            <p>Generated on ${new Date().toLocaleString()}</p>
+            <p>Jiyaan Institute of Technology - Candidate Performance Report</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const printWindow = window.open(url, '_blank');
+    if (printWindow) {
+      setTimeout(() => {
+        printWindow.print();
+      }, 250);
+    }
+  };
+
   if (candidatePerformance.length === 0) {
     return (
       <div className="text-center py-16">
@@ -598,12 +771,20 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                   <div>
                     <div className="flex justify-between items-center mb-3">
                       <div className="text-sm font-semibold text-slate-300">📋 Interview History</div>
-                      <button
-                        onClick={() => exportToCSV(candidate)}
-                        className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-all"
-                      >
-                        📥 Export CSV
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => exportToPDF(candidate)}
+                          className="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded font-semibold transition-all"
+                        >
+                          📄 Export PDF
+                        </button>
+                        <button
+                          onClick={() => exportToCSV(candidate)}
+                          className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded font-semibold transition-all"
+                        >
+                          📥 Export CSV
+                        </button>
+                      </div>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">

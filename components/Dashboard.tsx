@@ -66,8 +66,8 @@ export default function Dashboard() {
             // Check if candidate is inactive
             const inactive = await isInactiveCandidate(user.email || '');
             setCandidateIsInactive(inactive);
-            // If candidate is logged in, default to 'book' tab
-            setActiveTab('book');
+            // If candidate is logged in, set default tab based on status
+            setActiveTab(inactive ? 'mybookings' : 'book');
           } else {
             // If not logged in, default to 'allbookings' tab
             setCandidateProfile(null);
@@ -596,7 +596,7 @@ export default function Dashboard() {
         )}
 
         <div className="card mt-4 overflow-hidden">
-          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} isAdmin={isAdmin} isCandidateLoggedIn={!!candidateUser} />
+          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} isAdmin={isAdmin} isCandidateLoggedIn={!!candidateUser} isInactiveCandidate={candidateIsInactive} />
 
           <div className="p-8">
             {activeTab === 'book' && (candidateUser || isAdmin) && (

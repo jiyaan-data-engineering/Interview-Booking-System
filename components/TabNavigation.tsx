@@ -5,9 +5,15 @@ interface TabNavigationProps {
   onTabChange: (tab: TabType) => void;
   isAdmin?: boolean;
   isCandidateLoggedIn?: boolean;
+  isInactiveCandidate?: boolean;
 }
 
-export default function TabNavigation({ activeTab, onTabChange, isAdmin = false, isCandidateLoggedIn = false }: TabNavigationProps) {
+export default function TabNavigation({ activeTab, onTabChange, isAdmin = false, isCandidateLoggedIn = false, isInactiveCandidate = false }: TabNavigationProps) {
+  const inactiveCandidateTabs: { id: TabType; label: string; icon: string }[] = [
+    { id: 'mybookings', label: 'My Bookings', icon: '📌' },
+    { id: 'myperformance', label: 'My Performance', icon: '📊' },
+  ];
+
   const candidateTabs: { id: TabType; label: string; icon: string }[] = isCandidateLoggedIn
     ? [
         { id: 'book', label: 'Book Interview', icon: '📋' },
@@ -37,7 +43,7 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
     { id: 'admin', label: 'Admin Panel', icon: '⚙️' },
   ];
 
-  const tabs = isAdmin ? adminTabs : candidateTabs;
+  const tabs = isAdmin ? adminTabs : isInactiveCandidate ? inactiveCandidateTabs : candidateTabs;
 
   return (
     <div className="flex border-b border-slate-700 bg-slate-800/50">
