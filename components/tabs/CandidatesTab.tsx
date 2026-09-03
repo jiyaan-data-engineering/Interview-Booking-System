@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot, getCandidateProfileByEmail } from '@/lib/firestore';
+import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot, getCandidateProfileByEmail, markCandidatePlaced } from '@/lib/firestore';
 
 interface CandidatesTabProps {
   slots: InterviewSlot[];
+  isAdmin?: boolean;
 }
 
-export default function CandidatesTab({ slots }: CandidatesTabProps) {
+export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabProps) {
   const [filterCandidate, setFilterCandidate] = useState('');
   const [filterActive, setFilterActive] = useState('');
   const [inactiveCandidates, setInactiveCandidates] = useState(new Set<string>());
@@ -126,6 +127,19 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
     } catch (error) {
       console.error('Error updating candidate status:', error);
       alert('Failed to update candidate status');
+    }
+  };
+
+  const handleMarkAsPlaced = async (email: string, candidateName: string) => {
+    if (confirm(`Mark ${candidateName} as Placed? This will update their placement status.`)) {
+      try {
+        await markCandidatePlaced(email);
+        alert('✅ Candidate marked as placed successfully!');
+        window.location.reload();
+      } catch (error) {
+        console.error('Error marking candidate as placed:', error);
+        alert('❌ Failed to mark candidate as placed');
+      }
     }
   };
 
@@ -345,6 +359,14 @@ export default function CandidatesTab({ slots }: CandidatesTabProps) {
                   >
                     🔐 Reset Password
                   </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
+                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                    >
+                      🎯 Mark as Placed
+                    </button>
+                  )}
                   <button
                     onClick={() => toggleCandidateStatus(candidate.email)}
                     className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full ${

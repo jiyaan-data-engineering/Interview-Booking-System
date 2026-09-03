@@ -688,7 +688,7 @@ export default function Dashboard() {
             )}
 
             {activeTab === 'candidates' && isAdmin && (
-              <CandidatesTab slots={slots} />
+              <CandidatesTab slots={slots} isAdmin={isAdmin} />
             )}
 
             {activeTab === 'performance' && isAdmin && (

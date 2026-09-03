@@ -232,7 +232,7 @@ export const getCandidateProfileByEmail = async (email: string): Promise<any | n
 // Update candidate profile by email (creates if doesn't exist)
 export const updateCandidateProfileByEmail = async (
   email: string,
-  updates: { name?: string; phone?: string; batchNo?: string }
+  updates: { name?: string; phone?: string; batchNo?: string; isPlaced?: boolean }
 ): Promise<void> => {
   try {
     if (!db) throw new Error('Firestore not initialized');
@@ -265,6 +265,17 @@ export const updateCandidateProfileByEmail = async (
     }
   } catch (error) {
     console.error('Error updating candidate profile:', error);
+    throw error;
+  }
+};
+
+// Mark candidate as placed
+export const markCandidatePlaced = async (email: string): Promise<void> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    await updateCandidateProfileByEmail(email, { isPlaced: true });
+  } catch (error) {
+    console.error('Error marking candidate as placed:', error);
     throw error;
   }
 };
