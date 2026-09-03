@@ -39,8 +39,6 @@ export default function DocumentRequestsTab({ slots, onSubmitDocumentRequest, ca
     slot.offerStatus || slot.packageLPA || slot.offerReleasedDate || slot.joiningDate
   );
 
-  const documentOptions = ['Offer Letter', 'Joining Letter', 'Experience Certificate', 'Relieving Letter', 'Other'];
-
   const initializeForm = (slotId: string) => {
     if (!formData[slotId]) {
       setFormData(prev => ({
