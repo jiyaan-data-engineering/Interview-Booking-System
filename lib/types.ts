@@ -24,6 +24,7 @@ export interface InterviewSlot {
   createdAt?: string;
   completedAt?: string;
   requestedDocuments?: string[];
+  documentRequestMessage?: string;
   offerStatus?: string;
   offerReleasedDate?: string;
   joiningDate?: string;
