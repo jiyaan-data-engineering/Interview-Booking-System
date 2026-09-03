@@ -289,50 +289,52 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
         <title>${candidate.name} - Performance Report</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; }
-          .page { background: #ffffff; min-height: 100vh; padding: 40px; max-width: 900px; margin: auto; }
-          .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 40px; border-radius: 12px; margin-bottom: 30px; text-align: center; border: 2px solid #667eea; }
-          .logo { font-size: 28px; font-weight: bold; margin-bottom: 15px; color: #a78bfa; }
-          .candidate-name { font-size: 36px; font-weight: bold; margin: 15px 0; color: #f1f5f9; }
-          .candidate-info { font-size: 14px; color: #cbd5e1; line-height: 1.6; }
-          .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
-          .metric-card { background: #f8fafc; padding: 25px; border-radius: 10px; border-left: 6px solid #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-          .metric-value { font-size: 36px; font-weight: bold; color: #667eea; }
-          .metric-label { font-size: 12px; color: #64748b; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-          .section { margin: 35px 0; }
-          .section-title { font-size: 18px; font-weight: bold; color: #1e293b; margin-bottom: 15px; border-bottom: 3px solid #667eea; padding-bottom: 12px; }
-          .offer-info { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 25px; border-radius: 10px; border: 2px solid #a78bfa; }
-          .offer-company { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #c4b5fd; }
-          .offer-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-          .offer-detail { padding: 15px; background: rgba(167, 139, 250, 0.1); border-radius: 8px; border-left: 3px solid #a78bfa; }
-          .offer-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-          .offer-value { font-size: 18px; font-weight: bold; margin-top: 8px; color: #f1f5f9; }
-          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-          th { background: #334155; color: #f1f5f9; padding: 14px; text-align: left; font-size: 12px; font-weight: 600; border: 1px solid #475569; }
-          td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 12px; color: #1e293b; }
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+          .page { background: #ffffff; min-height: 100vh; padding: 30px; max-width: 900px; margin: auto; }
+          .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 25px; text-align: center; border: 2px solid #667eea; }
+          .header img { max-width: 250px; margin-bottom: 15px; }
+          .candidate-name { font-size: 28px; font-weight: bold; margin: 10px 0; color: #f1f5f9; }
+          .candidate-info { font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-top: 10px; }
+          .metrics-section { background: #f8fafc; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+          .metrics-section h3 { font-size: 14px; color: #64748b; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px; }
+          .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+          .metric-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea; text-align: center; }
+          .metric-value { font-size: 28px; font-weight: bold; color: #667eea; }
+          .metric-label { font-size: 11px; color: #64748b; margin-top: 5px; text-transform: uppercase; font-weight: 600; }
+          .section { margin: 25px 0; }
+          .section-title { font-size: 16px; font-weight: bold; color: #1e293b; margin-bottom: 12px; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
+          .offer-info { background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #a78bfa; }
+          .offer-company { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #667eea; }
+          .offer-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+          .offer-detail { background: white; padding: 12px; border-radius: 6px; border-left: 3px solid #a78bfa; }
+          .offer-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; }
+          .offer-value { font-size: 15px; font-weight: bold; margin-top: 6px; color: #1e293b; }
+          table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+          th { background: #1e293b; color: #f1f5f9; padding: 12px; text-align: left; font-size: 11px; font-weight: 600; border: 1px solid #cbd5e1; }
+          td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; font-size: 12px; color: #1e293b; }
           tr:nth-child(even) { background: #f8fafc; }
-          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+          .status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
           .status-completed { background: #d1fae5; color: #065f46; }
           .status-confirmed { background: #dbeafe; color: #0c4a6e; }
           .status-pending { background: #fef3c7; color: #78350f; }
           .status-cancelled { background: #fee2e2; color: #7f1d1d; }
-          .round-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; background: #e0e7ff; color: #4c1d95; font-size: 11px; font-weight: 600; }
-          .footer { text-align: center; margin-top: 40px; color: #94a3b8; font-size: 12px; border-top: 2px solid #e2e8f0; padding-top: 20px; }
-          .completion-bar { width: 100%; background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 12px; }
+          .round-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; background: #e0e7ff; color: #4c1d95; font-size: 10px; font-weight: 600; }
+          .footer { text-align: center; margin-top: 30px; color: #94a3b8; font-size: 11px; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+          .completion-bar { width: 100%; background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; }
           .completion-fill { height: 100%; background: linear-gradient(90deg, #667eea 0%, #7c3aed 100%); width: ${completionRate}%; }
           .success-table { font-size: 12px; }
-          .success-table td { padding: 12px; }
+          .success-table td { padding: 10px 12px; }
           .success-rate-high { color: #059669; font-weight: bold; }
           .success-rate-medium { color: #d97706; font-weight: bold; }
           .success-rate-low { color: #dc2626; font-weight: bold; }
-          @media print { body { background: white; } .page { box-shadow: none; } }
+          @media print { body { background: white; } .page { padding: 20px; } }
         </style>
       </head>
       <body>
         <div class="page">
           <!-- Header -->
           <div class="header">
-            <img src="${window.location.origin}/images/jiyaan_gap_h.jpg?v=2" alt="Jiyaan Institute of Technology" style="max-width: 300px; margin: 0 auto 20px; display: block; border-radius: 8px;">
+            <img src="${window.location.origin}/images/jiyaan_gap_h.jpg?v=2" alt="Jiyaan Institute of Technology" style="border-radius: 8px;">
             <div class="candidate-name">${candidate.name}</div>
             <div class="candidate-info">
               <div>📧 ${candidate.email}</div>
@@ -340,30 +342,33 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
             </div>
           </div>
 
-          <!-- Completion Rate -->
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-value">${completionRate}%</div>
-              <div class="metric-label">Completion Rate</div>
-              <div class="completion-bar"><div class="completion-fill"></div></div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">${candidate.totalInterviews}</div>
-              <div class="metric-label">Total Interviews</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">${candidate.completed}</div>
-              <div class="metric-label">Completed</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">${candidate.confirmed}</div>
-              <div class="metric-label">Confirmed</div>
+          <!-- Metrics Section -->
+          <div class="metrics-section">
+            <h3>📊 Interview Metrics</h3>
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-value">${candidate.totalInterviews}</div>
+                <div class="metric-label">Total Interviews</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value">${candidate.completed}</div>
+                <div class="metric-label">Completed</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value">${candidate.confirmed}</div>
+                <div class="metric-label">Confirmed</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-value">${completionRate}%</div>
+                <div class="metric-label">Completion</div>
+              </div>
             </div>
           </div>
 
           ${candidate.offerStatus ? `
           <!-- Offer Information -->
           <div class="section">
+            <div class="section-title">🎁 Offer Information</div>
             <div class="offer-info">
               <div class="offer-company">${candidate.offerCompany || 'Offer Details'}</div>
               <div class="offer-details">
