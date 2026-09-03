@@ -12,7 +12,7 @@ export default function LoginPage({ onShowCandidateLogin, onShowAdminLogin }: Lo
         {/* Brand Header with Logo */}
         <div className="mb-12">
           <img
-            src="/images/jiyaan-logo.svg"
+            src="/images/jiyaan_gap_h.jpg"
             alt="Jiyaan Institute of Technology"
             className="w-full max-w-4xl mx-auto shadow-lg shadow-blue-500/20 rounded-2xl"
           />
