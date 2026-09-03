@@ -130,7 +130,6 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       }
 
       // Track dates
-      const slotDate = new Date(slot.date);
       if (!data.lastInterviewDate || new Date(slot.date) > new Date(data.lastInterviewDate)) {
         data.lastInterviewDate = slot.date;
       }
