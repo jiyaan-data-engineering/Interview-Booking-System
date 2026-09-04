@@ -306,72 +306,100 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                   }}
                   className="mt-4 space-y-4 bg-blue-900/30 p-4 rounded-lg border border-blue-500/50"
                 >
-                  <h4 className="text-blue-300 font-semibold mb-3">Edit Interview Feedback</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Support Person
-                      </label>
-                      <input
-                        type="text"
-                        className="input-field"
-                        placeholder="e.g., Ananda"
-                        value={completeFormData[slot.id]?.supportPerson || slot.supportPerson || ''}
-                        onChange={e =>
-                          setCompleteFormData(prev => ({
-                            ...prev,
-                            [slot.id]: { ...prev[slot.id], supportPerson: e.target.value },
-                          }))
-                        }
-                      />
-                    </div>
+                  <h4 className="text-blue-300 font-semibold mb-4">Edit Interview Feedback</h4>
 
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Panel Name
-                      </label>
-                      <input
-                        type="text"
-                        className="input-field"
-                        placeholder="e.g., Technical Panel"
-                        value={completeFormData[slot.id]?.panelName || slot.panelName || ''}
-                        onChange={e =>
-                          setCompleteFormData(prev => ({
-                            ...prev,
-                            [slot.id]: { ...prev[slot.id], panelName: e.target.value },
-                          }))
-                        }
-                      />
-                    </div>
+                  <div className="border-b border-blue-500/30 pb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Support Person
+                        </label>
+                        <input
+                          type="text"
+                          className="input-field"
+                          placeholder="e.g., Ananda"
+                          value={completeFormData[slot.id]?.supportPerson || slot.supportPerson || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], supportPerson: e.target.value },
+                            }))
+                          }
+                        />
+                      </div>
 
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Interview Feedback * <span className="text-xs text-slate-400">(Can edit anytime)</span>
-                      </label>
-                      <select
-                        className="input-field"
-                        value={completeFormData[slot.id]?.feedback || slot.feedback || ''}
-                        onChange={e =>
-                          setCompleteFormData(prev => ({
-                            ...prev,
-                            [slot.id]: { ...prev[slot.id], feedback: e.target.value },
-                          }))
-                        }
-                        required
-                      >
-                        <option value="">Select Feedback</option>
-                        <option value="Positive">🟢 Positive - Good Performance</option>
-                        <option value="Negative">🔴 Negative - Needs Improvement</option>
-                        <option value="Waiting">⏳ Waiting for Feedback</option>
-                      </select>
-                      {(() => {
-                        const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
-                        return daysPassed > 7 && (!completeFormData[slot.id]?.feedback || completeFormData[slot.id]?.feedback === 'Waiting') ? (
-                          <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/30 p-2 rounded border border-yellow-600/50">
-                            ⚠️ Interview was {daysPassed} days ago. After 7 days, feedback defaults to Negative if not updated.
-                          </div>
-                        ) : null;
-                      })()}
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Support Person Feedback
+                        </label>
+                        <select
+                          className="input-field"
+                          value={completeFormData[slot.id]?.supportPersonFeedback || slot.supportPersonFeedback || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], supportPersonFeedback: e.target.value },
+                            }))
+                          }
+                        >
+                          <option value="">Select Feedback</option>
+                          <option value="Good">😊 Good</option>
+                          <option value="Avg">😐 Average</option>
+                          <option value="Bad">😞 Bad</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-b border-blue-500/30 pb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Panel Name
+                        </label>
+                        <input
+                          type="text"
+                          className="input-field"
+                          placeholder="e.g., Technical Panel"
+                          value={completeFormData[slot.id]?.panelName || slot.panelName || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], panelName: e.target.value },
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Panel Name Feedback * <span className="text-xs text-slate-400">(Can edit anytime)</span>
+                        </label>
+                        <select
+                          className="input-field"
+                          value={completeFormData[slot.id]?.feedback || slot.feedback || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], feedback: e.target.value },
+                            }))
+                          }
+                          required
+                        >
+                          <option value="">Select Feedback</option>
+                          <option value="Positive">🟢 Positive</option>
+                          <option value="Negative">🔴 Negative</option>
+                          <option value="Waiting">⏳ Waiting for Feedback</option>
+                        </select>
+                        {(() => {
+                          const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
+                          return daysPassed > 7 && (!completeFormData[slot.id]?.feedback || completeFormData[slot.id]?.feedback === 'Waiting') ? (
+                            <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/30 p-2 rounded border border-yellow-600/50">
+                              ⚠️ Interview was {daysPassed} days ago. After 7 days, feedback defaults to Negative if not updated.
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
                     </div>
                   </div>
 
@@ -422,39 +450,36 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                       <div>
                         <span className="text-slate-400">Support Person: </span>
                         <span className="text-white font-semibold">{slot.supportPerson}</span>
-                      </div>
-                    )}
-                    {slot.hrName && (
-                      <div>
-                        <span className="text-slate-400">HR Name: </span>
-                        <span className="text-white font-semibold">{slot.hrName}</span>
+                        {slot.supportPersonFeedback && (
+                          <span className={`ml-2 font-semibold ${
+                            slot.supportPersonFeedback === 'Good' ? 'text-green-300' :
+                            slot.supportPersonFeedback === 'Avg' ? 'text-yellow-300' :
+                            slot.supportPersonFeedback === 'Bad' ? 'text-red-300' :
+                            'text-white'
+                          }`}>
+                            {slot.supportPersonFeedback === 'Good' && '😊 Good'}
+                            {slot.supportPersonFeedback === 'Avg' && '😐 Average'}
+                            {slot.supportPersonFeedback === 'Bad' && '😞 Bad'}
+                          </span>
+                        )}
                       </div>
                     )}
                     {slot.panelName && (
                       <div>
                         <span className="text-slate-400">Panel Name: </span>
                         <span className="text-white font-semibold">{slot.panelName}</span>
-                      </div>
-                    )}
-                    {slot.feedback && (
-                      <div>
-                        <span className="text-slate-400">Feedback: </span>
-                        <span className={`font-semibold ${
-                          slot.feedback === 'Positive' ? 'text-green-300' :
-                          slot.feedback === 'Negative' ? 'text-red-300' :
-                          slot.feedback === 'Waiting' ? 'text-yellow-300' :
-                          slot.feedback === 'GOOD' ? 'text-green-300' :
-                          slot.feedback === 'AVG' ? 'text-yellow-300' :
-                          slot.feedback === 'BAD' ? 'text-red-300' :
-                          'text-white'
-                        }`}>
-                          {slot.feedback === 'Positive' && '🟢 Positive'}
-                          {slot.feedback === 'Negative' && '🔴 Negative'}
-                          {slot.feedback === 'Waiting' && '⏳ Waiting for Feedback'}
-                          {slot.feedback === 'GOOD' && '🟢 GOOD'}
-                          {slot.feedback === 'AVG' && '🟡 AVERAGE'}
-                          {slot.feedback === 'BAD' && '🔴 BAD'}
-                        </span>
+                        {slot.feedback && (
+                          <span className={`ml-2 font-semibold ${
+                            slot.feedback === 'Positive' ? 'text-green-300' :
+                            slot.feedback === 'Negative' ? 'text-red-300' :
+                            slot.feedback === 'Waiting' ? 'text-yellow-300' :
+                            'text-white'
+                          }`}>
+                            {slot.feedback === 'Positive' && '🟢 Positive'}
+                            {slot.feedback === 'Negative' && '🔴 Negative'}
+                            {slot.feedback === 'Waiting' && '⏳ Waiting'}
+                          </span>
+                        )}
                       </div>
                     )}
                     {slot.comments && (
@@ -598,96 +623,104 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                   }}
                   className="mt-4 space-y-4 bg-green-900/30 p-4 rounded-lg border border-green-500/50"
                 >
-                  <h4 className="text-green-300 font-semibold mb-3">Mark Interview as Completed</h4>
+                  <h4 className="text-green-300 font-semibold mb-4">Mark Interview as Completed</h4>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Support Person Name *
-                      </label>
-                      <input
-                        type="text"
-                        className="input-field"
-                        placeholder="e.g., John Smith"
-                        value={completeFormData[slot.id]?.supportPerson || ''}
-                        onChange={e =>
-                          setCompleteFormData(prev => ({
-                            ...prev,
-                            [slot.id]: { ...prev[slot.id], supportPerson: e.target.value },
-                          }))
-                        }
-                        required
-                      />
+                  <div className="border-b border-green-500/30 pb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Support Person *
+                        </label>
+                        <input
+                          type="text"
+                          className="input-field"
+                          placeholder="e.g., Ananda"
+                          value={completeFormData[slot.id]?.supportPerson || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], supportPerson: e.target.value },
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Support Person Feedback *
+                        </label>
+                        <select
+                          className="input-field"
+                          value={completeFormData[slot.id]?.supportPersonFeedback || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], supportPersonFeedback: e.target.value },
+                            }))
+                          }
+                          required
+                        >
+                          <option value="">Select Feedback</option>
+                          <option value="Good">😊 Good</option>
+                          <option value="Avg">😐 Average</option>
+                          <option value="Bad">😞 Bad</option>
+                        </select>
+                      </div>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        HR Name *
-                      </label>
-                      <input
-                        type="text"
-                        className="input-field"
-                        placeholder="e.g., Sarah Johnson"
-                        value={completeFormData[slot.id]?.hrName || ''}
-                        onChange={e =>
-                          setCompleteFormData(prev => ({
-                            ...prev,
-                            [slot.id]: { ...prev[slot.id], hrName: e.target.value },
-                          }))
-                        }
-                        required
-                      />
+                  <div className="border-b border-green-500/30 pb-4 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Panel Name *
+                        </label>
+                        <input
+                          type="text"
+                          className="input-field"
+                          placeholder="e.g., Technical Panel"
+                          value={completeFormData[slot.id]?.panelName || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], panelName: e.target.value },
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                          Panel Name Feedback * <span className="text-xs text-slate-400">(Can edit anytime)</span>
+                        </label>
+                        <select
+                          className="input-field"
+                          value={completeFormData[slot.id]?.feedback || ''}
+                          onChange={e =>
+                            setCompleteFormData(prev => ({
+                              ...prev,
+                              [slot.id]: { ...prev[slot.id], feedback: e.target.value },
+                            }))
+                          }
+                          required
+                        >
+                          <option value="">Select Feedback</option>
+                          <option value="Positive">🟢 Positive</option>
+                          <option value="Negative">🔴 Negative</option>
+                          <option value="Waiting">⏳ Waiting for Feedback</option>
+                        </select>
+                        {(() => {
+                          const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
+                          return daysPassed > 7 && (!completeFormData[slot.id]?.feedback || completeFormData[slot.id]?.feedback === 'Waiting') ? (
+                            <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/30 p-2 rounded border border-yellow-600/50">
+                              ⚠️ Interview was {daysPassed} days ago. After 7 days, feedback defaults to Negative if not updated.
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Panel Name *
-                      </label>
-                      <input
-                        type="text"
-                        className="input-field"
-                        placeholder="e.g., Technical Panel, HR Round"
-                        value={completeFormData[slot.id]?.panelName || ''}
-                        onChange={e =>
-                          setCompleteFormData(prev => ({
-                            ...prev,
-                            [slot.id]: { ...prev[slot.id], panelName: e.target.value },
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Interview Feedback * <span className="text-xs text-slate-400">(Can edit anytime)</span>
-                      </label>
-                      <select
-                        className="input-field"
-                        value={completeFormData[slot.id]?.feedback || ''}
-                        onChange={e =>
-                          setCompleteFormData(prev => ({
-                            ...prev,
-                            [slot.id]: { ...prev[slot.id], feedback: e.target.value },
-                          }))
-                        }
-                        required
-                      >
-                        <option value="">Select Feedback</option>
-                        <option value="Positive">🟢 Positive - Good Performance</option>
-                        <option value="Negative">🔴 Negative - Needs Improvement</option>
-                        <option value="Waiting">⏳ Waiting for Feedback</option>
-                      </select>
-                      {(() => {
-                        const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
-                        return daysPassed > 7 && (!completeFormData[slot.id]?.feedback || completeFormData[slot.id]?.feedback === 'Waiting') ? (
-                          <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/30 p-2 rounded border border-yellow-600/50">
-                            ⚠️ Interview was {daysPassed} days ago. After 7 days, feedback defaults to Negative if not updated.
-                          </div>
-                        ) : null;
-                      })()}
-                    </div>
-
                   </div>
 
                   <div>
