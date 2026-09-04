@@ -294,7 +294,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                     e.preventDefault();
                     const data = completeFormData[slot.id];
                     if (data && data.feedback) {
-                      handleCompleteInterview(slot.id, data.supportPerson, data.feedback, data.hrName, data.panelName, data.comments);
+                      onMarkCompleted?.(slot.id, data.supportPerson, data.hrName || '', data.panelName, '', data.feedback, data.comments);
                       setExpandedSlot(null);
                     }
                   }}
