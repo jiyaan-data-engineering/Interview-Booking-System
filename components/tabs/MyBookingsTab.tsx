@@ -46,12 +46,6 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
     return `${displayHours}:${m} ${period}`;
   };
 
-  const shouldAutoMarkNegative = (slot: InterviewSlot): boolean => {
-    if (slot.feedback !== 'Waiting for Feedback' && slot.feedback !== 'Waiting') return false;
-    const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
-    return daysPassed > 7;
-  };
-
   const timeToMinutes = (time: string) => {
     const [hours, minutes] = time.split(':');
     return parseInt(hours) * 60 + parseInt(minutes);
