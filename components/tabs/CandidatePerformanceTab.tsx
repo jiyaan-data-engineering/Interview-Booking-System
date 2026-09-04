@@ -22,12 +22,15 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
     loadInactiveCandidates();
   }, []);
 
-  // Build simple candidate list
+  // Build candidate list with details
   const candidates = useMemo(() => {
     const candidateMap = new Map<string, {
       name: string;
       email: string;
       batchNo: string;
+      currentCompany: string;
+      currentExperience: string;
+      currentPackage: string;
       totalInterviews: number;
       isInactive: boolean;
     }>();
@@ -41,6 +44,9 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
           name: slot.candidateName,
           email: slot.candidateEmail,
           batchNo: slot.batchNo || 'N/A',
+          currentCompany: slot.currentCompany || 'N/A',
+          currentExperience: slot.totalYearsExperience || 'N/A',
+          currentPackage: slot.lastCompanyPackage ? `₹${slot.lastCompanyPackage} LPA` : 'N/A',
           totalInterviews: 0,
           isInactive: inactiveCandidates.has(slot.candidateEmail),
         });
@@ -83,8 +89,8 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-white mb-2">📊 Candidate List</h2>
-      <p className="text-slate-400 mb-6">All candidates with interview bookings</p>
+      <h2 className="text-2xl font-bold text-white mb-2">📊 Candidate Performance Analytics</h2>
+      <p className="text-slate-400 mb-6">Candidate details and interview information</p>
 
       {/* Filters */}
       <div className="bg-slate-700/50 rounded-lg p-4 mb-6 border border-slate-600">
@@ -142,40 +148,57 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
         </div>
       </div>
 
-      {/* Simple Candidate List */}
-      <div className="overflow-x-auto bg-slate-800 rounded-lg border border-slate-700">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-600 bg-slate-900/50">
-              <th className="text-left py-4 px-4 text-slate-300 font-semibold">Candidate Name</th>
-              <th className="text-left py-4 px-4 text-slate-300 font-semibold">Email</th>
-              <th className="text-left py-4 px-4 text-slate-300 font-semibold">Batch No</th>
-              <th className="text-center py-4 px-4 text-slate-300 font-semibold">Total Interviews</th>
-              <th className="text-center py-4 px-4 text-slate-300 font-semibold">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map((candidate, idx) => (
-              <tr key={candidate.email} className={`border-b border-slate-700 ${idx % 2 === 0 ? 'bg-slate-800/50' : ''} hover:bg-slate-700/50 transition-colors`}>
-                <td className="py-3 px-4 text-white font-semibold">{candidate.name}</td>
-                <td className="py-3 px-4 text-slate-300">{candidate.email}</td>
-                <td className="py-3 px-4 text-slate-300">{candidate.batchNo}</td>
-                <td className="py-3 px-4 text-center">
-                  <span className="bg-blue-900/50 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold">
-                    {candidate.totalInterviews}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-center">
-                  {candidate.isInactive ? (
-                    <span className="bg-red-900/50 text-red-300 px-3 py-1 rounded-full text-xs font-semibold">❌ Inactive</span>
-                  ) : (
-                    <span className="bg-green-900/50 text-green-300 px-3 py-1 rounded-full text-xs font-semibold">✅ Active</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Candidate Cards */}
+      <div className="space-y-4">
+        {sorted.map(candidate => (
+          <div key={candidate.email} className="bg-slate-800 rounded-lg border border-slate-700 p-6 hover:border-slate-600 transition-all">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+              {/* Candidate Name */}
+              <div>
+                <div className="text-xs text-slate-400 font-semibold mb-2">👤 CANDIDATE NAME</div>
+                <div className="text-lg font-bold text-white">{candidate.name}</div>
+                <div className="text-xs text-slate-500 mt-1">{candidate.email}</div>
+              </div>
+
+              {/* Current Company */}
+              <div>
+                <div className="text-xs text-slate-400 font-semibold mb-2">🏢 CURRENT COMPANY</div>
+                <div className="text-lg font-bold text-blue-400">{candidate.currentCompany}</div>
+              </div>
+
+              {/* Current Experience */}
+              <div>
+                <div className="text-xs text-slate-400 font-semibold mb-2">⏱️ EXPERIENCE</div>
+                <div className="text-lg font-bold text-cyan-400">{candidate.currentExperience} years</div>
+              </div>
+
+              {/* Current Package */}
+              <div>
+                <div className="text-xs text-slate-400 font-semibold mb-2">💰 CURRENT PACKAGE</div>
+                <div className="text-lg font-bold text-green-400">{candidate.currentPackage}</div>
+              </div>
+
+              {/* Batch No */}
+              <div>
+                <div className="text-xs text-slate-400 font-semibold mb-2">📚 BATCH NO</div>
+                <div className="text-lg font-bold text-purple-400">{candidate.batchNo}</div>
+                <div className="text-xs text-slate-500 mt-1 font-semibold">{candidate.totalInterviews} Interviews</div>
+              </div>
+            </div>
+
+            {/* Status Badge */}
+            <div className="mt-4 pt-4 border-t border-slate-700 flex justify-between items-center">
+              <span className="text-xs text-slate-500">
+                {candidate.totalInterviews} total interview{candidate.totalInterviews !== 1 ? 's' : ''}
+              </span>
+              {candidate.isInactive ? (
+                <span className="bg-red-900/50 text-red-300 px-3 py-1 rounded-full text-xs font-semibold">❌ Inactive</span>
+              ) : (
+                <span className="bg-green-900/50 text-green-300 px-3 py-1 rounded-full text-xs font-semibold">✅ Active</span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
       {sorted.length === 0 && (
