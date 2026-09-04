@@ -788,7 +788,6 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                           const positiveCount = data.interviews.filter(i => i.feedback === 'Positive').length;
                           const negativeCount = data.interviews.filter(i => i.feedback === 'Negative').length;
                           const waitingCount = data.interviews.filter(i => i.feedback === 'Waiting' || !i.feedback).length;
-                          const completedCount = data.interviews.filter(i => i.status === 'completed').length;
 
                           return (
                             <div key={company} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
