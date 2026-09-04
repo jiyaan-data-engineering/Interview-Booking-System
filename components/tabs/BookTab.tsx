@@ -196,7 +196,7 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Scheduled Date *
+                  Scheduled Date * <span className="text-xs text-slate-400">(Past dates allowed)</span>
                 </label>
                 <input
                   type="date"
@@ -204,7 +204,6 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                   className="input-field"
                   value={formData.date}
                   onChange={handleChange}
-                  min={new Date().toISOString().split('T')[0]}
                   required
                 />
               </div>
