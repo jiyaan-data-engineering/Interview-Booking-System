@@ -46,6 +46,12 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
     return `${displayHours}:${m} ${period}`;
   };
 
+  const shouldAutoMarkNegative = (slot: InterviewSlot): boolean => {
+    if (slot.feedback !== 'Waiting for Feedback' && slot.feedback !== 'Waiting') return false;
+    const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
+    return daysPassed > 7;
+  };
+
   const timeToMinutes = (time: string) => {
     const [hours, minutes] = time.split(':');
     return parseInt(hours) * 60 + parseInt(minutes);
@@ -528,7 +534,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
 
                     <div>
                       <label className="block text-sm font-semibold text-slate-300 mb-2">
-                        Feedback/Rating (optional)
+                        Interview Feedback * <span className="text-xs text-slate-400">(Can edit anytime)</span>
                       </label>
                       <select
                         className="input-field"
@@ -539,12 +545,21 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                             [slot.id]: { ...prev[slot.id], feedback: e.target.value },
                           }))
                         }
+                        required
                       >
-                        <option value="">Select Feedback Rating</option>
-                        <option value="GOOD">🟢 GOOD - Excellent Performance</option>
-                        <option value="AVG">🟡 AVERAGE - Satisfactory Performance</option>
-                        <option value="BAD">🔴 BAD - Needs Improvement</option>
+                        <option value="">Select Feedback</option>
+                        <option value="Positive">🟢 Positive - Good Performance</option>
+                        <option value="Negative">🔴 Negative - Needs Improvement</option>
+                        <option value="Waiting">⏳ Waiting for Feedback</option>
                       </select>
+                      {(() => {
+                        const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
+                        return daysPassed > 7 && (!completeFormData[slot.id]?.feedback || completeFormData[slot.id]?.feedback === 'Waiting') ? (
+                          <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/30 p-2 rounded border border-yellow-600/50">
+                            ⚠️ Interview was {daysPassed} days ago. After 7 days, feedback defaults to Negative if not updated.
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
 
                   </div>
