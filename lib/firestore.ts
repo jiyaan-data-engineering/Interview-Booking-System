@@ -13,8 +13,11 @@ import { db } from './firebase';
 import { InterviewSlot } from './types';
 
 const SLOTS_COLLECTION = 'interview_slots';
+const SUBMITTED_REQUESTS_COLLECTION = 'submitted_requests';
 let slotsCache: InterviewSlot[] | null = null;
+let requestsCache: any[] | null = null;
 let cacheTime = 0;
+let requestsCacheTime = 0;
 const CACHE_DURATION = 30000; // 30 seconds
 
 // Get all slots
@@ -98,6 +101,36 @@ export const deleteSlot = async (slotId: string): Promise<void> => {
   } catch (error) {
     console.error('Error deleting slot:', error);
     throw error;
+  }
+};
+
+// Get all submitted requests
+export const getSubmittedRequests = async (): Promise<any[]> => {
+  try {
+    // Return cached data if fresh
+    if (requestsCache && Date.now() - requestsCacheTime < CACHE_DURATION) {
+      return requestsCache;
+    }
+
+    if (!db) {
+      throw new Error('Firestore not initialized');
+    }
+
+    const querySnapshot = await getDocs(collection(db, SUBMITTED_REQUESTS_COLLECTION));
+    const requests: any[] = [];
+    querySnapshot.forEach((docSnap) => {
+      requests.push({
+        id: docSnap.id,
+        ...docSnap.data(),
+      });
+    });
+
+    requestsCache = requests;
+    requestsCacheTime = Date.now();
+    return requests;
+  } catch (error) {
+    console.error('Error fetching submitted requests:', error);
+    return [];
   }
 };
 
