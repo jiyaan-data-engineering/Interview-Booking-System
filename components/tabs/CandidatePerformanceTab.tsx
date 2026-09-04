@@ -31,6 +31,7 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       currentCompany: string;
       currentExperience: string;
       currentPackage: string;
+      experienceType: string;
       totalInterviews: number;
       isInactive: boolean;
     }>();
@@ -47,6 +48,7 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
           currentCompany: slot.currentCompany || 'N/A',
           currentExperience: slot.totalYearsExperience || 'N/A',
           currentPackage: slot.lastCompanyPackage ? `₹${slot.lastCompanyPackage} LPA` : 'N/A',
+          experienceType: slot.experienceVerification || 'N/A',
           totalInterviews: 0,
           isInactive: inactiveCandidates.has(slot.candidateEmail),
         });
@@ -152,7 +154,7 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       <div className="space-y-4">
         {sorted.map(candidate => (
           <div key={candidate.email} className="bg-slate-800 rounded-lg border border-slate-700 p-6 hover:border-slate-600 transition-all">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
               {/* Candidate Name */}
               <div>
                 <div className="text-xs text-slate-400 font-semibold mb-2">👤 CANDIDATE NAME</div>
@@ -176,6 +178,22 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
               <div>
                 <div className="text-xs text-slate-400 font-semibold mb-2">💰 CURRENT PACKAGE</div>
                 <div className="text-lg font-bold text-green-400">{candidate.currentPackage}</div>
+              </div>
+
+              {/* Experience Type */}
+              <div>
+                <div className="text-xs text-slate-400 font-semibold mb-2">✅ EXPERIENCE TYPE</div>
+                <div className={`text-lg font-bold ${
+                  candidate.experienceType === 'Genuine' ? 'text-green-400' :
+                  candidate.experienceType === 'Semi-Genuine' ? 'text-yellow-400' :
+                  candidate.experienceType === 'Fake' ? 'text-red-400' :
+                  'text-slate-400'
+                }`}>
+                  {candidate.experienceType === 'Genuine' && '✅ Genuine'}
+                  {candidate.experienceType === 'Semi-Genuine' && '⚠️ Semi-Genuine'}
+                  {candidate.experienceType === 'Fake' && '❌ Fake'}
+                  {candidate.experienceType === 'N/A' && 'N/A'}
+                </div>
               </div>
 
               {/* Batch No */}
