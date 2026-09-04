@@ -319,10 +319,10 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
               </div>
             </div>
 
-            {/* Interview Statistics */}
+            {/* Interview Statistics & Offer Status */}
             <div className="mt-4 pt-4 border-t border-slate-700">
-              <div className="text-xs text-slate-400 font-semibold mb-3">📊 INTERVIEW STATISTICS</div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+              <div className="text-xs text-slate-400 font-semibold mb-3">📊 INTERVIEW STATISTICS & OFFER STATUS</div>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-4">
                 <div className="bg-blue-900/30 rounded p-3 border border-blue-600">
                   <div className="text-2xl font-bold text-blue-400">{candidate.totalInterviews}</div>
                   <div className="text-xs text-slate-400">Total</div>
@@ -345,85 +345,15 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                   </div>
                   <div className="text-xs text-slate-400">Confirmed</div>
                 </div>
+                <div className={`rounded p-3 border ${candidate.offerStatus === 'Received' ? 'bg-green-900/30 border-green-600' : candidate.offerStatus === 'Pending' ? 'bg-yellow-900/30 border-yellow-600' : 'bg-slate-700/30 border-slate-600'}`}>
+                  <div className={`text-lg font-bold ${candidate.offerStatus === 'Received' ? 'text-green-400' : candidate.offerStatus === 'Pending' ? 'text-yellow-400' : 'text-slate-400'}`}>
+                    {candidate.offerStatus ? '✅' : '-'}
+                  </div>
+                  <div className="text-xs text-slate-400">Offer</div>
+                </div>
               </div>
             </div>
 
-            {/* Offer/Placement Summary */}
-            {candidate.offerCompany && (
-              <div className="mt-4 pt-4 border-t border-slate-700">
-                <div className="text-xs text-slate-400 font-semibold mb-3">🎯 OFFER/PLACEMENT SUMMARY</div>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Status</div>
-                      <div className="text-sm font-bold text-cyan-400">{candidate.offerStatus || 'In Progress'}</div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Offer Status</div>
-                      <div className="flex gap-2">
-                        {candidate.offerStatus === 'Received' && <span className="bg-green-900/50 text-green-300 px-2 py-1 rounded text-xs font-semibold">✅ Received</span>}
-                        {candidate.offerStatus === 'Pending' && <span className="bg-yellow-900/50 text-yellow-300 px-2 py-1 rounded text-xs font-semibold">⏳ Pending</span>}
-                        {!candidate.offerStatus && <span className="text-slate-400 text-xs">-</span>}
-                      </div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Interview Started</div>
-                      <div className="text-sm font-bold text-blue-400">{candidate.firstInterviewDate || '-'}</div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Old Company → New Company</div>
-                      <div className="text-sm font-bold text-amber-400">{candidate.currentCompany} → {candidate.offerCompany}</div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Old Package → New Package</div>
-                      <div className="text-sm font-bold text-green-400">{candidate.currentPackage} → ₹{candidate.offerPackage} LPA</div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Hike %</div>
-                      <div className="text-sm font-bold text-red-400">
-                        {(() => {
-                          const oldPkg = parseFloat(String(candidate.currentPackage).replace(/[^0-9.]/g, ''));
-                          const newPkg = parseFloat(String(candidate.offerPackage || '0').replace(/[^0-9.]/g, ''));
-                          if (oldPkg && newPkg) {
-                            const hike = ((newPkg - oldPkg) / oldPkg) * 100;
-                            return `${hike.toFixed(1)}%`;
-                          }
-                          return '-';
-                        })()}
-                      </div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Total Experience</div>
-                      <div className="text-sm font-bold text-purple-400">{candidate.currentExperience} years</div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Experience Type</div>
-                      <div className={`text-sm font-bold ${
-                        candidate.experienceType === 'Genuine' ? 'text-green-400' :
-                        candidate.experienceType === 'Semi-Genuine' ? 'text-yellow-400' :
-                        candidate.experienceType === 'Fake' ? 'text-red-400' :
-                        'text-slate-400'
-                      }`}>
-                        {candidate.experienceType}
-                      </div>
-                    </div>
-                  </div>
-
-                  {candidate.joiningDate && (
-                    <div className="bg-slate-700/50 rounded p-3">
-                      <div className="text-xs text-slate-400 mb-1">Joining Date</div>
-                      <div className="text-sm font-bold text-orange-400">{candidate.joiningDate}</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
 
             {/* Interview Status - Feedback Status */}
             <div className="mt-4 pt-4 border-t border-slate-700">
@@ -475,6 +405,45 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                 })()}
               </div>
             </div>
+
+            {/* Offer Details */}
+            {candidate.offerCompany && (
+              <div className="mt-4 pt-4 border-t border-slate-700">
+                <div className="text-xs text-slate-400 font-semibold mb-3">📋 OFFER DETAILS</div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-700/30 rounded p-4">
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Company</div>
+                    <div className="text-sm font-bold text-blue-400">{candidate.offerCompany}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Released Date</div>
+                    <div className="text-sm font-bold text-cyan-400">{candidate.joiningDate || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Joining Date</div>
+                    <div className="text-sm font-bold text-purple-400">{candidate.joiningDate || '-'}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-slate-400 mb-1">Package LPA</div>
+                    <div className="text-sm font-bold text-green-400">₹{candidate.offerPackage || '-'} LPA</div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                  <div className="bg-slate-700/30 rounded p-3">
+                    <div className="text-xs text-slate-400 mb-1">Settlement (Monthly)</div>
+                    <div className="text-sm font-bold text-amber-400">-</div>
+                  </div>
+                  <div className="bg-slate-700/30 rounded p-3">
+                    <div className="text-xs text-slate-400 mb-1">Offer Status</div>
+                    <div className="flex gap-2">
+                      {candidate.offerStatus === 'Received' && <span className="bg-green-900/50 text-green-300 px-2 py-1 rounded text-xs font-semibold">✅ Received</span>}
+                      {candidate.offerStatus === 'Pending' && <span className="bg-yellow-900/50 text-yellow-300 px-2 py-1 rounded text-xs font-semibold">⏳ Pending</span>}
+                      {!candidate.offerStatus && <span className="text-slate-400 text-xs">-</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Interview History */}
             <div className="mt-4 pt-4 border-t border-slate-700">
