@@ -36,6 +36,11 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       completedInterviews: number;
       pendingInterviews: number;
       cancelledInterviews: number;
+      positiveCount: number;
+      negativeCount: number;
+      waitingCount: number;
+      roundCounts: Map<string, number>;
+      successRates: Map<string, number>;
       isInactive: boolean;
     }>();
 
@@ -56,6 +61,11 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
           completedInterviews: 0,
           pendingInterviews: 0,
           cancelledInterviews: 0,
+          positiveCount: 0,
+          negativeCount: 0,
+          waitingCount: 0,
+          roundCounts: new Map(),
+          successRates: new Map(),
           isInactive: inactiveCandidates.has(slot.candidateEmail),
         });
       }
@@ -65,10 +75,42 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
 
       if (slot.status === 'completed') {
         data.completedInterviews++;
+        if (slot.feedback === 'Positive') data.positiveCount++;
+        else if (slot.feedback === 'Negative') data.negativeCount++;
+        else data.waitingCount++;
       } else if (slot.status === 'pending' || slot.status === 'confirmed') {
         data.pendingInterviews++;
       } else if (slot.status === 'cancelled') {
         data.cancelledInterviews++;
+      }
+
+      // Track round counts
+      if (slot.round && slot.status === 'completed') {
+        const currentCount = data.roundCounts.get(slot.round) || 0;
+        data.roundCounts.set(slot.round, currentCount + 1);
+      }
+    });
+
+    // Calculate success rates (candidates who completed a round and have interviews in the next round)
+    const roundOrder = ['Screening', 'Online test', 'AI Round', 'L1', 'L2', 'Client', 'HR', 'Offer'];
+    slots.forEach(slot => {
+      if (!slot.candidateName || !slot.candidateEmail) return;
+      const data = candidateMap.get(slot.candidateEmail);
+      if (!data || !slot.round) return;
+
+      const currentRoundIndex = roundOrder.indexOf(slot.round);
+      if (currentRoundIndex >= 0 && currentRoundIndex < roundOrder.length - 1) {
+        const nextRound = roundOrder[currentRoundIndex + 1];
+        if (!data.successRates.has(slot.round)) {
+          const nextRoundCount = slots.filter(s =>
+            s.candidateEmail === slot.candidateEmail &&
+            s.round === nextRound &&
+            (s.status === 'completed' || s.status === 'confirmed' || s.status === 'pending')
+          ).length;
+          const roundCount = data.roundCounts.get(slot.round) || 1;
+          const rate = Math.round((nextRoundCount / roundCount) * 100);
+          data.successRates.set(slot.round, rate);
+        }
       }
     });
 
@@ -241,8 +283,61 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
               </div>
             </div>
 
+            {/* Interview Status - Feedback Status */}
+            <div className="mt-4 pt-4 border-t border-slate-700">
+              <div className="text-xs text-slate-400 font-semibold mb-3">💬 INTERVIEW STATUS - FEEDBACK</div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-green-900/30 rounded p-3 border border-green-600">
+                  <div className="text-2xl font-bold text-green-400">{candidate.positiveCount}</div>
+                  <div className="text-xs text-slate-400">Positive</div>
+                </div>
+                <div className="bg-red-900/30 rounded p-3 border border-red-600">
+                  <div className="text-2xl font-bold text-red-400">{candidate.negativeCount}</div>
+                  <div className="text-xs text-slate-400">Negative</div>
+                </div>
+                <div className="bg-yellow-900/30 rounded p-3 border border-yellow-600">
+                  <div className="text-2xl font-bold text-yellow-400">{candidate.waitingCount}</div>
+                  <div className="text-xs text-slate-400">Waiting</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Interview Status - Round Breakdown */}
+            <div className="mt-4 pt-4 border-t border-slate-700">
+              <div className="text-xs text-slate-400 font-semibold mb-3">🔄 INTERVIEW STATUS - ROUND BREAKDOWN</div>
+              {candidate.roundCounts.size > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {Array.from(candidate.roundCounts.entries()).map(([round, count]) => (
+                    <div key={round} className="bg-purple-900/30 rounded p-3 border border-purple-600">
+                      <div className="text-lg font-bold text-purple-400">{count}</div>
+                      <div className="text-xs text-slate-400">{round}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">No completed rounds yet</p>
+              )}
+            </div>
+
+            {/* Interview Status - Progression Success Rate */}
+            <div className="mt-4 pt-4 border-t border-slate-700">
+              <div className="text-xs text-slate-400 font-semibold mb-3">📈 INTERVIEW STATUS - PROGRESSION</div>
+              {candidate.successRates.size > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {Array.from(candidate.successRates.entries()).map(([round, rate]) => (
+                    <div key={round} className="bg-indigo-900/30 rounded p-3 border border-indigo-600">
+                      <div className="text-lg font-bold text-indigo-400">{rate}%</div>
+                      <div className="text-xs text-slate-400">→ {round}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">No progression data yet</p>
+              )}
+            </div>
+
             {/* Status Badge */}
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-4 pt-4 border-t border-slate-700">
               {candidate.isInactive ? (
                 <span className="bg-red-900/50 text-red-300 px-3 py-1 rounded-full text-xs font-semibold">❌ Inactive</span>
               ) : (
