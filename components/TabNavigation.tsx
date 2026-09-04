@@ -52,7 +52,8 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`tab-button whitespace-nowrap px-4 py-4 border-b-2 transition-all flex items-center gap-2 ${
+            title={tab.label}
+            className={`tab-button whitespace-nowrap px-4 py-4 border-b-2 transition-all flex items-center gap-2 cursor-pointer group relative ${
               activeTab === tab.id
                 ? 'border-purple-500 text-white'
                 : 'border-transparent text-slate-400 hover:text-slate-300'
@@ -60,6 +61,11 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
           >
             <span>{tab.icon}</span>
             <span>{tab.label}</span>
+
+            {/* Custom Tooltip */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-slate-700">
+              {tab.label}
+            </div>
           </button>
         ))}
       </div>
