@@ -297,14 +297,14 @@ export default function Dashboard() {
     }
   };
 
-  const handleMarkCompleted = async (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string, comments: string) => {
+  const handleMarkCompleted = async (slotId: string, supportPerson: string, supportPersonFeedback: string, hrName: string, panelName: string, feedback: string, comments: string) => {
     try {
       const updates: any = {
         status: 'completed' as const,
         supportPerson,
+        supportPersonFeedback,
         hrName,
         panelName,
-        hrNumber,
         feedback,
         completedAt: new Date().toISOString()
       };
@@ -317,9 +317,9 @@ export default function Dashboard() {
               ...slot,
               status: 'completed' as const,
               supportPerson,
+              supportPersonFeedback,
               hrName,
               panelName,
-              hrNumber,
               feedback,
               ...(comments && { comments }),
               completedAt: new Date().toISOString()

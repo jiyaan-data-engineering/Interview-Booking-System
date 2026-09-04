@@ -7,7 +7,7 @@ interface MyBookingsTabProps {
   slots: InterviewSlot[];
   onReschedule: (slotId: string, date: string, time: string) => Promise<void> | void;
   onCancel: (slotId: string, reason: string) => Promise<void> | void;
-  onMarkCompleted?: (slotId: string, supportPerson: string, hrName: string, panelName: string, hrNumber: string, feedback: string, comments: string) => Promise<void> | void;
+  onMarkCompleted?: (slotId: string, supportPerson: string, supportPersonFeedback: string, hrName: string, panelName: string, feedback: string, comments: string) => Promise<void> | void;
   onUpdateInterviewStatus?: (slotId: string, interviewStatus: string) => Promise<void> | void;
   candidateEmail?: string;
 }
@@ -294,7 +294,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                     e.preventDefault();
                     const data = completeFormData[slot.id];
                     if (data && data.feedback) {
-                      onMarkCompleted?.(slot.id, data.supportPerson, data.hrName || '', data.panelName, '', data.feedback, data.comments);
+                      onMarkCompleted?.(slot.id, data.supportPerson, data.supportPersonFeedback || '', data.hrName || '', data.panelName, data.feedback, data.comments);
                       setExpandedSlot(null);
                     }
                   }}
