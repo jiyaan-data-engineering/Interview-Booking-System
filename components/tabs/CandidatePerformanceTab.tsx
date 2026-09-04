@@ -761,6 +761,85 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                   </div>
                 )}
 
+                {/* KPI: Round Progress by Company */}
+                {candidate.interviews.length > 0 && (
+                  <div className="bg-gradient-to-r from-indigo-900/30 to-slate-900/30 border border-indigo-500/50 rounded-lg p-4">
+                    <div className="text-sm font-semibold text-slate-300 mb-4">🎯 KPI: Round Progress by Company</div>
+                    <div className="space-y-4">
+                      {(() => {
+                        const rounds = ['Screening', 'Online test', 'AI Round', 'L1', 'L2', 'Client', 'HR', 'Offer'];
+                        const companyMap = new Map<string, { maxRound: string; maxRoundIndex: number; interviews: any[] }>();
+
+                        candidate.interviews.forEach(interview => {
+                          if (!interview.company) return;
+                          if (!companyMap.has(interview.company)) {
+                            companyMap.set(interview.company, { maxRound: '', maxRoundIndex: -1, interviews: [] });
+                          }
+                          const data = companyMap.get(interview.company)!;
+                          data.interviews.push(interview);
+                          const roundIndex = rounds.indexOf(interview.round || '');
+                          if (roundIndex > data.maxRoundIndex) {
+                            data.maxRound = interview.round || '';
+                            data.maxRoundIndex = roundIndex;
+                          }
+                        });
+
+                        return Array.from(companyMap.entries()).map(([company, data]) => {
+                          const positiveCount = data.interviews.filter(i => i.feedback === 'Positive').length;
+                          const negativeCount = data.interviews.filter(i => i.feedback === 'Negative').length;
+                          const waitingCount = data.interviews.filter(i => i.feedback === 'Waiting' || !i.feedback).length;
+                          const completedCount = data.interviews.filter(i => i.status === 'completed').length;
+
+                          return (
+                            <div key={company} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+                              <div className="mb-3">
+                                <div className="text-white font-bold text-lg mb-2">{company}</div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {rounds.map((round, idx) => (
+                                    <div
+                                      key={round}
+                                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                                        idx <= data.maxRoundIndex
+                                          ? 'bg-green-600/70 text-green-100 border border-green-500'
+                                          : 'bg-slate-700 text-slate-400 border border-slate-600'
+                                      }`}
+                                    >
+                                      {round}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                                <div className="bg-slate-900/50 rounded p-2 text-center">
+                                  <div className="text-xs text-slate-400">Current</div>
+                                  <div className="text-sm font-bold text-blue-400 mt-1">{data.maxRound || 'N/A'}</div>
+                                </div>
+                                <div className="bg-slate-900/50 rounded p-2 text-center">
+                                  <div className="text-xs text-slate-400">Total</div>
+                                  <div className="text-sm font-bold text-white mt-1">{data.interviews.length}</div>
+                                </div>
+                                <div className="bg-green-900/50 rounded p-2 text-center border border-green-600">
+                                  <div className="text-xs text-slate-400">🟢 Positive</div>
+                                  <div className="text-sm font-bold text-green-400 mt-1">{positiveCount}</div>
+                                </div>
+                                <div className="bg-red-900/50 rounded p-2 text-center border border-red-600">
+                                  <div className="text-xs text-slate-400">🔴 Negative</div>
+                                  <div className="text-sm font-bold text-red-400 mt-1">{negativeCount}</div>
+                                </div>
+                                <div className="bg-yellow-900/50 rounded p-2 text-center border border-yellow-600">
+                                  <div className="text-xs text-slate-400">⏳ Waiting</div>
+                                  <div className="text-sm font-bold text-yellow-400 mt-1">{waitingCount}</div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  </div>
+                )}
+
                 {/* Interview History */}
                 {candidate.interviews.length > 0 && (
                   <div>
