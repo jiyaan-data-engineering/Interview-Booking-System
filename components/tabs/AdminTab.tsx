@@ -27,6 +27,11 @@ export default function AdminTab({
     phone: '',
     password: '',
     batchNo: '',
+    employmentStatus: '',
+    currentCompany: '',
+    lastCompanyPackage: '',
+    totalYearsExperience: '',
+    experienceVerification: '',
   });
 
 
@@ -109,7 +114,18 @@ export default function AdminTab({
     e.preventDefault();
     if (candidateFormData.name && candidateFormData.email && candidateFormData.phone && candidateFormData.password && candidateFormData.batchNo && onRegisterCandidate) {
       onRegisterCandidate(candidateFormData.name, candidateFormData.email, candidateFormData.phone, candidateFormData.password);
-      setCandidateFormData({ name: '', email: '', phone: '', password: '', batchNo: '' });
+      setCandidateFormData({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        batchNo: '',
+        employmentStatus: '',
+        currentCompany: '',
+        lastCompanyPackage: '',
+        totalYearsExperience: '',
+        experienceVerification: '',
+      });
     }
   };
 
@@ -377,6 +393,76 @@ export default function AdminTab({
                 onChange={handleCandidateFormChange}
                 required
               />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Employment Status
+              </label>
+              <select
+                name="employmentStatus"
+                className="input-field"
+                value={candidateFormData.employmentStatus}
+                onChange={handleCandidateFormChange as any}
+              >
+                <option value="">-- Select --</option>
+                <option value="Working">Working</option>
+                <option value="Not Working">Not Working</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Current/Last Company
+              </label>
+              <input
+                type="text"
+                name="currentCompany"
+                className="input-field"
+                placeholder="e.g., TCS, Infosys"
+                value={candidateFormData.currentCompany}
+                onChange={handleCandidateFormChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Last Company Package (LPA)
+              </label>
+              <input
+                type="text"
+                name="lastCompanyPackage"
+                className="input-field"
+                placeholder="e.g., 8.5"
+                value={candidateFormData.lastCompanyPackage}
+                onChange={handleCandidateFormChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Total Years of Experience
+              </label>
+              <input
+                type="text"
+                name="totalYearsExperience"
+                className="input-field"
+                placeholder="e.g., 5, 3.5"
+                value={candidateFormData.totalYearsExperience}
+                onChange={handleCandidateFormChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
+                Experience Verification
+              </label>
+              <select
+                name="experienceVerification"
+                className="input-field"
+                value={candidateFormData.experienceVerification}
+                onChange={handleCandidateFormChange as any}
+              >
+                <option value="">-- Select --</option>
+                <option value="Genuine">✅ Genuine</option>
+                <option value="Semi-Genuine">⚠️ Semi-Genuine</option>
+                <option value="Fake">❌ Fake</option>
+              </select>
             </div>
           </div>
           <button type="submit" className="btn-primary w-full">

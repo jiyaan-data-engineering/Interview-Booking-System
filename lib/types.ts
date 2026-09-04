@@ -30,6 +30,11 @@ export interface InterviewSlot {
   offerReleasedDate?: string;
   joiningDate?: string;
   packageLPA?: string;
+  employmentStatus?: string;
+  currentCompany?: string;
+  lastCompanyPackage?: string;
+  totalYearsExperience?: string;
+  experienceVerification?: string;
 }
 
 export interface SlotFormData {
