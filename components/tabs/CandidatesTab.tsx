@@ -188,11 +188,20 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
   };
 
   const startEdit = async (candidate: { name: string; email: string; phone: string; interviews: InterviewSlot[] }) => {
-    // Fetch candidate profile from Firestore to get the latest batchNo
+    // Fetch candidate profile from Firestore to get the latest data
     const profile = await getCandidateProfileByEmail(candidate.email);
-    const batchNo = profile?.batchNo || '';
     setEditingEmail(candidate.email);
-    setEditFormData({ name: candidate.name, email: candidate.email, phone: candidate.phone, batchNo });
+    setEditFormData({
+      name: candidate.name,
+      email: candidate.email,
+      phone: candidate.phone,
+      batchNo: profile?.batchNo || '',
+      employmentStatus: profile?.employmentStatus || '',
+      currentCompany: profile?.currentCompany || '',
+      lastCompanyPackage: profile?.lastCompanyPackage || '',
+      totalYearsExperience: profile?.totalYearsExperience || '',
+      experienceVerification: profile?.experienceVerification || '',
+    });
   };
 
   const saveEdit = async () => {
