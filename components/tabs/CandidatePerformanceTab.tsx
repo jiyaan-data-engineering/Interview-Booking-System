@@ -33,6 +33,9 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       currentPackage: string;
       experienceType: string;
       totalInterviews: number;
+      completedInterviews: number;
+      pendingInterviews: number;
+      cancelledInterviews: number;
       isInactive: boolean;
     }>();
 
@@ -50,12 +53,23 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
           currentPackage: slot.lastCompanyPackage ? `₹${slot.lastCompanyPackage} LPA` : 'N/A',
           experienceType: slot.experienceVerification || 'N/A',
           totalInterviews: 0,
+          completedInterviews: 0,
+          pendingInterviews: 0,
+          cancelledInterviews: 0,
           isInactive: inactiveCandidates.has(slot.candidateEmail),
         });
       }
 
       const data = candidateMap.get(key)!;
       data.totalInterviews++;
+
+      if (slot.status === 'completed') {
+        data.completedInterviews++;
+      } else if (slot.status === 'pending' || slot.status === 'confirmed') {
+        data.pendingInterviews++;
+      } else if (slot.status === 'cancelled') {
+        data.cancelledInterviews++;
+      }
     });
 
     return Array.from(candidateMap.values());
@@ -204,11 +218,31 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
               </div>
             </div>
 
+            {/* Interview Statistics */}
+            <div className="mt-4 pt-4 border-t border-slate-700">
+              <div className="text-xs text-slate-400 font-semibold mb-3">📊 INTERVIEW STATISTICS</div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div className="bg-blue-900/30 rounded p-3 border border-blue-600">
+                  <div className="text-2xl font-bold text-blue-400">{candidate.totalInterviews}</div>
+                  <div className="text-xs text-slate-400">Total</div>
+                </div>
+                <div className="bg-green-900/30 rounded p-3 border border-green-600">
+                  <div className="text-2xl font-bold text-green-400">{candidate.completedInterviews}</div>
+                  <div className="text-xs text-slate-400">Completed</div>
+                </div>
+                <div className="bg-yellow-900/30 rounded p-3 border border-yellow-600">
+                  <div className="text-2xl font-bold text-yellow-400">{candidate.pendingInterviews}</div>
+                  <div className="text-xs text-slate-400">Pending</div>
+                </div>
+                <div className="bg-red-900/30 rounded p-3 border border-red-600">
+                  <div className="text-2xl font-bold text-red-400">{candidate.cancelledInterviews}</div>
+                  <div className="text-xs text-slate-400">Cancelled</div>
+                </div>
+              </div>
+            </div>
+
             {/* Status Badge */}
-            <div className="mt-4 pt-4 border-t border-slate-700 flex justify-between items-center">
-              <span className="text-xs text-slate-500">
-                {candidate.totalInterviews} total interview{candidate.totalInterviews !== 1 ? 's' : ''}
-              </span>
+            <div className="flex justify-end">
               {candidate.isInactive ? (
                 <span className="bg-red-900/50 text-red-300 px-3 py-1 rounded-full text-xs font-semibold">❌ Inactive</span>
               ) : (
