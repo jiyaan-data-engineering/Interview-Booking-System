@@ -46,21 +46,23 @@ export default function TabNavigation({ activeTab, onTabChange, isAdmin = false,
   const tabs = isAdmin ? adminTabs : isInactiveCandidate ? inactiveCandidateTabs : candidateTabs;
 
   return (
-    <div className="flex border-b border-slate-700 bg-slate-800/50">
-      {tabs.map(tab => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={`tab-button flex-1 py-4 border-b-2 transition-all ${
-            activeTab === tab.id
-              ? 'border-purple-500 text-white'
-              : 'border-transparent text-slate-400 hover:text-slate-300'
-          }`}
-        >
-          <span className="mr-2">{tab.icon}</span>
-          {tab.label}
-        </button>
-      ))}
+    <div className="overflow-x-auto border-b border-slate-700 bg-slate-800/50">
+      <div className="flex">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className={`tab-button whitespace-nowrap px-4 py-4 border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === tab.id
+                ? 'border-purple-500 text-white'
+                : 'border-transparent text-slate-400 hover:text-slate-300'
+            }`}
+          >
+            <span>{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
