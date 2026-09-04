@@ -226,35 +226,6 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
     }
   };
 
-  const getStatusColor = (status: string | undefined) => {
-    switch (status) {
-      case 'confirmed':
-        return 'bg-green-900/30 border-green-500 text-green-300';
-      case 'pending':
-        return 'bg-yellow-900/30 border-yellow-500 text-yellow-300';
-      case 'cancelled':
-        return 'bg-red-900/30 border-red-500 text-red-300';
-      case 'postponed':
-        return 'bg-orange-900/30 border-orange-500 text-orange-300';
-      case 'completed':
-        return 'bg-blue-900/30 border-blue-500 text-blue-300';
-      default:
-        return 'bg-yellow-900/30 border-yellow-500 text-yellow-300';
-    }
-  };
-
-  const getStatusLabel = (status: string | undefined) => {
-    if (!status) return 'Pending';
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(':');
-    const h = parseInt(hours);
-    const period = h >= 12 ? 'PM' : 'AM';
-    const displayHours = h > 12 ? h - 12 : h === 0 ? 12 : h;
-    return `${displayHours}:${minutes} ${period}`;
-  };
 
   return (
     <div>
