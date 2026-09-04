@@ -258,7 +258,7 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
 
         alert('✅ Changes saved successfully!');
         setEditingEmail(null);
-        setCandidateFormData({
+        setEditFormData({
           name: '',
           email: '',
           phone: '',
