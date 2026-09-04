@@ -782,9 +782,13 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
 
                         return Array.from(companyMap.entries()).map(([company, data]) => {
                           const completedInterviews = data.interviews.filter(i => i.status === 'completed');
-                          const positiveCount = completedInterviews.filter(i => i.feedback === 'Positive').length;
-                          const negativeCount = completedInterviews.filter(i => i.feedback === 'Negative').length;
-                          const waitingCount = completedInterviews.filter(i => i.feedback === 'Waiting' || !i.feedback).length;
+                          const latestCompleted = completedInterviews.length > 0
+                            ? completedInterviews.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+                            : null;
+
+                          const positiveCount = latestCompleted?.feedback === 'Positive' ? 1 : 0;
+                          const negativeCount = latestCompleted?.feedback === 'Negative' ? 1 : 0;
+                          const waitingCount = (latestCompleted?.feedback === 'Waiting' || !latestCompleted?.feedback) && latestCompleted ? 1 : 0;
 
                           return (
                             <div key={company} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
