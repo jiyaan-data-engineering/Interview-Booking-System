@@ -16,7 +16,7 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
   const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
   const [rescheduleData, setRescheduleData] = useState<Record<string, { date: string; time: string }>>({});
   const [cancelReason, setCancelReason] = useState<Record<string, string>>({});
-  const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; hrName: string; panelName: string; hrNumber?: string; feedback: string; comments: string }>>({});
+  const [completeFormData, setCompleteFormData] = useState<Record<string, { supportPerson: string; supportPersonFeedback?: string; hrName: string; panelName: string; hrNumber?: string; feedback: string; comments: string }>>({});
   const [interviewStatusData, setInterviewStatusData] = useState<Record<string, string>>({});
   const [filterDate, setFilterDate] = useState('');
   const [filterTime, setFilterTime] = useState('');

@@ -15,6 +15,7 @@ export interface InterviewSlot {
   reason?: string;
   room?: string;
   supportPerson?: string;
+  supportPersonFeedback?: string;
   hrName?: string;
   panelName?: string;
   hrNumber?: string;
