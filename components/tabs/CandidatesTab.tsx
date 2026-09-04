@@ -205,16 +205,25 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
   };
 
   const saveEdit = async () => {
-    if (!editingEmail || !editFormData.name || !editFormData.email || !editFormData.phone || !editFormData.batchNo) {
-      alert('All fields are required');
+    console.log('saveEdit called, editingEmail:', editingEmail);
+    console.log('editFormData:', editFormData);
+
+    if (!editingEmail) {
+      alert('❌ No candidate selected for editing');
+      return;
+    }
+
+    if (!editFormData.name || !editFormData.email || !editFormData.phone || !editFormData.batchNo) {
+      alert('❌ Please fill in all required fields:\n- Full Name\n- Email Address\n- Phone Number\n- Batch No');
       return;
     }
 
     if (window.confirm('⚠️ Save changes?\n\nName: ' + editFormData.name + '\nEmail: ' + editFormData.email + '\nPhone: ' + editFormData.phone + '\nBatch: ' + editFormData.batchNo)) {
       try {
-        console.log('Saving candidate profile for:', editingEmail);
+        console.log('Starting save process for:', editingEmail);
 
         // Update candidate profile in Firestore
+        console.log('Calling updateCandidateProfileByEmail...');
         await updateCandidateProfileByEmail(editingEmail, {
           name: editFormData.name,
           phone: editFormData.phone,
@@ -225,27 +234,45 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
           totalYearsExperience: editFormData.totalYearsExperience,
           experienceVerification: editFormData.experienceVerification,
         });
-        console.log('✅ Candidate profile updated');
+        console.log('✅ Candidate profile updated successfully');
 
         // Update all slots with old email to new candidate info
         const slotsToUpdate = slots.filter(slot => slot.candidateEmail === editingEmail);
-        console.log(`Updating ${slotsToUpdate.length} interview slots`);
+        console.log(`Found ${slotsToUpdate.length} interview slots to update`);
 
         for (const slot of slotsToUpdate) {
+          console.log(`Updating slot ${slot.id}...`);
           await updateSlot(slot.id, {
             candidateName: editFormData.name,
             candidateEmail: editFormData.email,
             candidatePhone: editFormData.phone,
             batchNo: editFormData.batchNo,
+            employmentStatus: editFormData.employmentStatus,
+            currentCompany: editFormData.currentCompany,
+            lastCompanyPackage: editFormData.lastCompanyPackage,
+            totalYearsExperience: editFormData.totalYearsExperience,
+            experienceVerification: editFormData.experienceVerification,
           });
         }
-        console.log('✅ All slots updated');
+        console.log('✅ All slots updated successfully');
 
         alert('✅ Changes saved successfully!');
         setEditingEmail(null);
+        setCandidateFormData({
+          name: '',
+          email: '',
+          phone: '',
+          batchNo: '',
+          employmentStatus: '',
+          currentCompany: '',
+          lastCompanyPackage: '',
+          totalYearsExperience: '',
+          experienceVerification: '',
+        });
       } catch (error) {
-        console.error('Error saving changes:', error);
-        alert('❌ Failed to save changes: ' + (error instanceof Error ? error.message : 'Unknown error'));
+        console.error('❌ Error saving changes:', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        alert('❌ Failed to save changes:\n\n' + errorMessage + '\n\nPlease check the browser console for more details.');
       }
     }
   };
