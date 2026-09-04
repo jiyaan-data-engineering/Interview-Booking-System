@@ -697,11 +697,7 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                 {/* Key Performance Indicators */}
                 <div>
                   <div className="text-sm font-semibold text-slate-300 mb-3">📈 Key Performance Indicators</div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                    <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-3">
-                      <div className="text-xs text-slate-400">Total Interviews</div>
-                      <div className="text-2xl font-bold text-blue-400 mt-2">{candidate.totalInterviews}</div>
-                    </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                     <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-3">
                       <div className="text-xs text-slate-400">Completed Interviews</div>
                       <div className="text-2xl font-bold text-green-400 mt-2">{candidate.completed}</div>
@@ -785,9 +781,10 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                         });
 
                         return Array.from(companyMap.entries()).map(([company, data]) => {
-                          const positiveCount = data.interviews.filter(i => i.feedback === 'Positive').length;
-                          const negativeCount = data.interviews.filter(i => i.feedback === 'Negative').length;
-                          const waitingCount = data.interviews.filter(i => i.feedback === 'Waiting' || !i.feedback).length;
+                          const completedInterviews = data.interviews.filter(i => i.status === 'completed');
+                          const positiveCount = completedInterviews.filter(i => i.feedback === 'Positive').length;
+                          const negativeCount = completedInterviews.filter(i => i.feedback === 'Negative').length;
+                          const waitingCount = completedInterviews.filter(i => i.feedback === 'Waiting' || !i.feedback).length;
 
                           return (
                             <div key={company} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
@@ -809,14 +806,10 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
                                 </div>
                               </div>
 
-                              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                                 <div className="bg-slate-900/50 rounded p-2 text-center">
-                                  <div className="text-xs text-slate-400">Current</div>
+                                  <div className="text-xs text-slate-400">Current Round</div>
                                   <div className="text-sm font-bold text-blue-400 mt-1">{data.maxRound || 'N/A'}</div>
-                                </div>
-                                <div className="bg-slate-900/50 rounded p-2 text-center">
-                                  <div className="text-xs text-slate-400">Total</div>
-                                  <div className="text-sm font-bold text-white mt-1">{data.interviews.length}</div>
                                 </div>
                                 <div className="bg-green-900/50 rounded p-2 text-center border border-green-600">
                                   <div className="text-xs text-slate-400">🟢 Positive</div>
