@@ -605,8 +605,8 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
                   onSubmit={e => {
                     e.preventDefault();
                     const data = completeFormData[slot.id];
-                    if (data && data.supportPerson && data.hrName && data.panelName && onMarkCompleted) {
-                      onMarkCompleted(slot.id, data.supportPerson, data.hrName, data.panelName, data.hrNumber || '', data.feedback, data.comments);
+                    if (data && data.supportPerson && data.supportPersonFeedback && data.panelName && data.feedback && onMarkCompleted) {
+                      onMarkCompleted(slot.id, data.supportPerson, data.supportPersonFeedback, data.hrName || '', data.panelName, data.feedback, data.comments);
                       setExpandedSlot(null);
                       setCompleteFormData(prev => {
                         const updated = { ...prev };
