@@ -15,8 +15,6 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
   const [inactiveCandidates, setInactiveCandidates] = useState(new Set<string>());
   const [droppedCandidates, setDroppedCandidates] = useState(new Set<string>());
   const [showPasswordReset, setShowPasswordReset] = useState<string | null>(null);
-  const [statusBreakdownDate, setStatusBreakdownDate] = useState('');
-  const [statusBreakdownFilter, setStatusBreakdownFilter] = useState('');
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState({ name: '', email: '', phone: '', batchNo: '' });
 
