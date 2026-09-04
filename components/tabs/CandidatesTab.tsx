@@ -16,7 +16,17 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
   const [droppedCandidates, setDroppedCandidates] = useState(new Set<string>());
   const [showPasswordReset, setShowPasswordReset] = useState<string | null>(null);
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
-  const [editFormData, setEditFormData] = useState({ name: '', email: '', phone: '', batchNo: '' });
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    batchNo: '',
+    employmentStatus: '',
+    currentCompany: '',
+    lastCompanyPackage: '',
+    totalYearsExperience: '',
+    experienceVerification: '',
+  });
 
   // Load inactive and dropped candidates from Firestore on mount
   useEffect(() => {
@@ -200,6 +210,11 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
           name: editFormData.name,
           phone: editFormData.phone,
           batchNo: editFormData.batchNo,
+          employmentStatus: editFormData.employmentStatus,
+          currentCompany: editFormData.currentCompany,
+          lastCompanyPackage: editFormData.lastCompanyPackage,
+          totalYearsExperience: editFormData.totalYearsExperience,
+          experienceVerification: editFormData.experienceVerification,
         });
         console.log('✅ Candidate profile updated');
 
@@ -461,7 +476,64 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                         placeholder="e.g., Batch#9"
                       />
                     </div>
-                    <div className="flex gap-2 pt-2">
+                    <hr className="border-slate-600 my-3" />
+                    <div className="text-xs text-slate-300 font-semibold mb-2">📋 Candidate Profile</div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Employment Status</label>
+                      <select
+                        value={editFormData.employmentStatus}
+                        onChange={(e) => setEditFormData({ ...editFormData, employmentStatus: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                      >
+                        <option value="">-- Select --</option>
+                        <option value="Working">Working</option>
+                        <option value="Not Working">Not Working</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Current/Last Company</label>
+                      <input
+                        type="text"
+                        value={editFormData.currentCompany}
+                        onChange={(e) => setEditFormData({ ...editFormData, currentCompany: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                        placeholder="e.g., TCS"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Last Company Package (LPA)</label>
+                      <input
+                        type="text"
+                        value={editFormData.lastCompanyPackage}
+                        onChange={(e) => setEditFormData({ ...editFormData, lastCompanyPackage: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                        placeholder="e.g., 8.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Total Years of Experience</label>
+                      <input
+                        type="text"
+                        value={editFormData.totalYearsExperience}
+                        onChange={(e) => setEditFormData({ ...editFormData, totalYearsExperience: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                        placeholder="e.g., 5"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-slate-400 mb-1 block">Experience Verification</label>
+                      <select
+                        value={editFormData.experienceVerification}
+                        onChange={(e) => setEditFormData({ ...editFormData, experienceVerification: e.target.value })}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                      >
+                        <option value="">-- Select --</option>
+                        <option value="Genuine">✅ Genuine</option>
+                        <option value="Semi-Genuine">⚠️ Semi-Genuine</option>
+                        <option value="Fake">❌ Fake</option>
+                      </select>
+                    </div>
+                    <div className="flex gap-2 pt-3">
                       <button
                         onClick={saveEdit}
                         className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold"
