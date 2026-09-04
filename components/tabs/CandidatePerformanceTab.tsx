@@ -91,27 +91,35 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       }
     });
 
-    // Calculate success rates (candidates who completed a round and have interviews in the next round)
+    // Calculate success rates (based on POSITIVE feedback only)
     const roundOrder = ['Screening', 'Online test', 'AI Round', 'L1', 'L2', 'Client', 'HR', 'Offer'];
-    slots.forEach(slot => {
-      if (!slot.candidateName || !slot.candidateEmail) return;
-      const data = candidateMap.get(slot.candidateEmail);
-      if (!data || !slot.round) return;
+    candidateMap.forEach((data, email) => {
+      roundOrder.forEach((round, index) => {
+        if (index < roundOrder.length - 1) {
+          const nextRound = roundOrder[index + 1];
 
-      const currentRoundIndex = roundOrder.indexOf(slot.round);
-      if (currentRoundIndex >= 0 && currentRoundIndex < roundOrder.length - 1) {
-        const nextRound = roundOrder[currentRoundIndex + 1];
-        if (!data.successRates.has(slot.round)) {
-          const nextRoundCount = slots.filter(s =>
-            s.candidateEmail === slot.candidateEmail &&
-            s.round === nextRound &&
-            (s.status === 'completed' || s.status === 'confirmed' || s.status === 'pending')
+          // Count completed interviews with POSITIVE feedback in current round
+          const currentRoundPositive = slots.filter(s =>
+            s.candidateEmail === email &&
+            s.round === round &&
+            s.status === 'completed' &&
+            s.feedback === 'Positive'
           ).length;
-          const roundCount = data.roundCounts.get(slot.round) || 1;
-          const rate = Math.round((nextRoundCount / roundCount) * 100);
-          data.successRates.set(slot.round, rate);
+
+          if (currentRoundPositive > 0) {
+            // Count completed interviews with POSITIVE feedback in next round
+            const nextRoundPositive = slots.filter(s =>
+              s.candidateEmail === email &&
+              s.round === nextRound &&
+              s.status === 'completed' &&
+              s.feedback === 'Positive'
+            ).length;
+
+            const rate = Math.round((nextRoundPositive / currentRoundPositive) * 100);
+            data.successRates.set(round, rate);
+          }
         }
-      }
+      });
     });
 
     return Array.from(candidateMap.values());
