@@ -152,7 +152,7 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
     submittedRequests.forEach(request => {
       const candidateName = request.candidateName;
       console.log(`🔎 Looking for candidate: "${candidateName}"`, 'Request:', request);
-      for (const [email, data] of candidateMap.entries()) {
+      for (const [, data] of candidateMap.entries()) {
         if (data.name === candidateName) {
           console.log(`✅ MATCHED! Setting offer data:`, request);
           if (request.company) data.offerCompany = request.company;
