@@ -294,52 +294,178 @@ export default function MyBookingsTab({ slots, onReschedule, onCancel, onMarkCom
             )}
 
             {slot.status === 'completed' ? (
-              <div className="mt-4 p-4 bg-green-900/30 border border-green-500/50 rounded-lg">
-                <div className="flex items-start justify-between mb-3">
-                  <h4 className="text-green-300 font-semibold">✓ Interview Completed</h4>
+              expandedSlot === `edit-${slot.id}` ? (
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    const data = completeFormData[slot.id];
+                    if (data && data.feedback) {
+                      handleCompleteInterview(slot.id, data.supportPerson, data.feedback, data.hrName, data.panelName, data.comments);
+                      setExpandedSlot(null);
+                    }
+                  }}
+                  className="mt-4 space-y-4 bg-blue-900/30 p-4 rounded-lg border border-blue-500/50"
+                >
+                  <h4 className="text-blue-300 font-semibold mb-3">Edit Interview Feedback</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                        Support Person
+                      </label>
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="e.g., Ananda"
+                        value={completeFormData[slot.id]?.supportPerson || slot.supportPerson || ''}
+                        onChange={e =>
+                          setCompleteFormData(prev => ({
+                            ...prev,
+                            [slot.id]: { ...prev[slot.id], supportPerson: e.target.value },
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                        Panel Name
+                      </label>
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="e.g., Technical Panel"
+                        value={completeFormData[slot.id]?.panelName || slot.panelName || ''}
+                        onChange={e =>
+                          setCompleteFormData(prev => ({
+                            ...prev,
+                            [slot.id]: { ...prev[slot.id], panelName: e.target.value },
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-slate-300 mb-2">
+                        Interview Feedback * <span className="text-xs text-slate-400">(Can edit anytime)</span>
+                      </label>
+                      <select
+                        className="input-field"
+                        value={completeFormData[slot.id]?.feedback || slot.feedback || ''}
+                        onChange={e =>
+                          setCompleteFormData(prev => ({
+                            ...prev,
+                            [slot.id]: { ...prev[slot.id], feedback: e.target.value },
+                          }))
+                        }
+                        required
+                      >
+                        <option value="">Select Feedback</option>
+                        <option value="Positive">🟢 Positive - Good Performance</option>
+                        <option value="Negative">🔴 Negative - Needs Improvement</option>
+                        <option value="Waiting">⏳ Waiting for Feedback</option>
+                      </select>
+                      {(() => {
+                        const daysPassed = Math.floor((new Date().getTime() - new Date(slot.date).getTime()) / (1000 * 60 * 60 * 24));
+                        return daysPassed > 7 && (!completeFormData[slot.id]?.feedback || completeFormData[slot.id]?.feedback === 'Waiting') ? (
+                          <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/30 p-2 rounded border border-yellow-600/50">
+                            ⚠️ Interview was {daysPassed} days ago. After 7 days, feedback defaults to Negative if not updated.
+                          </div>
+                        ) : null;
+                      })()}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      Comments (optional)
+                    </label>
+                    <textarea
+                      className="input-field"
+                      placeholder="Write your detailed comments..."
+                      rows={3}
+                      value={completeFormData[slot.id]?.comments || slot.comments || ''}
+                      onChange={e =>
+                        setCompleteFormData(prev => ({
+                          ...prev,
+                          [slot.id]: { ...prev[slot.id], comments: e.target.value },
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button type="submit" className="btn-success flex-1">
+                      Save Changes
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-secondary flex-1"
+                      onClick={() => setExpandedSlot(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="mt-4 p-4 bg-green-900/30 border border-green-500/50 rounded-lg">
+                  <div className="flex items-start justify-between mb-3">
+                    <h4 className="text-green-300 font-semibold">✓ Interview Completed</h4>
+                    <button
+                      onClick={() => setExpandedSlot(`edit-${slot.id}`)}
+                      className="btn-primary text-xs py-1 px-3"
+                    >
+                      ✏️ Edit
+                    </button>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {slot.supportPerson && (
+                      <div>
+                        <span className="text-slate-400">Support Person: </span>
+                        <span className="text-white font-semibold">{slot.supportPerson}</span>
+                      </div>
+                    )}
+                    {slot.hrName && (
+                      <div>
+                        <span className="text-slate-400">HR Name: </span>
+                        <span className="text-white font-semibold">{slot.hrName}</span>
+                      </div>
+                    )}
+                    {slot.panelName && (
+                      <div>
+                        <span className="text-slate-400">Panel Name: </span>
+                        <span className="text-white font-semibold">{slot.panelName}</span>
+                      </div>
+                    )}
+                    {slot.feedback && (
+                      <div>
+                        <span className="text-slate-400">Feedback: </span>
+                        <span className={`font-semibold ${
+                          slot.feedback === 'Positive' ? 'text-green-300' :
+                          slot.feedback === 'Negative' ? 'text-red-300' :
+                          slot.feedback === 'Waiting' ? 'text-yellow-300' :
+                          slot.feedback === 'GOOD' ? 'text-green-300' :
+                          slot.feedback === 'AVG' ? 'text-yellow-300' :
+                          slot.feedback === 'BAD' ? 'text-red-300' :
+                          'text-white'
+                        }`}>
+                          {slot.feedback === 'Positive' && '🟢 Positive'}
+                          {slot.feedback === 'Negative' && '🔴 Negative'}
+                          {slot.feedback === 'Waiting' && '⏳ Waiting for Feedback'}
+                          {slot.feedback === 'GOOD' && '🟢 GOOD'}
+                          {slot.feedback === 'AVG' && '🟡 AVERAGE'}
+                          {slot.feedback === 'BAD' && '🔴 BAD'}
+                        </span>
+                      </div>
+                    )}
+                    {slot.comments && (
+                      <div>
+                        <span className="text-slate-400">Comments: </span>
+                        <span className="text-white">{slot.comments}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2 text-sm">
-                  {slot.supportPerson && (
-                    <div>
-                      <span className="text-slate-400">Support Person: </span>
-                      <span className="text-white font-semibold">{slot.supportPerson}</span>
-                    </div>
-                  )}
-                  {slot.hrName && (
-                    <div>
-                      <span className="text-slate-400">HR Name: </span>
-                      <span className="text-white font-semibold">{slot.hrName}</span>
-                    </div>
-                  )}
-                  {slot.panelName && (
-                    <div>
-                      <span className="text-slate-400">Panel Name: </span>
-                      <span className="text-white font-semibold">{slot.panelName}</span>
-                    </div>
-                  )}
-                  {slot.feedback && (
-                    <div>
-                      <span className="text-slate-400">Feedback: </span>
-                      <span className={`font-semibold ${
-                        slot.feedback === 'GOOD' ? 'text-green-300' :
-                        slot.feedback === 'AVG' ? 'text-yellow-300' :
-                        slot.feedback === 'BAD' ? 'text-red-300' :
-                        'text-white'
-                      }`}>
-                        {slot.feedback === 'GOOD' && '🟢 GOOD'}
-                        {slot.feedback === 'AVG' && '🟡 AVERAGE'}
-                        {slot.feedback === 'BAD' && '🔴 BAD'}
-                      </span>
-                    </div>
-                  )}
-                  {slot.comments && (
-                    <div>
-                      <span className="text-slate-400">Comments: </span>
-                      <span className="text-white">{slot.comments}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+              )
             ) : (slot.status === 'confirmed' || slot.status === 'pending' || !slot.status) ? (
               expandedSlot === slot.id ? (
                 <form
