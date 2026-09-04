@@ -232,7 +232,17 @@ export const getCandidateProfileByEmail = async (email: string): Promise<any | n
 // Update candidate profile by email (creates if doesn't exist)
 export const updateCandidateProfileByEmail = async (
   email: string,
-  updates: { name?: string; phone?: string; batchNo?: string; isPlaced?: boolean }
+  updates: {
+    name?: string;
+    phone?: string;
+    batchNo?: string;
+    isPlaced?: boolean;
+    employmentStatus?: string;
+    currentCompany?: string;
+    lastCompanyPackage?: string;
+    totalYearsExperience?: string;
+    experienceVerification?: string;
+  }
 ): Promise<void> => {
   try {
     if (!db) throw new Error('Firestore not initialized');
