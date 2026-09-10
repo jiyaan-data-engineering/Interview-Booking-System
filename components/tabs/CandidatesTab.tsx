@@ -43,6 +43,31 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
     setFilterActive('');
   }, []);
 
+  // Load candidate profiles from Firestore
+  useEffect(() => {
+    const loadCandidateProfiles = async () => {
+      const profiles = new Map<string, any>();
+
+      for (const [email] of candidatesMap.entries()) {
+        try {
+          const profile = await getCandidateProfileByEmail(email);
+          if (profile) {
+            profiles.set(email, profile);
+            candidatesMap.get(email)!.profile = profile;
+          }
+        } catch (error) {
+          console.error(`Error fetching profile for ${email}:`, error);
+        }
+      }
+
+      setCandidateProfiles(profiles);
+    };
+
+    if (candidatesMap.size > 0) {
+      loadCandidateProfiles();
+    }
+  }, [slots]);
+
   // Helper to get first interview date for a candidate
   const getFirstInterviewDate = (interviews: InterviewSlot[]): string | undefined => {
     if (interviews.length === 0) return undefined;
@@ -55,12 +80,15 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
   };
 
   // Get unique candidates with their details
+  const [candidateProfiles, setCandidateProfiles] = useState<Map<string, any>>(new Map());
+
   const candidatesMap = new Map<string, {
     name: string;
     email: string;
     phone: string;
     interviews: InterviewSlot[];
     candidateCreatedAt?: string;
+    profile?: any;
   }>();
 
   slots.forEach(slot => {
@@ -511,31 +539,44 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                     </div>
 
                     {/* Candidate Profile Information - INLINE TAGS */}
-                    {(candidate.interviews[0]?.currentCompany || candidate.interviews[0]?.employmentStatus || candidate.interviews[0]?.totalYearsExperience) && (
-                      <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-600">
-                        {candidate.interviews[0]?.employmentStatus && (
-                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💼 {candidate.interviews[0].employmentStatus}</span>
-                        )}
-                        {candidate.interviews[0]?.currentCompany && (
-                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">🏢 {candidate.interviews[0].currentCompany.substring(0, 18)}{candidate.interviews[0].currentCompany.length > 18 ? '...' : ''}</span>
-                        )}
-                        {candidate.interviews[0]?.lastCompanyPackage && (
-                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💰 ₹{candidate.interviews[0].lastCompanyPackage} LPA</span>
-                        )}
-                        {candidate.interviews[0]?.totalYearsExperience && (
-                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">📅 {candidate.interviews[0].totalYearsExperience}y</span>
-                        )}
-                        {candidate.interviews[0]?.experienceVerification && (
-                          <span className={`px-3 py-1 rounded-lg text-sm font-bold ${
-                            candidate.interviews[0].experienceVerification === 'Genuine' ? 'bg-green-900/50 text-green-300 border border-green-500' :
-                            candidate.interviews[0].experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/50 text-yellow-300 border border-yellow-500' :
-                            'bg-red-900/50 text-red-300 border border-red-500'
-                          }`}>
-                            {candidate.interviews[0].experienceVerification === 'Genuine' && '✅ Genuine'} {candidate.interviews[0].experienceVerification === 'Semi-Genuine' && '⚠️ Semi-Genuine'} {candidate.interviews[0].experienceVerification === 'Fake' && '❌ Fake'}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    {(() => {
+                      const profile = candidateProfiles.get(candidate.email) || candidate.interviews[0] || {};
+                      return (
+                        <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-600">
+                          {profile?.employmentStatus ? (
+                            <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💼 {profile.employmentStatus}</span>
+                          ) : (
+                            <span className="bg-slate-700/50 text-slate-400 px-3 py-1 rounded-lg text-sm font-semibold italic">💼 Not set</span>
+                          )}
+                          {profile?.currentCompany ? (
+                            <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">🏢 {profile.currentCompany.substring(0, 18)}{profile.currentCompany.length > 18 ? '...' : ''}</span>
+                          ) : (
+                            <span className="bg-slate-700/50 text-slate-400 px-3 py-1 rounded-lg text-sm font-semibold italic">🏢 Not set</span>
+                          )}
+                          {profile?.lastCompanyPackage ? (
+                            <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💰 ₹{profile.lastCompanyPackage} LPA</span>
+                          ) : (
+                            <span className="bg-slate-700/50 text-slate-400 px-3 py-1 rounded-lg text-sm font-semibold italic">💰 Not set</span>
+                          )}
+                          {profile?.totalYearsExperience ? (
+                            <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">📅 {profile.totalYearsExperience}y</span>
+                          ) : (
+                            <span className="bg-slate-700/50 text-slate-400 px-3 py-1 rounded-lg text-sm font-semibold italic">📅 Not set</span>
+                          )}
+                          {profile?.experienceVerification ? (
+                            <span className={`px-3 py-1 rounded-lg text-sm font-bold ${
+                              profile.experienceVerification === 'Genuine' ? 'bg-green-900/50 text-green-300 border border-green-500' :
+                              profile.experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/50 text-yellow-300 border border-yellow-500' :
+                              'bg-red-900/50 text-red-300 border border-red-500'
+                            }`}>
+                              {profile.experienceVerification === 'Genuine' && '✅ Genuine'} {profile.experienceVerification === 'Semi-Genuine' && '⚠️ Semi-Genuine'} {profile.experienceVerification === 'Fake' && '❌ Fake'}
+                            </span>
+                          ) : (
+                            <span className="bg-slate-700/50 text-slate-400 px-3 py-1 rounded-lg text-sm font-semibold italic">❓ Not verified</span>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     <div className="text-xs text-slate-500 pt-1">
                       <div>🔐 Password Protected</div>
