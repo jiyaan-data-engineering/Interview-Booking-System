@@ -40,7 +40,7 @@ export default function Dashboard() {
 
   // Candidate auth
   const [candidateUser, setCandidateUser] = useState<User | null>(null);
-  const [candidateProfile, setCandidateProfile] = useState<{ name: string; phone: string; batchNo?: string } | null>(null);
+  const [candidateProfile, setCandidateProfile] = useState<{ name: string; phone: string; batchNo?: string; employmentStatus?: string; currentCompany?: string; lastCompanyPackage?: string; totalYearsExperience?: string; experienceVerification?: string } | null>(null);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [candidateIsInactive, setCandidateIsInactive] = useState(false);
   const [candidateIsDropped, setCandidateIsDropped] = useState(false);
@@ -61,7 +61,12 @@ export default function Dashboard() {
               setCandidateProfile({
                 name: profile.name,
                 phone: profile.phone,
-                batchNo: profile.batchNo
+                batchNo: profile.batchNo,
+                employmentStatus: profile.employmentStatus,
+                currentCompany: profile.currentCompany,
+                lastCompanyPackage: profile.lastCompanyPackage,
+                totalYearsExperience: profile.totalYearsExperience,
+                experienceVerification: profile.experienceVerification
               });
             }
             // Check if candidate is dropped
@@ -119,9 +124,9 @@ export default function Dashboard() {
   const ADMIN_USERNAME = 'admin';
   const ADMIN_PASSWORD = 'admin@123';
 
-  const handleAdminRegisterCandidate = async (name: string, email: string, phone: string, password: string, batchNo?: string) => {
+  const handleAdminRegisterCandidate = async (name: string, email: string, phone: string, password: string, batchNo?: string, employmentStatus?: string, currentCompany?: string, lastCompanyPackage?: string, totalYearsExperience?: string, experienceVerification?: string) => {
     try {
-      await registerCandidate(name, email, phone, password, batchNo);
+      await registerCandidate(name, email, phone, password, batchNo, employmentStatus, currentCompany, lastCompanyPackage, totalYearsExperience, experienceVerification);
       showAlert(`Candidate "${name}" registered successfully!`, 'success');
     } catch (error: any) {
       showAlert(error.message || 'Registration failed', 'error');
@@ -662,6 +667,11 @@ export default function Dashboard() {
                 candidateName={candidateProfile?.name || candidateUser?.displayName || ''}
                 candidatePhone={candidateProfile?.phone || ''}
                 candidateBatchNo={candidateProfile?.batchNo || ''}
+                employmentStatus={candidateProfile?.employmentStatus || ''}
+                currentCompany={candidateProfile?.currentCompany || ''}
+                lastCompanyPackage={candidateProfile?.lastCompanyPackage || ''}
+                totalYearsExperience={candidateProfile?.totalYearsExperience || ''}
+                experienceVerification={candidateProfile?.experienceVerification || ''}
                 isInactive={candidateIsInactive}
               />
             )}

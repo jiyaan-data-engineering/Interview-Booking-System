@@ -16,6 +16,11 @@ interface CandidateProfile {
   email: string;
   phone: string;
   batchNo?: string;
+  employmentStatus?: string;
+  currentCompany?: string;
+  lastCompanyPackage?: string;
+  totalYearsExperience?: string;
+  experienceVerification?: string;
   createdAt: string;
 }
 
@@ -24,7 +29,12 @@ export const registerCandidate = async (
   email: string,
   phone: string,
   password: string,
-  batchNo?: string
+  batchNo?: string,
+  employmentStatus?: string,
+  currentCompany?: string,
+  lastCompanyPackage?: string,
+  totalYearsExperience?: string,
+  experienceVerification?: string
 ): Promise<User> => {
   if (!auth) {
     throw new Error('Firebase Authentication not initialized');
@@ -42,6 +52,11 @@ export const registerCandidate = async (
         email,
         phone,
         batchNo,
+        employmentStatus,
+        currentCompany,
+        lastCompanyPackage,
+        totalYearsExperience,
+        experienceVerification,
         createdAt: new Date().toISOString(),
       } as CandidateProfile);
     }

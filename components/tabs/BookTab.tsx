@@ -8,10 +8,15 @@ interface BookTabProps {
   candidateName?: string;
   candidatePhone?: string;
   candidateBatchNo?: string;
+  employmentStatus?: string;
+  currentCompany?: string;
+  lastCompanyPackage?: string;
+  totalYearsExperience?: string;
+  experienceVerification?: string;
   isInactive?: boolean;
 }
 
-export default function BookTab({ onBook, candidateEmail = '', candidateName = '', candidatePhone = '', candidateBatchNo = '', isInactive = false }: BookTabProps) {
+export default function BookTab({ onBook, candidateEmail = '', candidateName = '', candidatePhone = '', candidateBatchNo = '', employmentStatus = '', currentCompany = '', lastCompanyPackage = '', totalYearsExperience = '', experienceVerification = '', isInactive = false }: BookTabProps) {
   const [formData, setFormData] = useState({
     name: candidateName || 'Your Name',
     email: candidateEmail || 'your.email@example.com',
@@ -128,30 +133,32 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Full Name * <span className="text-xs text-slate-500">(Read-only)</span>
+                  Full Name * {candidateName && <span className="text-xs text-slate-500">(Read-only)</span>}
                 </label>
                 <input
                   type="text"
                   name="name"
-                  className="input-field bg-slate-600 cursor-not-allowed"
-                  placeholder="Your Name"
+                  className={candidateName ? "input-field bg-slate-600 cursor-not-allowed" : "input-field"}
+                  placeholder={candidateName ? "Your Name" : "Enter candidate full name"}
                   value={formData.name}
-                  disabled
+                  onChange={!candidateName ? handleChange : undefined}
+                  disabled={!!candidateName}
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Email Address * <span className="text-xs text-slate-500">(Read-only)</span>
+                  Email Address * {candidateEmail && <span className="text-xs text-slate-500">(Read-only)</span>}
                 </label>
                 <input
                   type="email"
                   name="email"
-                  className="input-field bg-slate-600 cursor-not-allowed"
-                  placeholder="your.email@example.com"
+                  className={candidateEmail ? "input-field bg-slate-600 cursor-not-allowed" : "input-field"}
+                  placeholder={candidateEmail ? "your.email@example.com" : "Enter candidate email address"}
                   value={formData.email}
-                  disabled
+                  onChange={!candidateEmail ? handleChange : undefined}
+                  disabled={!!candidateEmail}
                   required
                 />
               </div>
@@ -160,15 +167,16 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-2">
-                  Phone Number * <span className="text-xs text-slate-500">(Read-only)</span>
+                  Phone Number * {candidatePhone && <span className="text-xs text-slate-500">(Read-only)</span>}
                 </label>
                 <input
                   type="tel"
                   name="phone"
-                  className="input-field bg-slate-600 cursor-not-allowed"
-                  placeholder="+1 (555) 123-4567"
+                  className={candidatePhone ? "input-field bg-slate-600 cursor-not-allowed" : "input-field"}
+                  placeholder={candidatePhone ? "+1 (555) 123-4567" : "Enter candidate phone number"}
                   value={formData.phone}
-                  disabled
+                  onChange={!candidatePhone ? handleChange : undefined}
+                  disabled={!!candidatePhone}
                   required
                 />
               </div>
@@ -187,6 +195,51 @@ export default function BookTab({ onBook, candidateEmail = '', candidateName = '
                 />
               </div>
             </div>
+
+            {/* Candidate Profile Information */}
+            {(employmentStatus || currentCompany || totalYearsExperience) && (
+              <div className="border-t border-slate-600 pt-6 mt-6">
+                <h3 className="text-lg font-semibold text-white mb-4">📋 Candidate Profile</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {employmentStatus && (
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-2">Employment Status</label>
+                      <div className="bg-slate-700 rounded px-3 py-2 text-white text-sm">{employmentStatus}</div>
+                    </div>
+                  )}
+                  {currentCompany && (
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-2">Current/Last Company</label>
+                      <div className="bg-slate-700 rounded px-3 py-2 text-white text-sm">{currentCompany}</div>
+                    </div>
+                  )}
+                  {lastCompanyPackage && (
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-2">Last Company Package</label>
+                      <div className="bg-slate-700 rounded px-3 py-2 text-white text-sm">₹{lastCompanyPackage} LPA</div>
+                    </div>
+                  )}
+                  {totalYearsExperience && (
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-2">Total Years of Experience</label>
+                      <div className="bg-slate-700 rounded px-3 py-2 text-white text-sm">{totalYearsExperience} years</div>
+                    </div>
+                  )}
+                  {experienceVerification && (
+                    <div className="md:col-span-2">
+                      <label className="block text-xs text-slate-400 mb-2">Experience Verification</label>
+                      <div className={`rounded px-3 py-2 text-sm font-semibold ${
+                        experienceVerification === 'Genuine' ? 'bg-green-900/30 text-green-300' :
+                        experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/30 text-yellow-300' :
+                        'bg-red-900/30 text-red-300'
+                      }`}>
+                        {experienceVerification === 'Genuine' && '✅'} {experienceVerification === 'Semi-Genuine' && '⚠️'} {experienceVerification === 'Fake' && '❌'} {experienceVerification}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Interview Information */}

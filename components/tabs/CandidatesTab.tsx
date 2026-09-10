@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { InterviewSlot } from '@/lib/types';
-import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot, getCandidateProfileByEmail, markCandidatePlaced, markCandidateDropped, markCandidateNotDropped, getAllDroppedCandidates } from '@/lib/firestore';
+import { markCandidateInactive, markCandidateActive, getAllInactiveCandidates, updateCandidateProfileByEmail, updateSlot, getCandidateProfileByEmail, markCandidatePlaced, markCandidateDropped, markCandidateNotDropped, getAllDroppedCandidates, deleteCandidate } from '@/lib/firestore';
 
 interface CandidatesTabProps {
   slots: InterviewSlot[];
@@ -183,6 +183,19 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
       } catch (error) {
         console.error('Error removing drop status:', error);
         alert('❌ Failed to remove drop status');
+      }
+    }
+  };
+
+  const handleDeleteCandidate = async (email: string, candidateName: string) => {
+    if (confirm(`⚠️ DELETE CANDIDATE?\n\nThis will permanently remove ${candidateName} from the database.\n\nThis action cannot be undone.\n\nContinue?`)) {
+      try {
+        await deleteCandidate(email);
+        alert('✅ Candidate deleted successfully!');
+        window.location.reload();
+      } catch (error) {
+        console.error('Error deleting candidate:', error);
+        alert('❌ Failed to delete candidate');
       }
     }
   };
@@ -388,6 +401,35 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                     <div className="text-sm text-slate-300 font-semibold pt-2">
                       📦 Batch No: <span className="text-white bg-slate-700 px-2 py-1 rounded">{candidate.interviews[0]?.batchNo || 'Not Set'}</span>
                     </div>
+
+                    {/* Candidate Profile Information */}
+                    {(candidate.interviews[0]?.currentCompany || candidate.interviews[0]?.employmentStatus || candidate.interviews[0]?.totalYearsExperience) && (
+                      <div className="pt-3 border-t border-slate-600 mt-3">
+                        <div className="text-xs text-slate-400 font-semibold mb-2">📋 Profile Info</div>
+                        {candidate.interviews[0]?.employmentStatus && (
+                          <div className="text-xs text-slate-300">💼 Status: <span className="text-white">{candidate.interviews[0].employmentStatus}</span></div>
+                        )}
+                        {candidate.interviews[0]?.currentCompany && (
+                          <div className="text-xs text-slate-300">🏢 Company: <span className="text-white">{candidate.interviews[0].currentCompany}</span></div>
+                        )}
+                        {candidate.interviews[0]?.lastCompanyPackage && (
+                          <div className="text-xs text-slate-300">💰 Package: <span className="text-white">₹{candidate.interviews[0].lastCompanyPackage} LPA</span></div>
+                        )}
+                        {candidate.interviews[0]?.totalYearsExperience && (
+                          <div className="text-xs text-slate-300">📅 Experience: <span className="text-white">{candidate.interviews[0].totalYearsExperience} years</span></div>
+                        )}
+                        {candidate.interviews[0]?.experienceVerification && (
+                          <div className={`text-xs font-semibold mt-1 px-2 py-1 rounded w-fit ${
+                            candidate.interviews[0].experienceVerification === 'Genuine' ? 'bg-green-900/30 text-green-300' :
+                            candidate.interviews[0].experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/30 text-yellow-300' :
+                            'bg-red-900/30 text-red-300'
+                          }`}>
+                            {candidate.interviews[0].experienceVerification === 'Genuine' && '✅'} {candidate.interviews[0].experienceVerification === 'Semi-Genuine' && '⚠️'} {candidate.interviews[0].experienceVerification === 'Fake' && '❌'} {candidate.interviews[0].experienceVerification}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div className="text-xs text-slate-500 pt-1">
                       <div>🔐 Password Protected</div>
                       {showPasswordReset === candidate.email && (
@@ -464,6 +506,14 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                   >
                     ✏️ Edit Info
                   </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDeleteCandidate(candidate.email, candidate.name)}
+                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-red-900 hover:bg-red-800 text-red-200 border border-red-600"
+                    >
+                      🗑️ Delete Candidate
+                    </button>
+                  )}
                 </div>
               </div>
 

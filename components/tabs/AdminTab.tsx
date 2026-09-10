@@ -11,7 +11,7 @@ interface AdminTabProps {
   onCancelBooking: (slotId: string) => Promise<void> | void;
   onUpdateStatus: (slotId: string, status: string, reason?: string, room?: string) => Promise<void> | void;
   onClearAllSlots?: () => void;
-  onRegisterCandidate?: (name: string, email: string, phone: string, password: string) => Promise<void> | void;
+  onRegisterCandidate?: (name: string, email: string, phone: string, password: string, batchNo?: string, employmentStatus?: string, currentCompany?: string, lastCompanyPackage?: string, totalYearsExperience?: string, experienceVerification?: string) => Promise<void> | void;
 }
 
 export default function AdminTab({
@@ -113,7 +113,18 @@ export default function AdminTab({
   const handleRegisterCandidate = (e: React.FormEvent) => {
     e.preventDefault();
     if (candidateFormData.name && candidateFormData.email && candidateFormData.phone && candidateFormData.password && candidateFormData.batchNo && onRegisterCandidate) {
-      onRegisterCandidate(candidateFormData.name, candidateFormData.email, candidateFormData.phone, candidateFormData.password);
+      onRegisterCandidate(
+        candidateFormData.name,
+        candidateFormData.email,
+        candidateFormData.phone,
+        candidateFormData.password,
+        candidateFormData.batchNo,
+        candidateFormData.employmentStatus,
+        candidateFormData.currentCompany,
+        candidateFormData.lastCompanyPackage,
+        candidateFormData.totalYearsExperience,
+        candidateFormData.experienceVerification
+      );
       setCandidateFormData({
         name: '',
         email: '',

@@ -323,6 +323,23 @@ export const markCandidatePlaced = async (email: string): Promise<void> => {
   }
 };
 
+// Delete candidate from database
+export const deleteCandidate = async (email: string): Promise<void> => {
+  try {
+    if (!db) throw new Error('Firestore not initialized');
+    const candidatesRef = collection(db, 'candidates');
+    const q = query(candidatesRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    for (const docSnap of querySnapshot.docs) {
+      await deleteDoc(doc(db, 'candidates', docSnap.id));
+    }
+  } catch (error) {
+    console.error('Error deleting candidate:', error);
+    throw error;
+  }
+};
+
 // Dropped Candidates Management
 const DROPPED_CANDIDATES_COLLECTION = 'dropped_candidates';
 
