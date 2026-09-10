@@ -148,17 +148,28 @@ export default function CandidatePerformanceTab({ slots }: CandidatePerformanceT
       });
     });
 
-    // Merge submitted requests data (match by candidate name)
+    // Merge submitted requests data (match by candidate name with fallback field names)
     submittedRequests.forEach(request => {
-      const candidateName = request.candidateName;
-      console.log(`🔎 Looking for candidate: "${candidateName}"`, 'Request:', request);
+      const candidateName = request.candidateName || request.name || request.candidate;
+      if (!candidateName) return;
+
+      console.log(`🔎 Looking for candidate: "${candidateName}"`, 'Request fields:', Object.keys(request));
+
       for (const [, data] of candidateMap.entries()) {
-        if (data.name === candidateName) {
-          console.log(`✅ MATCHED! Setting offer data:`, request);
-          if (request.company) data.offerCompany = request.company;
-          if (request.packageLPA) data.offerPackage = request.packageLPA;
-          if (request.offerStatus) data.offerStatus = request.offerStatus;
-          if (request.joiningDate) data.joiningDate = request.joiningDate;
+        if (data.name.toLowerCase() === candidateName.toLowerCase()) {
+          console.log(`✅ MATCHED! Request data:`, request);
+
+          // Try multiple field name variations
+          data.offerCompany = request.company || request.companyName || request.newCompany || null;
+          data.offerPackage = request.packageLPA || request.package || request.newPackage || null;
+          data.offerStatus = request.offerStatus || request.status || request.statusOffer || null;
+          data.joiningDate = request.joiningDate || request.expectedJoiningDate || request.startDate || null;
+
+          // Remove "₹" and "LPA" if it contains them
+          if (data.offerPackage && typeof data.offerPackage === 'string') {
+            data.offerPackage = data.offerPackage.replace(/[₹\s]/g, '').replace(/LPA/i, '').trim();
+          }
+
           break;
         }
       }
