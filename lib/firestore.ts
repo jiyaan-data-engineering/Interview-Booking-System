@@ -255,7 +255,14 @@ export const getCandidateProfileByEmail = async (email: string): Promise<any | n
       return null;
     }
 
-    return querySnapshot.docs[0].data();
+    const data = querySnapshot.docs[0].data();
+
+    // If createdAt is missing, try to add it from interview data if available
+    if (!data.createdAt) {
+      console.log(`⚠️ Candidate ${email} has no createdAt, will use interview date`);
+    }
+
+    return data;
   } catch (error) {
     console.error('Error fetching candidate profile by email:', error);
     return null;

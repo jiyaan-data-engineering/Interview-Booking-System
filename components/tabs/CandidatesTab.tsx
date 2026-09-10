@@ -12,6 +12,7 @@ interface CandidatesTabProps {
 export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabProps) {
   const [filterCandidate, setFilterCandidate] = useState('');
   const [filterActive, setFilterActive] = useState('');
+  const [filterDays, setFilterDays] = useState('');
   const [inactiveCandidates, setInactiveCandidates] = useState(new Set<string>());
   const [droppedCandidates, setDroppedCandidates] = useState(new Set<string>());
   const [showPasswordReset, setShowPasswordReset] = useState<string | null>(null);
@@ -42,12 +43,24 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
     setFilterActive('');
   }, []);
 
+  // Helper to get first interview date for a candidate
+  const getFirstInterviewDate = (interviews: InterviewSlot[]): string | undefined => {
+    if (interviews.length === 0) return undefined;
+    const sorted = [...interviews].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA - dateB;
+    });
+    return sorted[0]?.date;
+  };
+
   // Get unique candidates with their details
   const candidatesMap = new Map<string, {
     name: string;
     email: string;
     phone: string;
     interviews: InterviewSlot[];
+    candidateCreatedAt?: string;
   }>();
 
   slots.forEach(slot => {
@@ -124,6 +137,48 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
       else if (interview.status === 'postponed') overallStats.postponed++;
     });
   });
+
+  const calculateDaysSinceCreated = (candidateCreatedAtOrInterviews?: string | InterviewSlot[], interviews?: InterviewSlot[]): number => {
+    let dateToUse: Date | undefined;
+    let interviewList: InterviewSlot[] | undefined;
+
+    // Handle both calling conventions
+    if (typeof candidateCreatedAtOrInterviews === 'string') {
+      // Handle string dates (ISO or regular format)
+      if (candidateCreatedAtOrInterviews) {
+        try {
+          dateToUse = new Date(candidateCreatedAtOrInterviews);
+        } catch (e) {
+          console.error('Error parsing date:', candidateCreatedAtOrInterviews);
+        }
+      }
+      interviewList = interviews;
+    } else if (Array.isArray(candidateCreatedAtOrInterviews)) {
+      interviewList = candidateCreatedAtOrInterviews;
+    }
+
+    if (!dateToUse && (!interviewList || interviewList.length === 0)) return 0;
+
+    // Use candidate's actual createdAt if available, otherwise use earliest interview date
+    if (!dateToUse && interviewList && interviewList.length > 0) {
+      const firstInterview = interviewList[0];
+      const dateStr = firstInterview.createdAt || firstInterview.date;
+      if (dateStr) {
+        try {
+          dateToUse = new Date(dateStr);
+        } catch (e) {
+          console.error('Error parsing interview date:', dateStr);
+        }
+      }
+    }
+
+    if (!dateToUse || isNaN(dateToUse.getTime())) return 0;
+
+    const today = new Date();
+    const diffMs = today.getTime() - dateToUse.getTime();
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return days >= 0 ? days : 0;
+  };
 
   const toggleCandidateStatus = async (email: string) => {
     try {
@@ -349,11 +404,28 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
               <option value="inactive">❌ Inactive</option>
             </select>
           </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">📅 Days (Active Only)</label>
+            <select
+              value={filterDays}
+              onChange={(e) => setFilterDays(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">-- All Days --</option>
+              <option value="7">Last 7 Days</option>
+              <option value="14">Last 14 Days</option>
+              <option value="30">Last 30 Days</option>
+              <option value="60">Last 60 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="180">Last 180 Days</option>
+            </select>
+          </div>
           <div className="flex items-end">
             <button
               onClick={() => {
                 setFilterCandidate('');
                 setFilterActive('');
+                setFilterDays('');
                 setShowPasswordReset(null);
               }}
               className="w-full py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all"
@@ -372,13 +444,40 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
           <p className="text-slate-500 text-sm">Try adjusting your search or filters</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {candidates.map((candidate, idx) => (
+        <div className="space-y-12">
+          {/* GROUP 1: ACTIVE CANDIDATES */}
+          {(() => {
+            let active = candidates.filter(c => !inactiveCandidates.has(c.email) && !droppedCandidates.has(c.email) && !c.interviews.some(i => i.offerStatus === 'Received') && c.interviews.length > 0);
+
+            // Add first interview date to each candidate
+            active = active.map(c => ({
+              ...c,
+              candidateCreatedAt: getFirstInterviewDate(c.interviews) || c.candidateCreatedAt
+            }));
+
+            // Sort by days ascending (newest first)
+            active = active.sort((a, b) => calculateDaysSinceCreated(a.candidateCreatedAt, a.interviews) - calculateDaysSinceCreated(b.candidateCreatedAt, b.interviews));
+
+            // Filter by days if specified
+            if (filterDays) {
+              const daysThreshold = parseInt(filterDays);
+              active = active.filter(c => calculateDaysSinceCreated(c.candidateCreatedAt, c.interviews) <= daysThreshold);
+            }
+
+            return active.length > 0 ? (
+              <div>
+                <div className="flex items-center gap-3 mb-6 pb-3 border-b-2 border-green-500">
+                  <div className="text-3xl">✅</div>
+                  <h3 className="text-2xl font-bold text-green-400">ACTIVE CANDIDATES</h3>
+                  <span className="ml-auto bg-green-900/50 text-green-300 px-4 py-2 rounded-full text-lg font-bold">{active.length}</span>
+                </div>
+                <div className="space-y-4">
+                  {active.map((candidate, idx) => (
             <div key={candidate.email} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border-2 border-slate-600 hover:border-purple-500 transition-all shadow-lg">
               {/* Candidate Header */}
               <div className="flex justify-between items-start mb-4 pb-4 border-b border-slate-600">
                 <div className="flex-1">
-                  <div className="text-3xl font-bold text-white mb-4 flex items-center gap-3">
+                  <div className="text-3xl font-bold text-white mb-4 flex items-center gap-3 flex-wrap">
                     <span className="bg-purple-600 px-4 py-2 rounded-full text-lg font-bold">{idx + 1}</span>
                     {candidate.name}
                     {droppedCandidates.has(candidate.email) ? (
@@ -394,6 +493,15 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                         {inactiveCandidates.has(candidate.email) ? '❌ Inactive' : '✅ Active'}
                       </span>
                     )}
+                    {(() => {
+                      const days = calculateDaysSinceCreated(candidate.candidateCreatedAt, candidate.interviews);
+                      const dateUsed = candidate.candidateCreatedAt || (candidate.interviews[0]?.createdAt || candidate.interviews[0]?.date);
+                      return (
+                        <span className="text-sm px-3 py-1 rounded-full font-semibold bg-blue-900/50 text-blue-300 border border-blue-500" title={`Date: ${dateUsed || 'Unknown'}`}>
+                          📅 {days} days
+                        </span>
+                      );
+                    })()}
                   </div>
                   <div className="text-base text-slate-300 space-y-2 mb-4">
                     <div className="text-lg">📧 <span className="text-white font-semibold">{candidate.email}</span></div>
@@ -640,7 +748,746 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
 
 
             </div>
-          ))}
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
+          {/* GROUP 2: INACTIVE CANDIDATES */}
+          {(() => {
+            const inactive = candidates.filter(c => inactiveCandidates.has(c.email) && c.interviews.length > 0);
+            return inactive.length > 0 ? (
+              <div>
+                <div className="flex items-center gap-3 mb-6 pb-3 border-b-2 border-red-500">
+                  <div className="text-3xl">❌</div>
+                  <h3 className="text-2xl font-bold text-red-400">INACTIVE CANDIDATES</h3>
+                  <span className="ml-auto bg-red-900/50 text-red-300 px-4 py-2 rounded-full text-lg font-bold">{inactive.length}</span>
+                </div>
+                <div className="space-y-4">
+                  {inactive.map((candidate, idx) => (
+                    <div key={candidate.email} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border-2 border-red-600 hover:border-purple-500 transition-all shadow-lg">
+                      <div className="flex justify-between items-start mb-4 pb-4 border-b border-slate-600">
+                        <div className="flex-1">
+                          <div className="text-3xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span className="bg-red-600 px-4 py-2 rounded-full text-lg font-bold">{idx + 1}</span>
+                            {candidate.name}
+                            <span className="text-xs px-2 py-1 rounded-full font-semibold bg-red-900/50 text-red-300 border border-red-500">❌ Inactive</span>
+                          </div>
+                          <div className="text-base text-slate-300 space-y-2 mb-4">
+                            <div className="text-lg">📧 <span className="text-white font-semibold">{candidate.email}</span></div>
+                            <div className="text-lg">📱 <span className="text-white font-semibold">{candidate.phone}</span></div>
+                            <div className="text-lg font-semibold">📦 Batch No: <span className="text-white bg-red-600/30 px-3 py-1 rounded-lg border border-red-500">{candidate.interviews[0]?.batchNo || 'Not Set'}</span></div>
+                            {(candidate.interviews[0]?.currentCompany || candidate.interviews[0]?.employmentStatus || candidate.interviews[0]?.totalYearsExperience) && (
+                              <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-600">
+                                {candidate.interviews[0]?.employmentStatus && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💼 {candidate.interviews[0].employmentStatus}</span>}
+                                {candidate.interviews[0]?.currentCompany && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">🏢 {candidate.interviews[0].currentCompany.substring(0, 18)}{candidate.interviews[0].currentCompany.length > 18 ? '...' : ''}</span>}
+                                {candidate.interviews[0]?.lastCompanyPackage && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💰 ₹{candidate.interviews[0].lastCompanyPackage} LPA</span>}
+                                {candidate.interviews[0]?.totalYearsExperience && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">📅 {candidate.interviews[0].totalYearsExperience}y</span>}
+                                {candidate.interviews[0]?.experienceVerification && <span className={`px-3 py-1 rounded-lg text-sm font-bold ${candidate.interviews[0].experienceVerification === 'Genuine' ? 'bg-green-900/50 text-green-300 border border-green-500' : candidate.interviews[0].experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/50 text-yellow-300 border border-yellow-500' : 'bg-red-900/50 text-red-300 border border-red-500'}`}>{candidate.interviews[0].experienceVerification === 'Genuine' && '✅ Genuine'} {candidate.interviews[0].experienceVerification === 'Semi-Genuine' && '⚠️ Semi-Genuine'} {candidate.interviews[0].experienceVerification === 'Fake' && '❌ Fake'}</span>}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right space-y-2">
+                          <div>
+                            <div className="text-3xl font-bold text-red-400 mb-2">{candidate.interviews.length}</div>
+                            <div className="text-xs text-slate-400">Total Interviews</div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <button
+                              onClick={() => setShowPasswordReset(showPasswordReset === candidate.email ? null : candidate.email)}
+                              className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              🔐 Reset Pwd
+                            </button>
+                            {isAdmin && (
+                              <>
+                                <button
+                                  onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
+                                  className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                  🎯 Placed
+                                </button>
+                                <button
+                                  onClick={() => droppedCandidates.has(candidate.email)
+                                    ? handleMarkAsNotDrop(candidate.email, candidate.name)
+                                    : handleMarkAsDrop(candidate.email, candidate.name)
+                                  }
+                                  className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                                    droppedCandidates.has(candidate.email)
+                                      ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                                      : 'bg-orange-600 hover:bg-orange-700 text-white'
+                                  }`}
+                                >
+                                  {droppedCandidates.has(candidate.email) ? '↩️ Restore' : '⛔ Drop'}
+                                </button>
+                              </>
+                            )}
+                            <button
+                              onClick={() => toggleCandidateStatus(candidate.email)}
+                              className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                                inactiveCandidates.has(candidate.email)
+                                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                                  : 'bg-red-600 hover:bg-red-700 text-white'
+                              }`}
+                            >
+                              {inactiveCandidates.has(candidate.email) ? '♻️ Active' : '🚫 Inactive'}
+                            </button>
+                            <button
+                              onClick={() => startEdit({ name: candidate.name, email: candidate.email, phone: candidate.phone, interviews: candidate.interviews })}
+                              className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-purple-600 hover:bg-purple-700 text-white"
+                            >
+                              ✏️ Edit
+                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleDeleteCandidate(candidate.email, candidate.name)}
+                                className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-red-900 hover:bg-red-800 text-red-200 border border-red-600"
+                              >
+                                🗑️ Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {showPasswordReset === candidate.email && (
+                        <div className="mt-4 p-3 bg-slate-900/50 rounded border border-blue-500/50">
+                          <div className="text-xs text-blue-300 mb-2">
+                            🔄 To reset password, send this link to candidate:
+                          </div>
+                          <div className="text-xs text-slate-300 break-all font-mono bg-slate-800 p-2 rounded">
+                            https://interview-booking-system-ifph-theta.vercel.app/reset-password?email={candidate.email}
+                          </div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `https://interview-booking-system-ifph-theta.vercel.app/reset-password?email=${candidate.email}`
+                              );
+                              alert('Password reset link copied to clipboard!');
+                            }}
+                            className="text-xs mt-2 px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                          >
+                            📋 Copy Link
+                          </button>
+                        </div>
+                      )}
+
+                      {editingEmail === candidate.email && (
+                        <div className="mt-4 p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
+                          <h4 className="text-purple-300 font-semibold mb-3">Edit Candidate Information</h4>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Full Name *</label>
+                              <input
+                                type="text"
+                                value={editFormData.name}
+                                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Full Name"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Email Address *</label>
+                              <input
+                                type="email"
+                                value={editFormData.email}
+                                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Email"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Phone Number *</label>
+                              <input
+                                type="tel"
+                                value={editFormData.phone}
+                                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Phone"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Batch No *</label>
+                              <input
+                                type="text"
+                                value={editFormData.batchNo}
+                                onChange={(e) => setEditFormData({ ...editFormData, batchNo: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., Batch#9"
+                              />
+                            </div>
+                            <hr className="border-slate-600 my-3" />
+                            <div className="text-xs text-slate-300 font-semibold mb-2">📋 Candidate Profile</div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Employment Status</label>
+                              <select
+                                value={editFormData.employmentStatus}
+                                onChange={(e) => setEditFormData({ ...editFormData, employmentStatus: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                              >
+                                <option value="">-- Select --</option>
+                                <option value="Working">Working</option>
+                                <option value="Not Working">Not Working</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Current/Last Company</label>
+                              <input
+                                type="text"
+                                value={editFormData.currentCompany}
+                                onChange={(e) => setEditFormData({ ...editFormData, currentCompany: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., TCS"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Last Company Package (LPA)</label>
+                              <input
+                                type="text"
+                                value={editFormData.lastCompanyPackage}
+                                onChange={(e) => setEditFormData({ ...editFormData, lastCompanyPackage: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., 8.5"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Total Years of Experience</label>
+                              <input
+                                type="text"
+                                value={editFormData.totalYearsExperience}
+                                onChange={(e) => setEditFormData({ ...editFormData, totalYearsExperience: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., 5"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Experience Verification</label>
+                              <select
+                                value={editFormData.experienceVerification}
+                                onChange={(e) => setEditFormData({ ...editFormData, experienceVerification: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                              >
+                                <option value="">-- Select --</option>
+                                <option value="Genuine">✅ Genuine</option>
+                                <option value="Semi-Genuine">⚠️ Semi-Genuine</option>
+                                <option value="Fake">❌ Fake</option>
+                              </select>
+                            </div>
+                            <div className="flex gap-2 pt-3">
+                              <button
+                                onClick={saveEdit}
+                                className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold"
+                              >
+                                ✅ Save
+                              </button>
+                              <button
+                                onClick={() => setEditingEmail(null)}
+                                className="flex-1 px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded text-xs font-semibold"
+                              >
+                                ❌ Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
+          {/* GROUP 3: PLACED CANDIDATES */}
+          {(() => {
+            const placed = candidates.filter(c => c.interviews.some(i => i.offerStatus === 'Received') && !droppedCandidates.has(c.email) && c.interviews.length > 0);
+            return placed.length > 0 ? (
+              <div>
+                <div className="flex items-center gap-3 mb-6 pb-3 border-b-2 border-blue-500">
+                  <div className="text-3xl">🎯</div>
+                  <h3 className="text-2xl font-bold text-blue-400">PLACED CANDIDATES</h3>
+                  <span className="ml-auto bg-blue-900/50 text-blue-300 px-4 py-2 rounded-full text-lg font-bold">{placed.length}</span>
+                </div>
+                <div className="space-y-4">
+                  {placed.map((candidate, idx) => (
+                    <div key={candidate.email} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border-2 border-blue-500 hover:border-purple-500 transition-all shadow-lg">
+                      <div className="flex justify-between items-start mb-4 pb-4 border-b border-slate-600">
+                        <div className="flex-1">
+                          <div className="text-3xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span className="bg-blue-600 px-4 py-2 rounded-full text-lg font-bold">{idx + 1}</span>
+                            {candidate.name}
+                            <span className="text-xs px-2 py-1 rounded-full font-semibold bg-blue-900/50 text-blue-300 border border-blue-500">🎯 Placed</span>
+                          </div>
+                          <div className="text-base text-slate-300 space-y-2 mb-4">
+                            <div className="text-lg">📧 <span className="text-white font-semibold">{candidate.email}</span></div>
+                            <div className="text-lg">📱 <span className="text-white font-semibold">{candidate.phone}</span></div>
+                            <div className="text-lg font-semibold">📦 Batch No: <span className="text-white bg-blue-600/30 px-3 py-1 rounded-lg border border-blue-500">{candidate.interviews[0]?.batchNo || 'Not Set'}</span></div>
+                            {(candidate.interviews[0]?.currentCompany || candidate.interviews[0]?.employmentStatus || candidate.interviews[0]?.totalYearsExperience) && (
+                              <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-600">
+                                {candidate.interviews[0]?.employmentStatus && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💼 {candidate.interviews[0].employmentStatus}</span>}
+                                {candidate.interviews[0]?.currentCompany && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">🏢 {candidate.interviews[0].currentCompany.substring(0, 18)}{candidate.interviews[0].currentCompany.length > 18 ? '...' : ''}</span>}
+                                {candidate.interviews[0]?.lastCompanyPackage && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💰 ₹{candidate.interviews[0].lastCompanyPackage} LPA</span>}
+                                {candidate.interviews[0]?.totalYearsExperience && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">📅 {candidate.interviews[0].totalYearsExperience}y</span>}
+                                {candidate.interviews[0]?.experienceVerification && <span className={`px-3 py-1 rounded-lg text-sm font-bold ${candidate.interviews[0].experienceVerification === 'Genuine' ? 'bg-green-900/50 text-green-300 border border-green-500' : candidate.interviews[0].experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/50 text-yellow-300 border border-yellow-500' : 'bg-red-900/50 text-red-300 border border-red-500'}`}>{candidate.interviews[0].experienceVerification === 'Genuine' && '✅ Genuine'} {candidate.interviews[0].experienceVerification === 'Semi-Genuine' && '⚠️ Semi-Genuine'} {candidate.interviews[0].experienceVerification === 'Fake' && '❌ Fake'}</span>}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right space-y-2">
+                          <div>
+                            <div className="text-3xl font-bold text-blue-400 mb-2">{candidate.interviews.length}</div>
+                            <div className="text-xs text-slate-400">Total Interviews</div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <button
+                              onClick={() => setShowPasswordReset(showPasswordReset === candidate.email ? null : candidate.email)}
+                              className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              🔐 Reset Pwd
+                            </button>
+                            {isAdmin && (
+                              <>
+                                <button
+                                  onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
+                                  className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                  🎯 Placed
+                                </button>
+                                <button
+                                  onClick={() => droppedCandidates.has(candidate.email)
+                                    ? handleMarkAsNotDrop(candidate.email, candidate.name)
+                                    : handleMarkAsDrop(candidate.email, candidate.name)
+                                  }
+                                  className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                                    droppedCandidates.has(candidate.email)
+                                      ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                                      : 'bg-orange-600 hover:bg-orange-700 text-white'
+                                  }`}
+                                >
+                                  {droppedCandidates.has(candidate.email) ? '↩️ Restore' : '⛔ Drop'}
+                                </button>
+                              </>
+                            )}
+                            <button
+                              onClick={() => toggleCandidateStatus(candidate.email)}
+                              className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                                inactiveCandidates.has(candidate.email)
+                                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                                  : 'bg-red-600 hover:bg-red-700 text-white'
+                              }`}
+                            >
+                              {inactiveCandidates.has(candidate.email) ? '♻️ Active' : '🚫 Inactive'}
+                            </button>
+                            <button
+                              onClick={() => startEdit({ name: candidate.name, email: candidate.email, phone: candidate.phone, interviews: candidate.interviews })}
+                              className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-purple-600 hover:bg-purple-700 text-white"
+                            >
+                              ✏️ Edit
+                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleDeleteCandidate(candidate.email, candidate.name)}
+                                className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-red-900 hover:bg-red-800 text-red-200 border border-red-600"
+                              >
+                                🗑️ Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {showPasswordReset === candidate.email && (
+                        <div className="mt-4 p-3 bg-slate-900/50 rounded border border-blue-500/50">
+                          <div className="text-xs text-blue-300 mb-2">
+                            🔄 To reset password, send this link to candidate:
+                          </div>
+                          <div className="text-xs text-slate-300 break-all font-mono bg-slate-800 p-2 rounded">
+                            https://interview-booking-system-ifph-theta.vercel.app/reset-password?email={candidate.email}
+                          </div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `https://interview-booking-system-ifph-theta.vercel.app/reset-password?email=${candidate.email}`
+                              );
+                              alert('Password reset link copied to clipboard!');
+                            }}
+                            className="text-xs mt-2 px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                          >
+                            📋 Copy Link
+                          </button>
+                        </div>
+                      )}
+
+                      {editingEmail === candidate.email && (
+                        <div className="mt-4 p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
+                          <h4 className="text-purple-300 font-semibold mb-3">Edit Candidate Information</h4>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Full Name *</label>
+                              <input
+                                type="text"
+                                value={editFormData.name}
+                                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Full Name"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Email Address *</label>
+                              <input
+                                type="email"
+                                value={editFormData.email}
+                                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Email"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Phone Number *</label>
+                              <input
+                                type="tel"
+                                value={editFormData.phone}
+                                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Phone"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Batch No *</label>
+                              <input
+                                type="text"
+                                value={editFormData.batchNo}
+                                onChange={(e) => setEditFormData({ ...editFormData, batchNo: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., Batch#9"
+                              />
+                            </div>
+                            <hr className="border-slate-600 my-3" />
+                            <div className="text-xs text-slate-300 font-semibold mb-2">📋 Candidate Profile</div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Employment Status</label>
+                              <select
+                                value={editFormData.employmentStatus}
+                                onChange={(e) => setEditFormData({ ...editFormData, employmentStatus: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                              >
+                                <option value="">-- Select --</option>
+                                <option value="Working">Working</option>
+                                <option value="Not Working">Not Working</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Current/Last Company</label>
+                              <input
+                                type="text"
+                                value={editFormData.currentCompany}
+                                onChange={(e) => setEditFormData({ ...editFormData, currentCompany: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., TCS"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Last Company Package (LPA)</label>
+                              <input
+                                type="text"
+                                value={editFormData.lastCompanyPackage}
+                                onChange={(e) => setEditFormData({ ...editFormData, lastCompanyPackage: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., 8.5"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Total Years of Experience</label>
+                              <input
+                                type="text"
+                                value={editFormData.totalYearsExperience}
+                                onChange={(e) => setEditFormData({ ...editFormData, totalYearsExperience: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., 5"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Experience Verification</label>
+                              <select
+                                value={editFormData.experienceVerification}
+                                onChange={(e) => setEditFormData({ ...editFormData, experienceVerification: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                              >
+                                <option value="">-- Select --</option>
+                                <option value="Genuine">✅ Genuine</option>
+                                <option value="Semi-Genuine">⚠️ Semi-Genuine</option>
+                                <option value="Fake">❌ Fake</option>
+                              </select>
+                            </div>
+                            <div className="flex gap-2 pt-3">
+                              <button
+                                onClick={saveEdit}
+                                className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold"
+                              >
+                                ✅ Save
+                              </button>
+                              <button
+                                onClick={() => setEditingEmail(null)}
+                                className="flex-1 px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded text-xs font-semibold"
+                              >
+                                ❌ Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
+
+          {/* GROUP 4: DROPPED CANDIDATES */}
+          {(() => {
+            const dropped = candidates.filter(c => droppedCandidates.has(c.email) && c.interviews.length > 0);
+            return dropped.length > 0 ? (
+              <div>
+                <div className="flex items-center gap-3 mb-6 pb-3 border-b-2 border-gray-500">
+                  <div className="text-3xl">⛔</div>
+                  <h3 className="text-2xl font-bold text-gray-400">DROPPED CANDIDATES</h3>
+                  <span className="ml-auto bg-gray-900/50 text-gray-300 px-4 py-2 rounded-full text-lg font-bold">{dropped.length}</span>
+                </div>
+                <div className="space-y-4">
+                  {dropped.map((candidate, idx) => (
+                    <div key={candidate.email} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border-2 border-gray-600 hover:border-purple-500 transition-all shadow-lg opacity-75">
+                      <div className="flex justify-between items-start mb-4 pb-4 border-b border-slate-600">
+                        <div className="flex-1">
+                          <div className="text-3xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span className="bg-gray-600 px-4 py-2 rounded-full text-lg font-bold">{idx + 1}</span>
+                            {candidate.name}
+                            <span className="text-xs px-2 py-1 rounded-full font-semibold bg-gray-900/50 text-gray-300 border border-gray-600">⛔ Dropped</span>
+                          </div>
+                          <div className="text-base text-slate-300 space-y-2 mb-4">
+                            <div className="text-lg">📧 <span className="text-white font-semibold">{candidate.email}</span></div>
+                            <div className="text-lg">📱 <span className="text-white font-semibold">{candidate.phone}</span></div>
+                            <div className="text-lg font-semibold">📦 Batch No: <span className="text-white bg-gray-700/30 px-3 py-1 rounded-lg border border-gray-600">{candidate.interviews[0]?.batchNo || 'Not Set'}</span></div>
+                            {(candidate.interviews[0]?.currentCompany || candidate.interviews[0]?.employmentStatus || candidate.interviews[0]?.totalYearsExperience) && (
+                              <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-600">
+                                {candidate.interviews[0]?.employmentStatus && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💼 {candidate.interviews[0].employmentStatus}</span>}
+                                {candidate.interviews[0]?.currentCompany && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">🏢 {candidate.interviews[0].currentCompany.substring(0, 18)}{candidate.interviews[0].currentCompany.length > 18 ? '...' : ''}</span>}
+                                {candidate.interviews[0]?.lastCompanyPackage && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💰 ₹{candidate.interviews[0].lastCompanyPackage} LPA</span>}
+                                {candidate.interviews[0]?.totalYearsExperience && <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">📅 {candidate.interviews[0].totalYearsExperience}y</span>}
+                                {candidate.interviews[0]?.experienceVerification && <span className={`px-3 py-1 rounded-lg text-sm font-bold ${candidate.interviews[0].experienceVerification === 'Genuine' ? 'bg-green-900/50 text-green-300 border border-green-500' : candidate.interviews[0].experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/50 text-yellow-300 border border-yellow-500' : 'bg-red-900/50 text-red-300 border border-red-500'}`}>{candidate.interviews[0].experienceVerification === 'Genuine' && '✅ Genuine'} {candidate.interviews[0].experienceVerification === 'Semi-Genuine' && '⚠️ Semi-Genuine'} {candidate.interviews[0].experienceVerification === 'Fake' && '❌ Fake'}</span>}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right space-y-2">
+                          <div>
+                            <div className="text-3xl font-bold text-gray-400 mb-2">{candidate.interviews.length}</div>
+                            <div className="text-xs text-slate-400">Total Interviews</div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <button
+                              onClick={() => setShowPasswordReset(showPasswordReset === candidate.email ? null : candidate.email)}
+                              className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              🔐 Reset Pwd
+                            </button>
+                            {isAdmin && (
+                              <>
+                                <button
+                                  onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
+                                  className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                  🎯 Placed
+                                </button>
+                                <button
+                                  onClick={() => droppedCandidates.has(candidate.email)
+                                    ? handleMarkAsNotDrop(candidate.email, candidate.name)
+                                    : handleMarkAsDrop(candidate.email, candidate.name)
+                                  }
+                                  className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                                    droppedCandidates.has(candidate.email)
+                                      ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                                      : 'bg-orange-600 hover:bg-orange-700 text-white'
+                                  }`}
+                                >
+                                  {droppedCandidates.has(candidate.email) ? '↩️ Restore' : '⛔ Drop'}
+                                </button>
+                              </>
+                            )}
+                            <button
+                              onClick={() => toggleCandidateStatus(candidate.email)}
+                              className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                                inactiveCandidates.has(candidate.email)
+                                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                                  : 'bg-red-600 hover:bg-red-700 text-white'
+                              }`}
+                            >
+                              {inactiveCandidates.has(candidate.email) ? '♻️ Active' : '🚫 Inactive'}
+                            </button>
+                            <button
+                              onClick={() => startEdit({ name: candidate.name, email: candidate.email, phone: candidate.phone, interviews: candidate.interviews })}
+                              className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-purple-600 hover:bg-purple-700 text-white"
+                            >
+                              ✏️ Edit
+                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleDeleteCandidate(candidate.email, candidate.name)}
+                                className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-red-900 hover:bg-red-800 text-red-200 border border-red-600"
+                              >
+                                🗑️ Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {showPasswordReset === candidate.email && (
+                        <div className="mt-4 p-3 bg-slate-900/50 rounded border border-blue-500/50">
+                          <div className="text-xs text-blue-300 mb-2">
+                            🔄 To reset password, send this link to candidate:
+                          </div>
+                          <div className="text-xs text-slate-300 break-all font-mono bg-slate-800 p-2 rounded">
+                            https://interview-booking-system-ifph-theta.vercel.app/reset-password?email={candidate.email}
+                          </div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `https://interview-booking-system-ifph-theta.vercel.app/reset-password?email=${candidate.email}`
+                              );
+                              alert('Password reset link copied to clipboard!');
+                            }}
+                            className="text-xs mt-2 px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                          >
+                            📋 Copy Link
+                          </button>
+                        </div>
+                      )}
+
+                      {editingEmail === candidate.email && (
+                        <div className="mt-4 p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
+                          <h4 className="text-purple-300 font-semibold mb-3">Edit Candidate Information</h4>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Full Name *</label>
+                              <input
+                                type="text"
+                                value={editFormData.name}
+                                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Full Name"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Email Address *</label>
+                              <input
+                                type="email"
+                                value={editFormData.email}
+                                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Email"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Phone Number *</label>
+                              <input
+                                type="tel"
+                                value={editFormData.phone}
+                                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="Phone"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Batch No *</label>
+                              <input
+                                type="text"
+                                value={editFormData.batchNo}
+                                onChange={(e) => setEditFormData({ ...editFormData, batchNo: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., Batch#9"
+                              />
+                            </div>
+                            <hr className="border-slate-600 my-3" />
+                            <div className="text-xs text-slate-300 font-semibold mb-2">📋 Candidate Profile</div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Employment Status</label>
+                              <select
+                                value={editFormData.employmentStatus}
+                                onChange={(e) => setEditFormData({ ...editFormData, employmentStatus: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                              >
+                                <option value="">-- Select --</option>
+                                <option value="Working">Working</option>
+                                <option value="Not Working">Not Working</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Current/Last Company</label>
+                              <input
+                                type="text"
+                                value={editFormData.currentCompany}
+                                onChange={(e) => setEditFormData({ ...editFormData, currentCompany: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., TCS"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Last Company Package (LPA)</label>
+                              <input
+                                type="text"
+                                value={editFormData.lastCompanyPackage}
+                                onChange={(e) => setEditFormData({ ...editFormData, lastCompanyPackage: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., 8.5"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Total Years of Experience</label>
+                              <input
+                                type="text"
+                                value={editFormData.totalYearsExperience}
+                                onChange={(e) => setEditFormData({ ...editFormData, totalYearsExperience: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                                placeholder="e.g., 5"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs text-slate-400 mb-1 block">Experience Verification</label>
+                              <select
+                                value={editFormData.experienceVerification}
+                                onChange={(e) => setEditFormData({ ...editFormData, experienceVerification: e.target.value })}
+                                className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm"
+                              >
+                                <option value="">-- Select --</option>
+                                <option value="Genuine">✅ Genuine</option>
+                                <option value="Semi-Genuine">⚠️ Semi-Genuine</option>
+                                <option value="Fake">❌ Fake</option>
+                              </select>
+                            </div>
+                            <div className="flex gap-2 pt-3">
+                              <button
+                                onClick={saveEdit}
+                                className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-xs font-semibold"
+                              >
+                                ✅ Save
+                              </button>
+                              <button
+                                onClick={() => setEditingEmail(null)}
+                                className="flex-1 px-3 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded text-xs font-semibold"
+                              >
+                                ❌ Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null;
+          })()}
         </div>
       )}
     </div>
