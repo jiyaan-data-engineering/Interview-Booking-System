@@ -374,12 +374,12 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
       ) : (
         <div className="space-y-6">
           {candidates.map((candidate, idx) => (
-            <div key={candidate.email} className="bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-slate-600 transition-all">
+            <div key={candidate.email} className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 border-2 border-slate-600 hover:border-purple-500 transition-all shadow-lg">
               {/* Candidate Header */}
               <div className="flex justify-between items-start mb-4 pb-4 border-b border-slate-600">
                 <div className="flex-1">
-                  <div className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                    <span className="bg-purple-600 px-3 py-1 rounded-full text-sm font-bold">{idx + 1}</span>
+                  <div className="text-3xl font-bold text-white mb-4 flex items-center gap-3">
+                    <span className="bg-purple-600 px-4 py-2 rounded-full text-lg font-bold">{idx + 1}</span>
                     {candidate.name}
                     {droppedCandidates.has(candidate.email) ? (
                       <span className="text-xs px-2 py-1 rounded-full font-semibold bg-black/50 text-gray-300 border border-gray-600">
@@ -395,37 +395,36 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                       </span>
                     )}
                   </div>
-                  <div className="text-sm text-slate-400 space-y-1">
-                    <div>📧 {candidate.email}</div>
-                    <div>📱 {candidate.phone}</div>
-                    <div className="text-sm text-slate-300 font-semibold pt-2">
-                      📦 Batch No: <span className="text-white bg-slate-700 px-2 py-1 rounded">{candidate.interviews[0]?.batchNo || 'Not Set'}</span>
+                  <div className="text-base text-slate-300 space-y-2 mb-4">
+                    <div className="text-lg">📧 <span className="text-white font-semibold">{candidate.email}</span></div>
+                    <div className="text-lg">📱 <span className="text-white font-semibold">{candidate.phone}</span></div>
+                    <div className="text-lg font-semibold">
+                      📦 Batch No: <span className="text-white bg-blue-600/30 px-3 py-1 rounded-lg border border-blue-500">{candidate.interviews[0]?.batchNo || 'Not Set'}</span>
                     </div>
 
-                    {/* Candidate Profile Information */}
+                    {/* Candidate Profile Information - INLINE TAGS */}
                     {(candidate.interviews[0]?.currentCompany || candidate.interviews[0]?.employmentStatus || candidate.interviews[0]?.totalYearsExperience) && (
-                      <div className="pt-3 border-t border-slate-600 mt-3">
-                        <div className="text-xs text-slate-400 font-semibold mb-2">📋 Profile Info</div>
+                      <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-600">
                         {candidate.interviews[0]?.employmentStatus && (
-                          <div className="text-xs text-slate-300">💼 Status: <span className="text-white">{candidate.interviews[0].employmentStatus}</span></div>
+                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💼 {candidate.interviews[0].employmentStatus}</span>
                         )}
                         {candidate.interviews[0]?.currentCompany && (
-                          <div className="text-xs text-slate-300">🏢 Company: <span className="text-white">{candidate.interviews[0].currentCompany}</span></div>
+                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">🏢 {candidate.interviews[0].currentCompany.substring(0, 18)}{candidate.interviews[0].currentCompany.length > 18 ? '...' : ''}</span>
                         )}
                         {candidate.interviews[0]?.lastCompanyPackage && (
-                          <div className="text-xs text-slate-300">💰 Package: <span className="text-white">₹{candidate.interviews[0].lastCompanyPackage} LPA</span></div>
+                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">💰 ₹{candidate.interviews[0].lastCompanyPackage} LPA</span>
                         )}
                         {candidate.interviews[0]?.totalYearsExperience && (
-                          <div className="text-xs text-slate-300">📅 Experience: <span className="text-white">{candidate.interviews[0].totalYearsExperience} years</span></div>
+                          <span className="bg-slate-700 text-white px-3 py-1 rounded-lg text-sm font-semibold">📅 {candidate.interviews[0].totalYearsExperience}y</span>
                         )}
                         {candidate.interviews[0]?.experienceVerification && (
-                          <div className={`text-xs font-semibold mt-1 px-2 py-1 rounded w-fit ${
-                            candidate.interviews[0].experienceVerification === 'Genuine' ? 'bg-green-900/30 text-green-300' :
-                            candidate.interviews[0].experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/30 text-yellow-300' :
-                            'bg-red-900/30 text-red-300'
+                          <span className={`px-3 py-1 rounded-lg text-sm font-bold ${
+                            candidate.interviews[0].experienceVerification === 'Genuine' ? 'bg-green-900/50 text-green-300 border border-green-500' :
+                            candidate.interviews[0].experienceVerification === 'Semi-Genuine' ? 'bg-yellow-900/50 text-yellow-300 border border-yellow-500' :
+                            'bg-red-900/50 text-red-300 border border-red-500'
                           }`}>
-                            {candidate.interviews[0].experienceVerification === 'Genuine' && '✅'} {candidate.interviews[0].experienceVerification === 'Semi-Genuine' && '⚠️'} {candidate.interviews[0].experienceVerification === 'Fake' && '❌'} {candidate.interviews[0].experienceVerification}
-                          </div>
+                            {candidate.interviews[0].experienceVerification === 'Genuine' && '✅ Genuine'} {candidate.interviews[0].experienceVerification === 'Semi-Genuine' && '⚠️ Semi-Genuine'} {candidate.interviews[0].experienceVerification === 'Fake' && '❌ Fake'}
+                          </span>
                         )}
                       </div>
                     )}
@@ -458,62 +457,64 @@ export default function CandidatesTab({ slots, isAdmin = false }: CandidatesTabP
                 </div>
                 <div className="text-right space-y-2">
                   <div>
-                    <div className="text-3xl font-bold text-blue-400 mb-1">{candidate.interviews.length}</div>
+                    <div className="text-3xl font-bold text-blue-400 mb-2">{candidate.interviews.length}</div>
                     <div className="text-xs text-slate-400">Total Interviews</div>
                   </div>
-                  <button
-                    onClick={() => setShowPasswordReset(showPasswordReset === candidate.email ? null : candidate.email)}
-                    className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    🔐 Reset Password
-                  </button>
-                  {isAdmin && (
-                    <>
-                      <button
-                        onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
-                        className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-                      >
-                        🎯 Mark as Placed
-                      </button>
-                      <button
-                        onClick={() => droppedCandidates.has(candidate.email)
-                          ? handleMarkAsNotDrop(candidate.email, candidate.name)
-                          : handleMarkAsDrop(candidate.email, candidate.name)
-                        }
-                        className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full ${
-                          droppedCandidates.has(candidate.email)
-                            ? 'bg-gray-600 hover:bg-gray-700 text-white'
-                            : 'bg-orange-600 hover:bg-orange-700 text-white'
-                        }`}
-                      >
-                        {droppedCandidates.has(candidate.email) ? '↩️ Restore Drop' : '⛔ Mark as Drop'}
-                      </button>
-                    </>
-                  )}
-                  <button
-                    onClick={() => toggleCandidateStatus(candidate.email)}
-                    className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full ${
-                      inactiveCandidates.has(candidate.email)
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : 'bg-red-600 hover:bg-red-700 text-white'
-                    }`}
-                  >
-                    {inactiveCandidates.has(candidate.email) ? '♻️ Make Active' : '🚫 Make Inactive'}
-                  </button>
-                  <button
-                    onClick={() => startEdit({ name: candidate.name, email: candidate.email, phone: candidate.phone, interviews: candidate.interviews })}
-                    className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-purple-600 hover:bg-purple-700 text-white"
-                  >
-                    ✏️ Edit Info
-                  </button>
-                  {isAdmin && (
+                  <div className="grid grid-cols-2 gap-1.5">
                     <button
-                      onClick={() => handleDeleteCandidate(candidate.email, candidate.name)}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all w-full bg-red-900 hover:bg-red-800 text-red-200 border border-red-600"
+                      onClick={() => setShowPasswordReset(showPasswordReset === candidate.email ? null : candidate.email)}
+                      className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      🗑️ Delete Candidate
+                      🔐 Reset Pwd
                     </button>
-                  )}
+                    {isAdmin && (
+                      <>
+                        <button
+                          onClick={() => handleMarkAsPlaced(candidate.email, candidate.name)}
+                          className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-emerald-600 hover:bg-emerald-700 text-white"
+                        >
+                          🎯 Placed
+                        </button>
+                        <button
+                          onClick={() => droppedCandidates.has(candidate.email)
+                            ? handleMarkAsNotDrop(candidate.email, candidate.name)
+                            : handleMarkAsDrop(candidate.email, candidate.name)
+                          }
+                          className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                            droppedCandidates.has(candidate.email)
+                              ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                              : 'bg-orange-600 hover:bg-orange-700 text-white'
+                          }`}
+                        >
+                          {droppedCandidates.has(candidate.email) ? '↩️ Restore' : '⛔ Drop'}
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => toggleCandidateStatus(candidate.email)}
+                      className={`px-2 py-1 rounded text-[11px] font-semibold transition-all ${
+                        inactiveCandidates.has(candidate.email)
+                          ? 'bg-green-600 hover:bg-green-700 text-white'
+                          : 'bg-red-600 hover:bg-red-700 text-white'
+                      }`}
+                    >
+                      {inactiveCandidates.has(candidate.email) ? '♻️ Active' : '🚫 Inactive'}
+                    </button>
+                    <button
+                      onClick={() => startEdit({ name: candidate.name, email: candidate.email, phone: candidate.phone, interviews: candidate.interviews })}
+                      className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      ✏️ Edit
+                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteCandidate(candidate.email, candidate.name)}
+                        className="px-2 py-1 rounded text-[11px] font-semibold transition-all bg-red-900 hover:bg-red-800 text-red-200 border border-red-600"
+                      >
+                        🗑️ Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
